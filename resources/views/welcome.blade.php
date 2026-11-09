@@ -28,36 +28,34 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <style>
-        /* Sembunyikan scrollbar bawaan agar tampilan aplikasi mulus tanpa scroll */
+        /* Sembunyikan scrollbar visual bawaan agar tampilan aplikasi mulus dan tetap bisa di-scroll */
         ::-webkit-scrollbar {
             display: none !important;
             width: 0 !important;
             height: 0 !important;
         }
-        html, body {
+        html, body, * {
             -ms-overflow-style: none !important;
             scrollbar-width: none !important;
-            height: 100%;
-            overflow: hidden;
         }
     </style>
 </head>
 
-<body class="h-screen h-[100dvh] bg-slate-100 font-sans text-slate-900 antialiased flex flex-col items-center sm:justify-start sm:pt-2 sm:pb-6 sm:px-4">
+<body class="min-h-screen min-h-[100dvh] bg-slate-100 font-sans text-slate-900 antialiased flex flex-col items-center sm:justify-start sm:py-4 sm:px-4">
     <!-- Centered Mobile App Container matching the design mockup -->
-    <main class="w-full max-w-md h-full sm:h-[840px] sm:max-h-[calc(100dvh-1rem)] bg-white sm:rounded-[36px] sm:shadow-2xl sm:border sm:border-slate-200/80 flex flex-col justify-between overflow-hidden relative">
+    <main class="w-full max-w-md min-h-screen min-h-[100dvh] sm:min-h-0 sm:h-auto sm:max-h-[calc(100dvh-2rem)] bg-white sm:rounded-[36px] sm:shadow-2xl sm:border sm:border-slate-200/80 flex flex-col justify-between overflow-y-auto overflow-x-hidden relative">
         
         <!-- Header Section (Logo + Tagline) -->
-        <header class="pt-10 sm:pt-14 px-6 pb-2 text-center shrink-0 z-10">
+        <header class="pt-6 sm:pt-10 px-6 pb-2 text-center shrink-0 z-10">
             <x-sayabantu-logo size="lg" />
             
-            <h1 class="mt-4 sm:mt-5 text-base sm:text-[17px] font-bold text-slate-900 leading-snug tracking-tight">
+            <h1 class="mt-3 sm:mt-5 text-base sm:text-[17px] font-bold text-slate-900 leading-snug tracking-tight">
                 Jasa Serabutan,<br>Mudah, Cepat, Terpercaya
             </h1>
         </header>
 
         <!-- Center Hero Mascot Section -->
-        <section class="relative w-full flex-1 flex items-center justify-center overflow-hidden my-auto min-h-[180px] max-h-[300px]">
+        <section class="relative w-full flex-1 flex items-center justify-center overflow-hidden my-auto min-h-[140px] max-h-[300px]">
             <img src="{{ asset('images/landing-mascot.png') }}"
                  alt="Petugas sayabantu.com berkaus biru bertopi memberi jempol"
                  class="w-full h-full object-cover object-top select-none pointer-events-none">
@@ -69,7 +67,7 @@
         </section>
 
         <!-- Features Badges (Aman & Terpercaya, Proses Cepat, Harga Bersaing) -->
-        <section class="grid grid-cols-3 gap-2 px-6 pt-3 pb-4 text-center shrink-0">
+        <section class="grid grid-cols-3 gap-2 px-6 pt-2 pb-3 sm:pt-3 sm:pb-4 text-center shrink-0">
             <!-- Feature 1: Aman & Terpercaya -->
             <div class="flex flex-col items-center">
                 <div class="w-12 h-12 rounded-full bg-blue-50 text-[#0066FF] flex items-center justify-center mb-1.5 shadow-2xs">
@@ -109,10 +107,10 @@
         </section>
 
         <!-- CTA & Footer Section -->
-        <footer class="px-6 pb-8 sm:pb-10 pt-2 shrink-0">
+        <footer class="px-6 pb-6 sm:pb-8 pt-2 shrink-0">
             <!-- Mulai Sekarang Button -->
             <a href="{{ route('login') }}" wire:navigate
-               class="w-full flex items-center justify-center py-4 sm:py-4.5 rounded-full bg-[#0066FF] hover:bg-[#0055D4] active:scale-[0.98] text-white font-bold text-base shadow-md shadow-blue-500/25 transition cursor-pointer">
+               class="w-full flex items-center justify-center py-3.5 sm:py-4 rounded-full bg-[#0066FF] hover:bg-[#0055D4] active:scale-[0.98] text-white font-bold text-base shadow-md shadow-blue-500/25 transition cursor-pointer">
                 Mulai Sekarang
             </a>
         </footer>
