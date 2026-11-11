@@ -4,59 +4,63 @@
 
 ### Bantuan sosial, lebih dekat dan terkoordinasi.
 
-Platform yang menghubungkan **customer** yang membutuhkan bantuan dengan **mitra** yang siap membantu—dengan proses verifikasi, pemantauan, dan pengelolaan dana oleh admin.
+**Satu platform untuk menghubungkan orang yang membutuhkan bantuan dengan mitra yang siap membantu.**
+
+Customer mengajukan permintaan · Mitra membantu · Admin menjaga proses tetap terverifikasi
 
 <br>
 
 ![PHP](https://img.shields.io/badge/PHP-8.2%2B-777BB4?logo=php&logoColor=white)
 ![Laravel](https://img.shields.io/badge/Laravel-12-FF2D20?logo=laravel&logoColor=white)
 ![Livewire](https://img.shields.io/badge/Livewire-3-FB70A9?logo=livewire&logoColor=white)
-![UI](https://img.shields.io/badge/UI-Mobile--first-0EA5E9)
+![Mobile first](https://img.shields.io/badge/Experience-Mobile--first-0EA5E9)
 
 </div>
 
 ---
 
-## Tentang proyek
+## Mengapa SayaBantu?
 
-SayaBantu adalah aplikasi web **mobile-first** untuk mengelola layanan bantuan sosial on-demand. Customer membuat permintaan, mitra menangani pesanan, dan admin wilayah bersama super admin mengelola verifikasi, moderasi, serta pencairan dana.
+Mengelola bantuan sosial membutuhkan koordinasi yang jelas antara penerima bantuan, mitra lapangan, dan admin. **SayaBantu menyatukan alur tersebut dalam satu aplikasi**—dari pendaftaran dan verifikasi, permintaan bantuan, pelacakan pekerjaan, hingga pengelolaan saldo.
 
-Antarmuka dirancang dengan lebar maksimum 420 px dan navigasi bawah agar nyaman digunakan melalui ponsel.
+Aplikasi dibuat sebagai web app **mobile-first** dengan lebar antarmuka maksimum 420 px dan navigasi bawah, sehingga alur utama nyaman digunakan dari ponsel.
 
-## Peran dalam aplikasi
-
-| Peran | Tanggung jawab utama |
-|---|---|
-| **Customer** | Mendaftar, menyelesaikan onboarding, membuat permintaan, berkomunikasi dengan mitra, dan mengonfirmasi pekerjaan |
-| **Mitra** | Melengkapi verifikasi, mengambil permintaan, memperbarui perjalanan, dan mengunggah bukti pekerjaan |
-| **Admin wilayah** | Memeriksa pendaftaran dan KTP, mengelola transaksi, serta memoderasi aktivitas |
-| **Super admin** | Mengelola operasional dan pengawasan lintas wilayah |
-
-## Fitur utama
-
-- **Akun dan verifikasi:** registrasi, verifikasi email, login dengan email atau nomor HP, Google OAuth, dan onboarding KTP.
-- **Permintaan bantuan:** permintaan terjadwal atau urgent, pembatalan otomatis, dan pelacakan perjalanan mitra berbasis GPS (termasuk simulasi).
-- **Komunikasi dan akuntabilitas:** chat customer–mitra, rating dua arah, laporan pelanggaran, dan sanksi.
-- **Pengelolaan saldo:** penahanan saldo, top up dengan bukti transfer dan persetujuan, serta withdraw dengan persetujuan admin.
-- **Operasional admin:** panel admin wilayah dan super admin, activity log, serta ekspor transaksi ke Excel.
-- **Otomasi:** konfirmasi otomatis setelah 24 jam dan pembatalan permintaan kedaluwarsa melalui scheduler.
-
-> **Catatan integrasi pembayaran:** Midtrans saat ini tercatat sebagai kolom yang tersedia pada `balance_transactions`; jangan menganggap pembayaran Midtrans sudah aktif tanpa konfigurasi dan implementasi tambahan.
-
-## Alur permintaan bantuan
+## Cara kerja
 
 ```mermaid
 flowchart LR
-    A[Customer membuat permintaan] --> B[Saldo ditahan]
-    B --> C[Mitra mengambil permintaan]
-    C --> D[Mitra menuju lokasi dan mengerjakan]
-    D --> E[Mitra mengunggah bukti]
-    E --> F[Customer mengonfirmasi selesai]
-    F --> G[Saldo diteruskan ke mitra]
-    G --> H[Withdraw dengan persetujuan admin]
+    A[Customer daftar dan diverifikasi] --> B[Ajukan permintaan bantuan]
+    B --> C[Saldo ditahan]
+    C --> D[Mitra menerima permintaan]
+    D --> E[Perjalanan dan pengerjaan]
+    E --> F[Bukti pekerjaan diunggah]
+    F --> G[Customer mengonfirmasi]
+    G --> H[Saldo diteruskan ke mitra]
+    H --> I[Withdraw dengan persetujuan admin]
 ```
 
-Status bantuan yang digunakan aplikasi:
+## Untuk siapa?
+
+| Peran | Yang dapat dilakukan |
+|---|---|
+| **Customer** | Menyelesaikan onboarding, membuat permintaan, berkomunikasi dengan mitra, dan mengonfirmasi pekerjaan |
+| **Mitra** | Melengkapi verifikasi, mengambil permintaan, memperbarui perjalanan, dan mengunggah bukti pekerjaan |
+| **Admin wilayah** | Memverifikasi pendaftaran/KTP, memoderasi aktivitas, dan menyetujui transaksi |
+| **Super admin** | Memantau dan mengelola operasional lintas wilayah |
+
+## Fitur
+
+- **Akun terverifikasi** — registrasi, verifikasi email, login dengan email atau nomor HP, Google OAuth, dan onboarding KTP.
+- **Permintaan fleksibel** — bantuan terjadwal maupun urgent, dengan pembatalan otomatis untuk permintaan kedaluwarsa.
+- **Pelacakan pekerjaan** — status perjalanan mitra, GPS (termasuk simulasi), chat, serta unggah bukti.
+- **Kepercayaan dan keamanan** — rating dua arah, laporan pelanggaran, sanksi, dan verifikasi manual oleh admin.
+- **Pengelolaan dana** — penahanan saldo, top up dengan bukti transfer dan persetujuan, serta withdraw dengan persetujuan admin.
+- **Perangkat operasional** — panel admin wilayah dan super admin, activity log, serta ekspor transaksi ke Excel.
+- **Otomasi** — konfirmasi otomatis setelah 24 jam dan pembatalan otomatis melalui scheduler.
+
+> **Status pembayaran:** Midtrans belum dinyatakan sebagai integrasi pembayaran aktif. Saat ini informasi yang tersedia adalah kolom Midtrans pada `balance_transactions`.
+
+## Status bantuan
 
 ```text
 menunggu_mitra → memperoleh_mitra → partner_on_the_way → partner_arrived
@@ -64,21 +68,20 @@ menunggu_mitra → memperoleh_mitra → partner_on_the_way → partner_arrived
                                           └──────────→ dibatalkan / rejected
 ```
 
-Nilai status lama (`approved`, `taken`, `completed`, `cancelled`, `pending`) tetap dikenali melalui `HelpStatus::aliases()` dan telah dinormalkan oleh migration.
+Nilai lama (`approved`, `taken`, `completed`, `cancelled`, `pending`) tetap dikenali melalui `HelpStatus::aliases()` dan telah dinormalkan oleh migration.
 
 ## Teknologi
 
 | Area | Teknologi |
 |---|---|
 | Backend | PHP 8.2+, Laravel 12 |
-| UI dan frontend | Livewire 3, Volt, Alpine.js, Tailwind CSS, Vite |
+| Antarmuka | Livewire 3, Volt, Alpine.js, Tailwind CSS, Vite |
 | Autentikasi | Laravel Breeze, verifikasi email, Google OAuth (Socialite) |
-| Database | MySQL 8 / MariaDB untuk penggunaan aplikasi; SQLite in-memory untuk test |
-| Pembayaran | Kolom Midtrans tersedia di `balance_transactions` (lihat catatan integrasi di atas) |
+| Database | MySQL 8 / MariaDB; SQLite in-memory untuk test |
 
-## Menjalankan secara lokal
+## Mulai di komputer lokal
 
-### Persyaratan
+### Yang dibutuhkan
 
 - PHP 8.2+ dengan ekstensi `pdo`, `mbstring`, `gd`, dan `fileinfo`
 - Composer 2
@@ -87,85 +90,77 @@ Nilai status lama (`approved`, `taken`, `completed`, `cancelled`, `pending`) tet
 
 ### Instalasi
 
-1. Pasang dependency:
+```bash
+# Pasang dependency
+composer install
+npm install
 
-   ```bash
-   composer install
-   npm install
-   ```
+# Siapkan konfigurasi dan application key
+cp .env.example .env
+php artisan key:generate
+```
 
-2. Buat file environment dan application key:
+Atur `DB_DATABASE`, `DB_USERNAME`, dan `DB_PASSWORD` di `.env`. Tambahkan kredensial Google OAuth bila ingin memakai login Google.
 
-   ```bash
-   cp .env.example .env
-   php artisan key:generate
-   ```
+```bash
+# Siapkan database, storage, dan aset
+php artisan migrate --seed
+php artisan storage:link
+npm run build
 
-3. Isi koneksi database di `.env` (`DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`). Tambahkan kredensial Google OAuth bila diperlukan.
+# Jalankan aplikasi
+php artisan serve
+```
 
-4. Siapkan database, storage, dan aset:
+Buka [http://127.0.0.1:8000](http://127.0.0.1:8000).
 
-   ```bash
-   php artisan migrate --seed
-   php artisan storage:link
-   npm run build
-   ```
-
-5. Jalankan aplikasi:
-
-   ```bash
-   php artisan serve
-   ```
-
-   Buka [http://127.0.0.1:8000](http://127.0.0.1:8000).
-
-Untuk lingkungan development, `composer dev` menjalankan server Laravel, listener queue, scheduler, log, dan Vite secara bersamaan. Queue worker saat ini belum dibutuhkan oleh fitur notifikasi karena notifikasi dikirim sinkron; listener queue yang dimulai oleh skrip tersebut disediakan untuk kebutuhan development.
+Untuk development, `composer dev` menjalankan server Laravel, listener queue, scheduler, log, dan Vite secara bersamaan. Notifikasi saat ini dikirim sinkron; queue worker belum dibutuhkan oleh fitur notifikasi.
 
 ### Akun uji onboarding
 
-Seeder `database/seeders/UserSeeder.php` membuat akun berikut dengan password `Sayabantu123!`. Akun berstatus `active`, tetapi `is_completed = false`, sehingga login akan diarahkan ke langkah onboarding yang belum selesai.
+Seeder `database/seeders/UserSeeder.php` membuat akun berikut. Password semua akun adalah `Sayabantu123!`. Akun berstatus `active`, tetapi `is_completed = false`, sehingga login mengarahkan pengguna ke tahap onboarding yang belum selesai.
 
-| Email | Peran | Tahap onboarding |
+| Email | Peran | Tujuan setelah login |
 |---|---|---|
 | `customer.onboarding@sayabantu.com` | Customer | `onboarding/step1` (NIK belum diisi) |
 | `customer.pending@sayabantu.com` | Customer | `onboarding/step2` (unggah KTP) |
 | `mitra.pending@sayabantu.com` | Mitra | `onboarding/step2` (unggah KTP) |
 | `yusuf.mitra@test.com` | Mitra | `onboarding/step2` (unggah KTP) |
 
-Dua akun mitra juga memiliki entri `registrations` berstatus `pending_verification` untuk menguji antrean verifikasi KTP di panel admin.
+Dua akun mitra memiliki entri `registrations` berstatus `pending_verification` untuk mencoba antrean verifikasi KTP di panel admin.
 
-> Akun dan password ini untuk pengembangan/testing lokal saja. Jangan gunakan akun seeder atau password yang sama di production.
+> **Lokal saja:** akun seeder dan password tersebut hanya untuk development/testing. Jangan gunakan di production.
 
 ### Login demo
 
-`DEMO_LOGIN=true` mengaktifkan toleransi password demo (`Sayabantu123!`, `sayabantu123`, atau `password`) bagi akun yang memang menggunakan salah satu password tersebut. Nilai default di `.env.example` adalah `false`. **Jangan aktifkan fitur ini di production.**
+`DEMO_LOGIN=true` mengaktifkan toleransi password demo (`Sayabantu123!`, `sayabantu123`, atau `password`) bagi akun yang memang memakai salah satu password tersebut. Nilai default di `.env.example` adalah `false`. **Jangan aktifkan di production.**
 
-## Scheduler dan proses background
+## Scheduler
 
-Scheduler harus aktif agar tugas otomatis berjalan. Saat development gunakan:
+Scheduler harus aktif untuk menjalankan tugas otomatis. Saat development:
 
 ```bash
 php artisan schedule:work
 ```
 
-Di server, daftarkan cron untuk menjalankan scheduler setiap menit:
+Di server, tambahkan cron berikut agar scheduler dijalankan setiap menit:
 
 ```cron
 * * * * * cd /path/to/sayabantu && php artisan schedule:run >> /dev/null 2>&1
 ```
 
-Scheduler menjalankan `helps:auto-confirm` setiap 10 menit dan `helps:auto-cancel` setiap menit. Queue worker belum dibutuhkan untuk notifikasi saat ini. Jika kelak job menggunakan `ShouldQueue`, jalankan worker dengan `php artisan queue:work`.
+Jadwal aplikasi menjalankan `helps:auto-confirm` setiap 10 menit dan `helps:auto-cancel` setiap menit. Queue worker belum dibutuhkan untuk notifikasi saat ini. Jika kelak job menggunakan `ShouldQueue`, jalankan `php artisan queue:work`.
 
 ## Testing
 
-Test menggunakan SQLite in-memory melalui `phpunit.xml`, jadi tidak mengubah database MySQL lokal.
+Test menggunakan SQLite in-memory dari `phpunit.xml`, sehingga tidak mengubah database MySQL lokal.
 
 ```bash
 php artisan test
 php artisan test tests/Feature/Smoke
 ```
 
-Cakupan test meliputi autentikasi, verifikasi email, registrasi multi-step, profil, alur saldo dan withdraw, normalisasi status, serta smoke test halaman utama per role.
+Cakupan meliputi autentikasi, verifikasi email, registrasi multi-step, profil, saldo dan withdraw, normalisasi status, serta smoke test halaman utama per role.
 
 ## Perintah berguna
 
@@ -181,11 +176,11 @@ php artisan config:clear && php artisan cache:clear && php artisan view:clear
 
 ```text
 app/
-├── Enums/HelpStatus.php              Sumber nilai status bantuan dan alias legacy
+├── Enums/HelpStatus.php              Status bantuan dan alias legacy
 ├── Models/Help.php                   Model inti transaksi bantuan
-├── Models/Concerns/                  Trait status, timeline, payout, dan pembatalan mitra
-├── Livewire/                         Komponen customer, mitra, admin, dan super admin
-├── Observers/HelpObserver.php        Efek perubahan status, refund, dan pencairan saldo
+├── Models/Concerns/                  Trait status, timeline, payout, pembatalan mitra
+├── Livewire/                         Komponen customer, mitra, admin, super admin
+├── Observers/HelpObserver.php        Efek perubahan status, refund, pencairan saldo
 ├── Support/                          Utilitas master wilayah dan SQL lintas driver
 └── Console/Commands/                 Perintah bantuan dan maintenance
 
@@ -194,16 +189,16 @@ database/migrations/                  Skema dan perubahan database
 scripts/                              Skrip utilitas manual; lihat scripts/README.md
 ```
 
-## Status pengembangan
+## Roadmap
 
-**Tersedia:** autentikasi dan onboarding, verifikasi KTP manual, alur permintaan bantuan, tracking mitra, chat, rating, laporan pelanggaran, saldo/top up/withdraw, panel admin, activity log, dan ekspor transaksi Excel.
+**Sudah tersedia:** autentikasi dan onboarding, verifikasi KTP manual, alur permintaan bantuan, tracking mitra, chat, rating, laporan pelanggaran, saldo/top up/withdraw, panel admin, activity log, dan ekspor transaksi Excel.
 
 **Belum tersedia:** notifikasi real-time (Pusher/Laravel Echo), push notification, verifikasi KTP otomatis (OCR), dan ekspor laporan PDF.
 
-## Catatan keamanan dan operasional
+## Keamanan dan operasional
 
-- Production wajib menggunakan `APP_DEBUG=false`; nilai default di `.env.example` adalah `false`.
-- Jangan aktifkan `DEMO_LOGIN` di production dan jangan gunakan kredensial seeder di production.
+- Gunakan `APP_DEBUG=false` di production; nilai default di `.env.example` adalah `false`.
+- Jangan aktifkan `DEMO_LOGIN` atau gunakan kredensial seeder di production.
 - Log menggunakan channel `daily` (`LOG_STACK=daily`) dengan retensi 14 hari.
 - Aplikasi ini dibuat untuk tujuan pembelajaran dan sosial.
 
@@ -211,6 +206,6 @@ scripts/                              Skrip utilitas manual; lihat scripts/READM
 
 <div align="center">
 
-Dibangun dengan Laravel dan Livewire.
+**SayaBantu — teknologi untuk membantu, dengan proses yang lebih terkoordinasi.**
 
 </div>
