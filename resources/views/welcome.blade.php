@@ -4,6 +4,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="color-scheme" content="only light">
+    <meta name="supported-color-schemes" content="light">
     <title>sayabantu.com - Jasa Serabutan, Mudah, Cepat, Terpercaya</title>
     <meta name="description" content="Temukan jasa serabutan yang mudah, cepat, dan terpercaya di sekitar Anda.">
 
@@ -28,6 +30,16 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <style>
+        :root, html, body {
+            color-scheme: only light !important;
+        }
+        @media (prefers-color-scheme: dark) {
+            :root, html, body {
+                color-scheme: only light !important;
+                background-color: #f1f5f9 !important;
+                color: #0f172a !important;
+            }
+        }
         /* Sembunyikan scrollbar visual bawaan agar tampilan aplikasi mulus dan tetap bisa di-scroll */
         ::-webkit-scrollbar {
             display: none !important;
@@ -46,7 +58,7 @@
     <main class="w-full max-w-md min-h-screen min-h-[100dvh] sm:min-h-0 sm:h-auto sm:max-h-[calc(100dvh-2rem)] bg-white sm:rounded-[36px] sm:shadow-2xl sm:border sm:border-slate-200/80 flex flex-col justify-between overflow-y-auto overflow-x-hidden relative">
         
         <!-- Header Section (Logo + Tagline) -->
-        <header class="pt-6 sm:pt-10 px-6 pb-2 text-center shrink-0 z-10">
+        <header class="pt-8 sm:pt-10 px-6 pb-2 text-center shrink-0 z-10">
             <x-sayabantu-logo size="lg" />
             
             <h1 class="mt-3 sm:mt-5 text-base sm:text-[17px] font-bold text-slate-900 leading-snug tracking-tight">

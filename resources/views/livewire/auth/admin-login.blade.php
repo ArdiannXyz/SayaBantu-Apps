@@ -191,11 +191,7 @@
                             @php
                                 $adminAccounts = [
                                     ['name' => 'Super Admin', 'desc' => 'Akses Penuh Nasional', 'email' => 'superadmin@sayabantu.com', 'icon' => '👑'],
-                                    ['name' => 'Admin DI Yogyakarta', 'desc' => 'Kota Yogya, Sleman, Bantul', 'email' => 'admin.jogja@test.com', 'icon' => '🛡️'],
-                                    ['name' => 'Admin Jakarta Pusat', 'desc' => 'Kota Jakarta Pusat', 'email' => 'admin.jakarta@sayabantu.com', 'icon' => '🛡️'],
-                                    ['name' => 'Admin Jakarta Selatan', 'desc' => 'Kota Jakarta Selatan', 'email' => 'admin.jaksel@sayabantu.com', 'icon' => '🛡️'],
-                                    ['name' => 'Admin Kota Bogor', 'desc' => 'Kota Bogor (Jawa Barat)', 'email' => 'admin.bogor@sayabantu.com', 'icon' => '🛡️'],
-                                    ['name' => 'Admin Utama', 'desc' => 'Operasional Wilayah', 'email' => 'admin@sayabantu.com', 'icon' => '🛡️'],
+                                    ['name' => 'Admin DI Yogyakarta', 'desc' => 'Kota Yogya, Sleman, Bantul', 'email' => 'admin.jogja@sayabantu.com', 'icon' => '🛡️'],
                                 ];
                             @endphp
 

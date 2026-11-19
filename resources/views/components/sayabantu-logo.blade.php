@@ -31,11 +31,19 @@
         'xl' => '-top-10',
         default => '-top-7',
     };
+    $topPadding = match($size) {
+        'xs' => 'pt-5',
+        'sm' => 'pt-6',
+        'md' => 'pt-7',
+        'lg' => 'pt-8',
+        'xl' => 'pt-10',
+        default => 'pt-7',
+    };
     $appIcon = \App\Models\AppSetting::get('app_icon');
     $iconUrl = $customIconUrl ?: ($appIcon && \Illuminate\Support\Facades\Storage::disk('public')->exists($appIcon) ? asset('storage/' . $appIcon) : null);
 @endphp
 
-<div {{ $attributes->merge(['class' => 'inline-flex flex-col items-center justify-center select-none']) }}>
+<div {{ $attributes->merge(['class' => 'inline-flex flex-col items-center justify-center select-none ' . $topPadding]) }}>
     <div class="flex items-center justify-center font-black tracking-tight leading-none {{ $textClasses }}">
         <span class="{{ $light ? 'text-white' : 'text-[#0066FF]' }}">saya</span>
         

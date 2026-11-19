@@ -1,0 +1,260 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2600 1850" width="2600" height="1850" style="background:#ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+    <defs>
+        <pattern id="grid-fc" width="24" height="24" patternUnits="userSpaceOnUse">
+            <circle cx="2" cy="2" r="1.2" fill="#cbd5e1" opacity="0.6"/>
+        </pattern>
+        <filter id="card-shadow" x="-5%" y="-5%" width="112%" height="112%">
+            <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#0f172a" flood-opacity="0.06"/>
+            <feDropShadow dx="0" dy="1" stdDeviation="2" flood-color="#0f172a" flood-opacity="0.04"/>
+        </filter>
+        <filter id="banner-shadow-fc" x="-3%" y="-5%" width="106%" height="115%">
+            <feDropShadow dx="0" dy="6" stdDeviation="12" flood-color="#0f172a" flood-opacity="0.07"/>
+        </filter>
+
+        <!-- Arrow Markers -->
+        <marker id="fc-arrow-blue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#2563eb" />
+        </marker>
+        <marker id="fc-arrow-indigo" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#4f46e5" />
+        </marker>
+        <marker id="fc-arrow-green" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#059669" />
+        </marker>
+        <marker id="fc-arrow-red" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#dc2626" />
+        </marker>
+        <marker id="fc-arrow-amber" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#d97706" />
+        </marker>
+    </defs>
+
+    <rect width="2600" height="1850" fill="url(#grid-fc)" />
+
+    <!-- Header Banner -->
+    <rect x="50" y="30" width="2500" height="96" rx="14" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5" filter="url(#banner-shadow-fc)"/>
+    <rect x="50" y="30" width="10" height="96" rx="4" fill="#059669"/>
+    <g transform="translate(80, 52)">
+        <text x="0" y="24" fill="#0f172a" font-size="25" font-weight="800" letter-spacing="0.5">FLOWCHART SIKLUS HIDUP PESANAN BANTUAN (HELP ORDER LIFECYCLE)</text>
+        <text x="0" y="50" fill="#64748b" font-size="14.5">Alur Kerja End-to-End: Pemesanan Customer, Matching Saldo Escrow, GPS Live Tracking, Dokumentasi Foto, hingga Penyelesaian</text>
+    </g>
+
+    <!-- 4 Clean Swimlane Columns -->
+    <!-- Col 1: Customer (x: 50 to 650) -->
+    <rect x="50" y="145" width="600" height="1650" rx="12" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+    <rect x="50" y="145" width="600" height="48" rx="12" fill="#eff6ff"/>
+    <line x1="50" y1="193" x2="650" y2="193" stroke="#bfdbfe" stroke-width="1.5"/>
+    <text x="350" y="176" fill="#1d4ed8" font-size="16.5" font-weight="bold" text-anchor="middle">👤 CUSTOMER (PEMESAN)</text>
+
+    <!-- Col 2: Sistem & Escrow (x: 680 to 1280) -->
+    <rect x="680" y="145" width="600" height="1650" rx="12" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+    <rect x="680" y="145" width="600" height="48" rx="12" fill="#eef2ff"/>
+    <line x1="680" y1="193" x2="1280" y2="193" stroke="#c7d2fe" stroke-width="1.5"/>
+    <text x="980" y="176" fill="#4338ca" font-size="16.5" font-weight="bold" text-anchor="middle">⚙️ ENGINE SISTEM &amp; ESCROW SALDO</text>
+
+    <!-- Col 3: Mitra (x: 1310 to 1910) -->
+    <rect x="1310" y="145" width="600" height="1650" rx="12" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+    <rect x="1310" y="145" width="600" height="48" rx="12" fill="#ecfdf5"/>
+    <line x1="1310" y1="193" x2="1910" y2="193" stroke="#a7f3d0" stroke-width="1.5"/>
+    <text x="1610" y="176" fill="#047857" font-size="16.5" font-weight="bold" text-anchor="middle">🛵 MITRA KERJA (REKAN JASA)</text>
+
+    <!-- Col 4: Admin (x: 1940 to 2540) -->
+    <rect x="1940" y="145" width="600" height="1650" rx="12" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+    <rect x="1940" y="145" width="600" height="48" rx="12" fill="#fff1f2"/>
+    <line x1="1940" y1="193" x2="2540" y2="193" stroke="#fecdd3" stroke-width="1.5"/>
+    <text x="2240" y="176" fill="#be123c" font-size="16.5" font-weight="bold" text-anchor="middle">🛡️ ADMIN WILAYAH &amp; MEDIASI</text>
+
+<g transform="translate(150,220)" filter="url(#card-shadow)">
+<rect x="0" y="0" width="400" height="48" rx="24" fill="#ecfdf5" stroke="#059669" stroke-width="2"/>
+<text x="200" y="30" fill="#047857" font-size="15" font-weight="bold" text-anchor="middle">MULAI: Kebutuhan Jasa Bantuan</text>
+</g>
+<g transform="translate(100,295)" filter="url(#card-shadow)">
+<rect x="0" y="0" width="500" height="95" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+<rect x="0" y="0" width="6" height="95" rx="3" fill="#2563eb"/>
+<rect x="385" y="8" width="105" height="20" rx="10" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+<text x="438" y="22" fill="#2563eb" font-size="10" font-weight="bold" text-anchor="middle">INPUT DATA</text>
+<text x="18" y="28" fill="#0f172a" font-size="15" font-weight="bold">1. Form Pengajuan Bantuan</text>
+<text x="18" y="50" fill="#475569" font-size="12">• Pilih Kategori Layanan (Pertukangan, Kebersihan, dll)</text>
+<text x="18" y="68" fill="#475569" font-size="12">• Tentukan Tipe: 'Urgent' (Instan) / 'Scheduled' (Terjadwal)</text>
+<text x="18" y="86" fill="#475569" font-size="12">• Masukkan Deskripsi, Foto Kendala, & Peralatan</text>
+</g>
+<g transform="translate(100,420)" filter="url(#card-shadow)">
+<rect x="0" y="0" width="500" height="80" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+<rect x="0" y="0" width="6" height="80" rx="3" fill="#2563eb"/>
+<rect x="385" y="8" width="105" height="20" rx="10" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+<text x="438" y="22" fill="#2563eb" font-size="10" font-weight="bold" text-anchor="middle">GEOLOCATION</text>
+<text x="18" y="28" fill="#0f172a" font-size="15" font-weight="bold">2. Penentuan Lokasi / Titik Peta</text>
+<text x="18" y="50" fill="#475569" font-size="12">• Deteksi titik akurat via Peta GPS / Pilih Alamat Tersimpan</text>
+<text x="18" y="68" fill="#475569" font-size="12">• Sistem membaca kode ID Kota/Wilayah Administratif</text>
+</g>
+<g transform="translate(100,530)" filter="url(#card-shadow)">
+<rect x="0" y="0" width="500" height="95" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+<rect x="0" y="0" width="6" height="95" rx="3" fill="#2563eb"/>
+<rect x="385" y="8" width="105" height="20" rx="10" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+<text x="438" y="22" fill="#2563eb" font-size="10" font-weight="bold" text-anchor="middle">PAYMENT ESCROW</text>
+<text x="18" y="28" fill="#0f172a" font-size="15" font-weight="bold">3. Verifikasi Biaya & Pembayaran</text>
+<text x="18" y="50" fill="#475569" font-size="12">• Rincian: Base Amount + Customer Fee + Admin Fee - Voucher</text>
+<text x="18" y="68" fill="#475569" font-size="12">• Pembayaran memotong Saldo Dompet SayaBantu</text>
+<text x="18" y="86" fill="#475569" font-size="12">• Jika Saldo Kurang -> Pop-up Top Up Midtrans Snap</text>
+</g>
+<g transform="translate(730,530)" filter="url(#card-shadow)">
+<rect x="0" y="0" width="500" height="95" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+<rect x="0" y="0" width="6" height="95" rx="3" fill="#4f46e5"/>
+<rect x="385" y="8" width="105" height="20" rx="10" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+<text x="438" y="22" fill="#4f46e5" font-size="10" font-weight="bold" text-anchor="middle">STATUS ORDER</text>
+<text x="18" y="28" fill="#0f172a" font-size="15" font-weight="bold">4. Status: MENUNGGU_MITRA</text>
+<text x="18" y="50" fill="#475569" font-size="12">• Saldo Customer dipindahkan ke 'held_balance' (Escrow Lock)</text>
+<text x="18" y="68" fill="#475569" font-size="12">• Order disiarkan ke seluruh Mitra aktif di Kota tersebut</text>
+<text x="18" y="86" fill="#475569" font-size="12">• Timer Auto-Cancel aktif untuk Urgent (15-30 menit)</text>
+</g>
+<g transform="translate(730,660)" filter="url(#card-shadow)">
+<rect x="0" y="0" width="500" height="85" rx="10" fill="#fff1f2" stroke="#e11d48" stroke-width="1.5"/>
+<rect x="0" y="0" width="6" height="85" rx="3" fill="#e11d48"/>
+<text x="18" y="26" fill="#9f1239" font-size="14.5" font-weight="bold">Timeout: Tidak Ada Mitra Menerima</text>
+<text x="18" y="48" fill="#be123c" font-size="12">• Batas waktu pencarian habis (auto_cancel_at)
+• Status diubah: 'dibatalkan' (oleh sistem)
+• Saldo 100% otomatis di-refund kembali ke Dompet Customer</text>
+</g>
+<g transform="translate(1360,530)" filter="url(#card-shadow)">
+<rect x="0" y="0" width="500" height="95" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+<rect x="0" y="0" width="6" height="95" rx="3" fill="#059669"/>
+<rect x="385" y="8" width="105" height="20" rx="10" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+<text x="438" y="22" fill="#059669" font-size="10" font-weight="bold" text-anchor="middle">MATCH SUCCESS</text>
+<text x="18" y="28" fill="#0f172a" font-size="15" font-weight="bold">5. Status: MEMPEROLEH_MITRA</text>
+<text x="18" y="50" fill="#475569" font-size="12">• Mitra menerima Push Notifikasi & meninjau detail tugas</text>
+<text x="18" y="68" fill="#475569" font-size="12">• Mitra klik 'Ambil Bantuan' (Order terkunci ke Mitra)</text>
+<text x="18" y="86" fill="#475569" font-size="12">• Waktu penetapan: mitra_assigned_at tercatat</text>
+</g>
+<g transform="translate(1360,680)" filter="url(#card-shadow)">
+<rect x="0" y="0" width="500" height="95" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+<rect x="0" y="0" width="6" height="95" rx="3" fill="#059669"/>
+<rect x="385" y="8" width="105" height="20" rx="10" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+<text x="438" y="22" fill="#059669" font-size="10" font-weight="bold" text-anchor="middle">GPS LIVE TRACK</text>
+<text x="18" y="28" fill="#0f172a" font-size="15" font-weight="bold">6. Status: PARTNER_ON_THE_WAY</text>
+<text x="18" y="50" fill="#475569" font-size="12">• Mitra klik tombol 'Berangkat Menuju Lokasi'</text>
+<text x="18" y="68" fill="#475569" font-size="12">• Pelacakan GPS Real-time aktif (koordinat live mitra)</text>
+<text x="18" y="86" fill="#475569" font-size="12">• Customer dapat memantau pergerakan & fitur Chat aktif</text>
+</g>
+<g transform="translate(1360,810)" filter="url(#card-shadow)">
+<rect x="0" y="0" width="500" height="80" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+<rect x="0" y="0" width="6" height="80" rx="3" fill="#059669"/>
+<rect x="385" y="8" width="105" height="20" rx="10" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+<text x="438" y="22" fill="#059669" font-size="10" font-weight="bold" text-anchor="middle">LOKASI TIBA</text>
+<text x="18" y="28" fill="#0f172a" font-size="15" font-weight="bold">7. Status: PARTNER_ARRIVED</text>
+<text x="18" y="50" fill="#475569" font-size="12">• Mitra tiba di lokasi pemesan & klik 'Tiba di Lokasi'</text>
+<text x="18" y="68" fill="#475569" font-size="12">• Hak pembatalan sepihak customer tertutup otomatis</text>
+</g>
+<g transform="translate(1360,920)" filter="url(#card-shadow)">
+<rect x="0" y="0" width="500" height="95" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+<rect x="0" y="0" width="6" height="95" rx="3" fill="#059669"/>
+<rect x="385" y="8" width="105" height="20" rx="10" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+<text x="438" y="22" fill="#059669" font-size="10" font-weight="bold" text-anchor="middle">DOKUMENTASI AWAL</text>
+<text x="18" y="28" fill="#0f172a" font-size="15" font-weight="bold">8. Status: IN_PROGRESS</text>
+<text x="18" y="50" fill="#475569" font-size="12">• Mitra wajib ambil & upload 'before_photo' (kondisi awal)</text>
+<text x="18" y="68" fill="#475569" font-size="12">• Memulai eksekusi perbaikan / pekerjaan bantuan</text>
+<text x="18" y="86" fill="#475569" font-size="12">• Catatan kondisi awal tersimpan (before_notes)</text>
+</g>
+<g transform="translate(1360,1050)" filter="url(#card-shadow)">
+<rect x="0" y="0" width="500" height="95" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+<rect x="0" y="0" width="6" height="95" rx="3" fill="#059669"/>
+<rect x="385" y="8" width="105" height="20" rx="10" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+<text x="438" y="22" fill="#059669" font-size="10" font-weight="bold" text-anchor="middle">BUKTI HASIL</text>
+<text x="18" y="28" fill="#0f172a" font-size="15" font-weight="bold">9. Status: WAITING_CUSTOMER_CONFIRMATION</text>
+<text x="18" y="50" fill="#475569" font-size="12">• Mitra menyelesaikan pekerjaan</text>
+<text x="18" y="68" fill="#475569" font-size="12">• Wajib upload 'completion_photo' (foto hasil) & notes</text>
+<text x="18" y="86" fill="#475569" font-size="12">• Timer 24 Jam Auto-Confirmation mulai berjalan</text>
+</g>
+<g transform="translate(100,1050)" filter="url(#card-shadow)">
+<rect x="0" y="0" width="500" height="95" rx="12" fill="#faf5ff" stroke="#7c3aed" stroke-width="2"/>
+<rect x="0" y="0" width="6" height="95" rx="3" fill="#7c3aed"/>
+<text x="250" y="28" fill="#5b21b6" font-size="15" font-weight="bold" text-anchor="middle">10. Evaluasi & Verifikasi Hasil</text>
+<text x="250" y="50" fill="#6b21a8" font-size="12" text-anchor="middle">Customer memeriksa kualitas hasil kerja mitra:
+• Apakah pekerjaan sesuai kesepakatan?
+• Batas waktu respons 24 jam sebelum auto-confirm</text>
+</g>
+<g transform="translate(100,1200)" filter="url(#card-shadow)">
+<rect x="0" y="0" width="500" height="110" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+<rect x="0" y="0" width="6" height="110" rx="3" fill="#059669"/>
+<rect x="385" y="8" width="105" height="20" rx="10" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+<text x="438" y="22" fill="#059669" font-size="10" font-weight="bold" text-anchor="middle">ESCROW RELEASE</text>
+<text x="18" y="28" fill="#0f172a" font-size="15" font-weight="bold">11A. Status: SELESAI (Puas / Disetujui)</text>
+<text x="18" y="50" fill="#475569" font-size="12">• Customer klik 'Konfirmasi Selesai' ATAU Auto-Confirm 24 Jam</text>
+<text x="18" y="68" fill="#475569" font-size="12">• Saldo Escrow rilis: net_mitra_amount masuk dompet Mitra</text>
+<text x="18" y="86" fill="#475569" font-size="12">• Platform fee dicairkan ke kas SayaBantu</text>
+<text x="18" y="104" fill="#475569" font-size="12">• Masuk ke tahap Mutual Rating & Review</text>
+</g>
+<g transform="translate(100,1350)" filter="url(#card-shadow)">
+<rect x="0" y="0" width="500" height="85" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+<rect x="0" y="0" width="6" height="85" rx="3" fill="#d97706"/>
+<rect x="385" y="8" width="105" height="20" rx="10" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+<text x="438" y="22" fill="#d97706" font-size="10" font-weight="bold" text-anchor="middle">MUTUAL REVIEW</text>
+<text x="18" y="28" fill="#0f172a" font-size="15" font-weight="bold">12. Mutual Rating (Timbal Balik)</text>
+<text x="18" y="50" fill="#475569" font-size="12">• Customer memberi rating bintang (1-5) & ulasan ke Mitra</text>
+<text x="18" y="68" fill="#475569" font-size="12">• Mitra memberi rating bintang & ulasan ke Customer</text>
+<text x="18" y="86" fill="#475569" font-size="12">• Reputasi mitra & customer terupdate realtime</text>
+</g>
+<g transform="translate(150,1480)" filter="url(#card-shadow)">
+<rect x="0" y="0" width="400" height="48" rx="24" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+<text x="200" y="30" fill="#1d4ed8" font-size="15" font-weight="bold" text-anchor="middle">TRANSAKSI SELESAI & TUNTAS</text>
+</g>
+<g transform="translate(730,1200)" filter="url(#card-shadow)">
+<rect x="0" y="0" width="500" height="110" rx="10" fill="#fff1f2" stroke="#e11d48" stroke-width="1.5"/>
+<rect x="0" y="0" width="6" height="110" rx="3" fill="#e11d48"/>
+<text x="18" y="26" fill="#9f1239" font-size="14.5" font-weight="bold">11B. Customer Mengajukan Komplain</text>
+<text x="18" y="48" fill="#be123c" font-size="12">• Customer tidak puas / hasil kerja bermasalah
+• Customer upload complaint_photo & alasan komplain
+• Escrow saldo DIBEKUKAN sementara
+• Notifikasi darurat dikirim ke Admin Wilayah</text>
+</g>
+<g transform="translate(1990,1200)" filter="url(#card-shadow)">
+<rect x="0" y="0" width="500" height="140" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+<rect x="0" y="0" width="6" height="140" rx="3" fill="#e11d48"/>
+<rect x="385" y="8" width="105" height="20" rx="10" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+<text x="438" y="22" fill="#e11d48" font-size="10" font-weight="bold" text-anchor="middle">INVESTIGASI ADMIN</text>
+<text x="18" y="28" fill="#0f172a" font-size="15" font-weight="bold">13. Investigasi & Mediasi Admin Wilayah</text>
+<text x="18" y="50" fill="#475569" font-size="12">Admin Wilayah membuka tiket sengketa:</text>
+<text x="18" y="68" fill="#475569" font-size="12">• Audit before_photo vs completion_photo vs complaint_photo</text>
+<text x="18" y="86" fill="#475569" font-size="12">• Periksa rekaman chat in-app & riwayat pergerakan mitra</text>
+<text x="18" y="104" fill="#475569" font-size="12">• Hubungi kedua belah pihak jika diperlukan verifikasi</text>
+<text x="18" y="122" fill="#475569" font-size="12">• Tentukan Putusan Resolusi Komplain</text>
+</g>
+<g transform="translate(1990,1380)" filter="url(#card-shadow)">
+<rect x="0" y="0" width="500" height="110" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+<rect x="0" y="0" width="6" height="110" rx="3" fill="#e11d48"/>
+<rect x="385" y="8" width="105" height="20" rx="10" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+<text x="438" y="22" fill="#e11d48" font-size="10" font-weight="bold" text-anchor="middle">RESOLUSI FINAL</text>
+<text x="18" y="28" fill="#0f172a" font-size="15" font-weight="bold">14. Eksekusi Putusan Mediasi Admin</text>
+<text x="18" y="50" fill="#475569" font-size="12">• Opsi 1: Refund penuh ke saldo Customer (Mitra wanprestasi)</text>
+<text x="18" y="68" fill="#475569" font-size="12">• Opsi 2: Pencairan diteruskan ke Mitra (Komplain tidak berdasar)</text>
+<text x="18" y="86" fill="#475569" font-size="12">• Opsi 3: Split payout (Solusi kompromi win-win)</text>
+<text x="18" y="104" fill="#475569" font-size="12">• Tiket ditutup & catatan disimpan di complaint_admin_notes</text>
+</g>
+<g transform="translate(730,810)" filter="url(#card-shadow)">
+<rect x="0" y="0" width="500" height="95" rx="10" fill="#fff1f2" stroke="#e11d48" stroke-width="1.5"/>
+<rect x="0" y="0" width="6" height="95" rx="3" fill="#e11d48"/>
+<text x="18" y="26" fill="#9f1239" font-size="14.5" font-weight="bold">Pembatalan Pesanan di Tengah Jalan</text>
+<text x="18" y="48" fill="#be123c" font-size="12">• Hak batal berlaku jika Mitra idle >= 30 menit tanpa gerak
+• Atau Mitra ajukan 'partner_cancel_requested' karena darurat
+• Status: 'dibatalkan' -> Pengembalian saldo utuh ke Customer
+• SP (Surat Peringatan) dihitung jika mitra melanggar</text>
+</g>
+<path d="M 350 268 L 350 295" fill="none" stroke="#2563eb" stroke-width="2.5" marker-end="url(#fc-arrow-blue)"/>
+<path d="M 350 390 L 350 420" fill="none" stroke="#2563eb" stroke-width="2.5" marker-end="url(#fc-arrow-blue)"/>
+<path d="M 350 500 L 350 530" fill="none" stroke="#2563eb" stroke-width="2.5" marker-end="url(#fc-arrow-blue)"/>
+<path d="M 600 580 L 730 580" fill="none" stroke="#4f46e5" stroke-width="2.5" marker-end="url(#fc-arrow-indigo)"/>
+<path d="M 980 625 L 980 660" fill="none" stroke="#dc2626" stroke-width="2" marker-end="url(#fc-arrow-red)"/>
+<path d="M 730 700 C 660 700, 660 610, 600 610" fill="none" stroke="#dc2626" stroke-width="2" marker-end="url(#fc-arrow-red)"/>
+<path d="M 1230 580 L 1360 580" fill="none" stroke="#059669" stroke-width="2.5" marker-end="url(#fc-arrow-green)"/>
+<path d="M 1610 625 L 1610 680" fill="none" stroke="#059669" stroke-width="2.5" marker-end="url(#fc-arrow-green)"/>
+<path d="M 1610 775 L 1610 810" fill="none" stroke="#059669" stroke-width="2.5" marker-end="url(#fc-arrow-green)"/>
+<path d="M 1610 890 L 1610 920" fill="none" stroke="#059669" stroke-width="2.5" marker-end="url(#fc-arrow-green)"/>
+<path d="M 1610 1015 L 1610 1050" fill="none" stroke="#059669" stroke-width="2.5" marker-end="url(#fc-arrow-green)"/>
+<path d="M 1360 1100 L 600 1100" fill="none" stroke="#7c3aed" stroke-width="2.5" marker-end="url(#fc-arrow-blue)"/>
+<path d="M 350 1145 L 350 1200" fill="none" stroke="#059669" stroke-width="2.5" marker-end="url(#fc-arrow-green)"/>
+<path d="M 350 1310 L 350 1350" fill="none" stroke="#d97706" stroke-width="2.5" marker-end="url(#fc-arrow-amber)"/>
+<path d="M 350 1435 L 350 1480" fill="none" stroke="#2563eb" stroke-width="2.5" marker-end="url(#fc-arrow-blue)"/>
+<path d="M 600 1120 C 660 1120, 660 1240, 730 1240" fill="none" stroke="#dc2626" stroke-width="2.5" marker-end="url(#fc-arrow-red)"/>
+<path d="M 1230 1255 L 1990 1255" fill="none" stroke="#e11d48" stroke-width="2.5" marker-end="url(#fc-arrow-red)"/>
+<path d="M 2240 1340 L 2240 1380" fill="none" stroke="#e11d48" stroke-width="2.5" marker-end="url(#fc-arrow-red)"/>
+<path d="M 1360 720 C 1300 720, 1300 830, 1230 830" fill="none" stroke="#dc2626" stroke-width="2" marker-end="url(#fc-arrow-red)"/>
+</svg>

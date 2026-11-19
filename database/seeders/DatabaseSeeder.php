@@ -23,7 +23,7 @@ class DatabaseSeeder extends Seeder
             // DistrictSeeder::class,
             CategorySeeder::class,
             UserSeeder::class,
-            HelpSeeder::class,
+            // HelpSeeder::class, // Dikosongkan untuk deployment bersih (tanpa sample order/permintaan bantuan)
             \Database\Seeders\UserBalancesSeeder::class,
         ]);
     }

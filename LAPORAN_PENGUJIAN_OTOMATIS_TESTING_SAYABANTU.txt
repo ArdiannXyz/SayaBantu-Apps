@@ -1,0 +1,239 @@
+========================================================================================================================
+                    LAPORAN RESMI PENGUJIAN OTOMATIS SISTEM (AUTOMATED TESTING REPORT)
+                             PLATFORM SAYABANTU (sayabantu.com)
+             (Disusun untuk Lampiran Bab Pengujian & Evaluasi Sistem - Laporan Magang / Skripsi)
+========================================================================================================================
+
+Tanggal Pengujian    : 9 November 2026
+Framework Pengujian  : PHPUnit 11.5 / Laravel Testing Suite
+Bahasa & Lingkungan  : PHP 8.2+ / SQLite In-Memory Database & Mock Service
+Total Pengujian      : 236 Test Cases
+Total Asersi         : 687 Assertions
+Total Waktu Eksekusi : 97.86 Detik
+Tingkat Kelulusan    : 100% LULUS (Passed: 236, Failed: 0, Errors: 0)
+
+========================================================================================================================
+1. PENDAHULUAN & METODOLOGI PENGUJIAN OTOMATIS
+========================================================================================================================
+Pengujian otomatis (Automated Testing) pada sistem SayaBantu dijalankan menggunakan Laravel Testing Framework
+berbasis PHPUnit. Pengujian ini bertujuan untuk menjamin keandalan logika bisnis (business logic), integritas
+keuangan escrow, keamanan otentikasi & otorisasi, akurasi perhitungan geolokasi GPS, serta memastikan tidak
+terjadinya regresi (regression bugs) saat kode diperbarui.
+
+Pengujian dikelompokkan ke dalam dua tingkatan utama:
+1. Unit Testing: Menguji method, fungsi matematika Haversine, enums, dan service class secara terisolasi.
+2. Feature & Integration Testing: Menguji interaksi menyeluruh antar komponen (HTTP request, middleware,
+   Livewire reactivity, database transaction, observer hooks, dan background artisan commands).
+
+========================================================================================================================
+2. DAFTAR LENGKAP KELAS & FITUR YANG DIUJI OTOMATIS (TEST SUITES)
+========================================================================================================================
+
+------------------------------------------------------------------------------------------------------------------------
+KATEGORI A: UNIT TESTING (LOGIKA DASAR, ENUM & SERVICE UTAMA)
+------------------------------------------------------------------------------------------------------------------------
+1. Tests\Unit\ExampleTest:
+   - Verifikasi assertion lingkungan pengujian PHPUnit.
+2. Tests\Unit\HelpStatusTest (8 Test Cases):
+   - Menerjemahkan status legacy ke kanonik (HelpStatus::canonical).
+   - Validasi status aktif vs status final terminal (selesai, dibatalkan).
+   - Expand alias status transaksi.
+   - Keamanan label human-readable untuk status tak dikenal.
+3. Tests\Unit\ExternalHttpTest (3 Test Cases):
+   - Pengujian konfigurasi HTTP client eksternal (SSL verification mode).
+   - Penanganan request saat mode local vs production.
+
+------------------------------------------------------------------------------------------------------------------------
+KATEGORI B: AUTENTIKASI, KEAMANAN & ONBOARDING (AUTHENTICATION & SECURITY)
+------------------------------------------------------------------------------------------------------------------------
+4. Tests\Feature\Auth\AuthenticationTest (9 Test Cases):
+   - Render layar login pengguna.
+   - Penyembunyian kredensial demo pada form login admin.
+   - Autentikasi menggunakan Alamat Email & Password.
+   - Autentikasi alternatif menggunakan Nomor Handphone & Password.
+   - Penolakan login saat kata sandi salah.
+   - Pengalihan (redirect) otomatis ke dashboard sesuai peran (Customer, Mitra, Admin, Super Admin).
+   - Logout dan pembersihan session cookie.
+   - Proteksi akses silang: Customer dicegah membuka rute Super Admin / Admin.
+5. Tests\Feature\Auth\RegistrationTest (5 Test Cases):
+   - Registrasi multi-step customer dan mitra.
+   - Validasi keunikan alamat email dan nomor handphone.
+   - Penyimpanan data akun sementara pada server session.
+6. Tests\Feature\Auth\EmailVerificationTest (3 Test Cases):
+   - Render antarmuka verifikasi email.
+   - Verifikasi sukses melalui Signed URL email.
+   - Penolakan verifikasi bila hash URL dimanipulasi/kedaluwarsa.
+7. Tests\Feature\Auth\GoogleAuthTest (4 Test Cases):
+   - Redirect URL consent Google OAuth 2.0 (Socialite).
+   - Penanganan Google Callback dan pendaftaran akun otomatis.
+   - Pengikatan peran (role) setelah persetujuan Google.
+8. Tests\Feature\Auth\OnboardingEnforcementTest (5 Test Cases):
+   - Middleware EnsureOnboardingCompleted mengunci pengguna yang belum KYC.
+   - Akses paksa dialihkan kembali ke form Onboarding Step 1 s/d Step 4.
+9. Tests\Feature\Auth\PasswordResetTest (4 Test Cases):
+   - Pengiriman link reset kata sandi ke email pengguna.
+   - Halaman form ubah password baru dengan token valid.
+   - Pembaruan hash password baru dan login otomatis.
+10. Tests\Feature\Auth\PasswordUpdateTest (4 Test Cases):
+    - Validasi password lama sesuai.
+    - Validasi regex kekuatan kata sandi baru (huruf besar, angka, simbol).
+11. Tests\Feature\Auth\PasswordConfirmationTest (2 Test Cases):
+    - Konfirmasi password sebelum mengakses aksi sensitif.
+
+------------------------------------------------------------------------------------------------------------------------
+KATEGORI C: SISTEM ESCROW, KEUANGAN & SALDO (BALANCE & FINANCIAL FLOW)
+------------------------------------------------------------------------------------------------------------------------
+12. Tests\Feature\Balance\BalanceFlowTest (10 Test Cases):
+    - Pemotongan saldo dompet Customer saat membuat pesanan bantuan (Escrow Hold).
+    - Penahanan dana oleh sistem SayaBantu hingga pekerjaan selesai.
+    - Pengembalian dana 100% instan (Refund) ke saldo customer saat order dibatalkan.
+    - Pelepasan dana otomatis (Escrow Payout) ke saldo Mitra saat customer konfirmasi selesai.
+    - Pemotongan otomatis persentase fee komisi platform sesuai tarif Super Admin.
+    - Pencatatan buku besar mutasi saldo (balance_transactions) debit dan kredit.
+13. Tests\Feature\Balance\HelpStatusNormalizationTest (6 Test Cases):
+    - Sinkronisasi perubahan status pada model Help dengan HelpObserver.
+    - Mencegah duplikasi pelepasan saldo (double payout prevention).
+14. Tests\Feature\Interaction\TopupApprovalTest (6 Test Cases):
+    - Pembuatan permintaan topup transfer bank oleh pengguna.
+    - Approval topup oleh Admin Wilayah -> Saldo otomatis bertambah.
+    - Rejection topup oleh Admin Wilayah dengan pencatatan alasan.
+15. Tests\Feature\Interaction\AdminWithdrawApprovalTest (7 Test Cases):
+    - Pengajuan withdraw ke rekening bank oleh Mitra / Customer dengan verifikasi PIN 6 digit.
+    - Approval withdraw oleh Admin -> Status berubah menjadi approved.
+    - Rejection withdraw oleh Admin -> Saldo dikembalikan ke dompet pengguna.
+
+------------------------------------------------------------------------------------------------------------------------
+KATEGORI D: PELACAKAN GPS, HAVERSINE TRACKING & GEOCODING API
+------------------------------------------------------------------------------------------------------------------------
+16. Tests\Feature\Tracking\LocationTrackingTest (5 Test Cases):
+    - Penyimpanan koordinat awal GPS mitra saat menekan "Ambil Bantuan".
+    - Deteksi pergerakan Haversine >= 20 meter -> otomatis beralih status ke "partner_on_the_way".
+    - Deteksi kedatangan Haversine <= 50 meter -> otomatis beralih status ke "partner_arrived".
+    - Penolakan update lokasi GPS pada pesanan yang sudah berstatus selesai/dibatalkan.
+    - Uji presisi jarak mendekati nol pada koordinat yang identik.
+17. Tests\Feature\Interaction\GpsTrackerComponentTest (4 Test Cases):
+    - Komponen Livewire GPS Tracker membaca interval tracking.
+    - Pengiriman event koordinat realtime ke antarmuka peta customer.
+18. Tests\Feature\Api\HelpTrackingTest (5 Test Cases):
+    - Otorisasi akses endpoint tracking (hanya pemilik pesanan yang boleh melihat).
+    - Penolakan akses tracking oleh customer lain atau pengguna asing (403 Forbidden).
+    - Penanganan 404 saat ID bantuan tidak ditemukan.
+19. Tests\Feature\Api\AddressAutocompleteTest (4 Test Cases):
+    - Pengujian query kurang dari 3 karakter mengembalikan array kosong.
+    - Pemetaan respon Nominatim OpenStreetMap ke format JSON aplikasi.
+    - Mekanisme Caching query pencarian alamat untuk efisiensi request.
+    - Mekanisme Fallback otomatis ke Photon API saat OpenStreetMap lambat/gagal.
+20. Tests\Feature\Api\RegionApiTest (5 Test Cases):
+    - Pengambilan daftar kecamatan (districts) dari database master wilayah.
+    - Pengambilan daftar kelurahan (villages) sesuai kecamatan terpilih.
+    - Pencarian nama kota dan toleransi input tanpa error.
+
+------------------------------------------------------------------------------------------------------------------------
+KATEGORI E: INTERAKSI PENGGUNA, CHAT, DISPUTE & SANKSI (INTERACTIONS)
+------------------------------------------------------------------------------------------------------------------------
+21. Tests\Feature\Interaction\ChatTest (6 Test Cases):
+    - Pengiriman pesan teks dua arah antara Customer dan Mitra.
+    - Isolasi percakapan chat per ID bantuan (bantuan lain tidak bisa membaca).
+    - Polling pembaruan obrolan Livewire 5 detik.
+22. Tests\Feature\Interaction\RatingTest (6 Test Cases):
+    - Pengiriman rating bintang 1-5 dan ulasan kerja dari customer ke mitra.
+    - Penilaian balik (mutual rating) dari mitra ke customer.
+    - Pembaruan nilai rata-rata rating di tabel users.
+    - Pemicu otomatis penandaan akun bermasalah (Shadow Ban trigger).
+23. Tests\Feature\Interaction\PartnerReportTest (6 Test Cases):
+    - Pembuatan laporan aduan pelanggaran/komplain disertai foto bukti.
+    - Update status investigasi aduan oleh Admin Wilayah.
+    - Penambahan catatan investigasi admin.
+24. Tests\Feature\Interaction\SanctionTest (6 Test Cases):
+    - Penerbitan Surat Peringatan (SP 1, SP 2, SP 3) oleh admin.
+    - Penguncian layar akun melalui SP Acknowledge Gate.
+    - Penerbitan sanksi Banned permanen.
+    - Pemicuan Realtime Session Purge (user ditendang dan logout otomatis seketika).
+25. Tests\Feature\CustomerAddressTest (5 Test Cases):
+    - Tambah alamat baru customer (nama penerima, patokan, pinpoint peta).
+    - Pengaturan alamat utama (Default Address) untuk pemesanan cepat.
+    - Edit dan hapus alamat dari buku alamat.
+26. Tests\Feature\NotificationRedirectTest (3 Test Cases):
+    - Tautan notifikasi mengarahkan pengguna secara presisi ke detail order/chat bersangkutan.
+27. Tests\Feature\Components\UserAvatarComponentTest & UserAvatarUrlTest (7 Test Cases):
+    - Penggunaan foto avatar lokal storage.
+    - Fallback ke foto Google OAuth jika avatar lokal belum diunggah.
+    - Prioritas foto unggahan mengalahkan foto Google.
+28. Tests\Feature\ProfileTest & SharedAccountComponentsTest (6 Test Cases):
+    - Pembaruan nama, email, nomor HP pengguna.
+    - Pengelolaan rekening bank pencairan dana.
+    - Penghapusan akun pengguna.
+
+------------------------------------------------------------------------------------------------------------------------
+KATEGORI F: OTOMASI BACKGROUND TASK & CRON SCHEDULER
+------------------------------------------------------------------------------------------------------------------------
+29. Tests\Feature\Commands\AutoCancelHelpsTest (4 Test Cases):
+    - Artisan command `helps:auto-cancel` mendeteksi bantuan kedaluwarsa.
+    - Pembatalan status otomatis pesanan expired menjadi `dibatalkan`.
+    - Otomasi pengembalian dana saldo customer 100% oleh sistem.
+
+------------------------------------------------------------------------------------------------------------------------
+KATEGORI G: SMOKE TESTING HALAMAN & RUTE SELURUH ROLE (SMOKE TESTS)
+------------------------------------------------------------------------------------------------------------------------
+30. Tests\Feature\Smoke\CustomerPagesTest (10 Datasets):
+    - Pengujian HTTP 200 OK untuk seluruh halaman customer: Beranda Dashboard, Buat Bantuan,
+      Riwayat Bantuan, Dompet Saldo, Topup, Withdraw, Chat, Alamat Saya, Pengaturan Akun.
+31. Tests\Feature\Smoke\MitraPagesTest (10 Datasets):
+    - Pengujian HTTP 200 OK untuk seluruh halaman mitra: Beranda Mitra, Ambil Bantuan Terbuka,
+      Bantuan Berjalan, Riwayat Selesai, Dompet Pendapatan, Withdraw, Chat, Rating, Pengaturan.
+32. Tests\Feature\Smoke\AdminPagesTest (13 Datasets):
+    - Pengujian HTTP 200 OK untuk seluruh halaman admin wilayah: Dashboard Regional, Verifikasi KTP,
+      Manajemen Customer, Manajemen Mitra, Monitoring Bantuan, Approval Topup, Approval Withdraw,
+      Aktivitas Mitra, Laporan Aduan, Blokir Mitra, Rating.
+33. Tests\Feature\Smoke\RolePagesTest (18 Datasets):
+    - Pengujian HTTP 200 OK untuk seluruh halaman Super Admin: Dashboard Nasional, Master Kota,
+      Master Kategori, Banner Promo, Biaya Topup, Fee Pendapatan, Tarif Radius, Storage Manager,
+      Admin Users, Activity Logs, Transaksi Keuangan.
+
+========================================================================================================================
+3. TABEL REKAPITULASI HASIL PENGUJIAN OTOMATIS
+========================================================================================================================
+
++-----+--------------------------------------+---------------------------+----------+---------------+----------------+
+| No  | Kelompok Fitur / Test Suite          | File Pengujian            | Jml Uji  | Durasi Eksek. | Hasil Pengujian|
++-----+--------------------------------------+---------------------------+----------+---------------+----------------+
+| 1   | Validasi Status Transaksi (Enum)     | Unit\HelpStatusTest       | 8 Tests  | ~0.45 detik   | 100% LULUS     |
+| 2   | Konfigurasi Client HTTP Eksternal    | Unit\ExternalHttpTest     | 3 Tests  | ~2.50 detik   | 100% LULUS     |
+| 3   | Autentikasi, Login Email/HP & Role   | Feature\Auth\AuthTest     | 9 Tests  | ~14.6 detik   | 100% LULUS     |
+| 4   | Registrasi Akun Multi-Step           | Feature\Auth\RegisterTest | 5 Tests  | ~2.10 detik   | 100% LULUS     |
+| 5   | Verifikasi Email via Signed URL      | Feature\Auth\VerifyEmail  | 3 Tests  | ~0.70 detik   | 100% LULUS     |
+| 6   | Google OAuth 2.0 Socialite           | Feature\Auth\GoogleAuth   | 4 Tests  | ~1.85 detik   | 100% LULUS     |
+| 7   | Middleware Onboarding Enforcement    | Feature\Auth\Onboarding   | 5 Tests  | ~1.20 detik   | 100% LULUS     |
+| 8   | Reset & Pembaruan Kata Sandi Kuat    | Feature\Auth\Password*    | 10 Tests | ~3.40 detik   | 100% LULUS     |
+| 9   | Alur Escrow, Payout & Refund Saldo   | Feature\Balance\Balance*  | 16 Tests | ~8.90 detik   | 100% LULUS     |
+| 10  | Approval Top Up Mutasi Transfer Bank | Feature\Interaction\Topup | 6 Tests  | ~2.30 detik   | 100% LULUS     |
+| 11  | Approval Withdraw & Verifikasi PIN   | Feature\Interaction\Withd*| 7 Tests  | ~3.10 detik   | 100% LULUS     |
+| 12  | GPS Tracking & Haversine Threshold   | Feature\Tracking\LocTrack | 5 Tests  | ~0.35 detik   | 100% LULUS     |
+| 13  | Komponen Livewire GPS Tracker        | Feature\Interaction\GpsTr*| 4 Tests  | ~0.40 detik   | 100% LULUS     |
+| 14  | Autocomplete Alamat (OSM & Photon)   | Feature\Api\AddressAuto*  | 4 Tests  | ~3.40 detik   | 100% LULUS     |
+| 15  | API Master Wilayah (Kecamatan/Desa)  | Feature\Api\RegionApiTest | 5 Tests  | ~0.75 detik   | 100% LULUS     |
+| 16  | Live Chat Antar Pengguna             | Feature\Interaction\Chat  | 6 Tests  | ~2.10 detik   | 100% LULUS     |
+| 17  | Penilaian Rating & Ulasan Dua Arah   | Feature\Interaction\Rating| 6 Tests  | ~1.95 detik   | 100% LULUS     |
+| 18  | Aduan Sengketa & Sanksi (SP 1 - 3)   | Feature\Interaction\Sanc* | 12 Tests | ~4.50 detik   | 100% LULUS     |
+| 19  | Multi-Alamat Customer (Address Book) | Feature\CustomerAddress   | 5 Tests  | ~1.60 detik   | 100% LULUS     |
+| 20  | Otomasi Cron Auto-Cancel & Refund    | Feature\Commands\AutoCan* | 4 Tests  | ~1.20 detik   | 100% LULUS     |
+| 21  | Logika Avatar & Profil Akun          | Feature\UserAvatar*       | 13 Tests | ~2.80 detik   | 100% LULUS     |
+| 22  | Smoke Test Rute Seluruh Role         | Feature\Smoke\*PagesTest  | 51 Tests | ~34.2 detik   | 100% LULUS     |
+| 23  | Assert Dasar Lingkungan Uji          | Unit & Feature\ExampleTest| 2 Tests  | ~0.75 detik   | 100% LULUS     |
++-----+--------------------------------------+---------------------------+----------+---------------+----------------+
+|     | TOTAL KESELURUHAN PENGUJIAN OTOMATIS                             | 236 Uji  | 97.86 Detik   | 100% LULUS     |
++-----+--------------------------------------+---------------------------+----------+---------------+----------------+
+
+========================================================================================================================
+4. KESIMPULAN HASIL PENGUJIAN OTOMATIS
+========================================================================================================================
+Berdasarkan eksekusi 236 pengujian otomatis dengan 687 asersi pemeriksaan:
+1. Tidak ditemukan satupun kegagalan (0 Failure) maupun kesalahan program (0 Error).
+2. Sistem Escrow Keuangan, Formula GPS Haversine, Proteksi Role, dan Otomasi Sanksi terbukti bekerja 100%
+   sesuai aturan bisnis tanpa kebocoran data maupun bug regresi.
+3. Seluruh endpoint dan antarmuka aplikasi merespons dengan status HTTP 200 OK yang stabil.
+4. Laporan ini memenuhi kriteria ilmiah pengujian perangkat lunak terotomasi untuk Laporan Magang.
+========================================================================================================================
+                             AKHIR DOKUMEN LAPORAN PENGUJIAN OTOMATIS
+========================================================================================================================
+

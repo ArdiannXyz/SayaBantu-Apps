@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\City;
-use App\Models\Registration;
 use App\Models\User;
 use App\Models\UserBalance;
 use Illuminate\Database\Seeder;
@@ -14,14 +13,26 @@ class UserSeeder extends Seeder
 {
     /**
      * Run the database seeds.
-     * Membuat akun-akun testing lengkap untuk semua peran (Customer, Mitra, Admin, Super Admin)
-     * khusus di wilayah DI Yogyakarta (Kota Yogyakarta, Sleman, Bantul, Gunungkidul, Kulonprogo).
+     * Membuat 6 akun resmi siap pakai untuk deployment:
+     * 1. Super Admin (Nasional)
+     * 2. Admin DI Yogyakarta
+     * 3. Hendra Wijaya (Mitra)
+     * 4. Doni Setiawan (Mitra)
+     * 5. Budi Hartono (Customer)
+     * 6. Dewi Rahayu (Customer)
+     *
+     * Password: Sayabantu123!
+     * PIN Transaksi: 123456
+     * Seluruh saldo awal: Rp 0
      */
     public function run(): void
     {
         $defaultPassword = Hash::make('Sayabantu123!');
+        $defaultPin = Hash::make('123456');
+
         $columns = Schema::getColumnListing('users');
         $hasOccupation = in_array('occupation', $columns);
+        $hasPin = in_array('transaction_pin', $columns);
 
         // Ambil data kota referensi DI Yogyakarta
         $kotaYogya = City::where('name', 'like', '%Kota Yogyakarta%')->first() ?: City::find(31);
@@ -39,22 +50,14 @@ class UserSeeder extends Seeder
         $slemanProv = $sleman ? ($sleman->province ?? 'DI Yogyakarta') : 'DI Yogyakarta';
 
         $bantulId = $bantul ? $bantul->id : 33;
-        $bantulName = $bantul ? $bantul->name : 'Kabupaten Bantul';
-        $bantulProv = $bantul ? ($bantul->province ?? 'DI Yogyakarta') : 'DI Yogyakarta';
-
         $gunungkidulId = $gunungkidul ? $gunungkidul->id : 34;
-        $gunungkidulName = $gunungkidul ? $gunungkidul->name : 'Kabupaten Gunungkidul';
-        $gunungkidulProv = $gunungkidul ? ($gunungkidul->province ?? 'DI Yogyakarta') : 'DI Yogyakarta';
-
         $kulonprogoId = $kulonprogo ? $kulonprogo->id : 35;
-        $kulonprogoName = $kulonprogo ? $kulonprogo->name : 'Kabupaten Kulonprogo';
-        $kulonprogoProv = $kulonprogo ? ($kulonprogo->province ?? 'DI Yogyakarta') : 'DI Yogyakarta';
 
-        $diyCityIds = [$yogyaId, $slemanId, $bantulId, $gunungkidulId, $kulonprogoId];
+        $diyCityIds = array_values(array_filter([$yogyaId, $slemanId, $bantulId, $gunungkidulId, $kulonprogoId]));
 
         $accounts = [
             // =========================================================================
-            // 1. SUPER ADMIN (Akses penuh nasional ke seluruh wilayah Indonesia & kelola admin)
+            // 1. SUPER ADMIN (Nasional)
             // =========================================================================
             [
                 'email' => 'superadmin@sayabantu.com',
@@ -71,13 +74,14 @@ class UserSeeder extends Seeder
                 'address' => 'Kantor Pusat SayaBantu Indonesia',
                 'is_completed' => true,
                 'email_verified_at' => now(),
+                'transaction_pin' => $defaultPin,
             ],
 
             // =========================================================================
-            // 2. ADMIN WILAYAH DI YOGYAKARTA (Mengelola seluruh 5 kabupaten/kota DIY)
+            // 2. ADMIN DI YOGYAKARTA
             // =========================================================================
             [
-                'email' => 'admin.jogja@test.com',
+                'email' => 'admin.jogja@sayabantu.com',
                 'name' => 'Admin DI Yogyakarta',
                 'password' => $defaultPassword,
                 'role' => 'admin',
@@ -86,123 +90,20 @@ class UserSeeder extends Seeder
                 'province' => $yogyaProv,
                 'verified' => true,
                 'status' => 'active',
-                'phone' => '081234562001',
-                'nik' => '3471010101900015',
+                'phone' => '081234562020',
+                'nik' => '3471010101900020',
                 'address' => 'Kantor Wilayah DIY, Jl. Malioboro No. 56, Yogyakarta',
                 'is_completed' => true,
                 'email_verified_at' => now(),
+                'transaction_pin' => $defaultPin,
             ],
 
             // =========================================================================
-            // 3. CUSTOMER TERVERIFIKASI (Yogyakarta & Sekitarnya / Saldo Rp 1.000.000)
-            // =========================================================================
-            [
-                'email' => 'dewi.jogja@test.com',
-                'name' => 'Dewi Rahayu (Customer)',
-                'password' => $defaultPassword,
-                'role' => 'customer',
-                'gender' => 'Perempuan',
-                'city_id' => $yogyaId,
-                'city' => $yogyaName,
-                'province' => $yogyaProv,
-                'kecamatan' => 'Gondokusuman',
-                'kelurahan' => 'Terban',
-                'verified' => true,
-                'status' => 'active',
-                'phone' => '081234560001',
-                'nik' => '3471015505950001',
-                'address' => 'Jl. C. Simanjuntak No. 25, Terban, Gondokusuman, Kota Yogyakarta',
-                'is_completed' => true,
-                'email_verified_at' => now(),
-                'initial_balance' => 1000000,
-            ],
-            [
-                'email' => 'budi.sleman@test.com',
-                'name' => 'Budi Hartono (Customer Sleman)',
-                'password' => $defaultPassword,
-                'role' => 'customer',
-                'gender' => 'Laki-laki',
-                'city_id' => $slemanId,
-                'city' => $slemanName,
-                'province' => $slemanProv,
-                'kecamatan' => 'Depok',
-                'kelurahan' => 'Caturtunggal',
-                'verified' => true,
-                'status' => 'active',
-                'phone' => '081234560002',
-                'nik' => '3404011505920002',
-                'address' => 'Jl. Gejayan No. 88, Caturtunggal, Depok, Sleman',
-                'is_completed' => true,
-                'email_verified_at' => now(),
-                'initial_balance' => 1000000,
-            ],
-            [
-                'email' => 'sari.bantul@test.com',
-                'name' => 'Sari Wulandari (Customer Bantul)',
-                'password' => $defaultPassword,
-                'role' => 'customer',
-                'gender' => 'Perempuan',
-                'city_id' => $bantulId,
-                'city' => $bantulName,
-                'province' => $bantulProv,
-                'kecamatan' => 'Banguntapan',
-                'kelurahan' => 'Baturetno',
-                'verified' => true,
-                'status' => 'active',
-                'phone' => '081234560003',
-                'nik' => '3402015005940003',
-                'address' => 'Jl. Gedongkuning No. 12, Banguntapan, Bantul',
-                'is_completed' => true,
-                'email_verified_at' => now(),
-                'initial_balance' => 1000000,
-            ],
-            [
-                'email' => 'agus.gunungkidul@test.com',
-                'name' => 'Agus Prasetyo (Customer Gunungkidul)',
-                'password' => $defaultPassword,
-                'role' => 'customer',
-                'gender' => 'Laki-laki',
-                'city_id' => $gunungkidulId,
-                'city' => $gunungkidulName,
-                'province' => $gunungkidulProv,
-                'kecamatan' => 'Wonosari',
-                'kelurahan' => 'Kepek',
-                'verified' => true,
-                'status' => 'active',
-                'phone' => '081234560004',
-                'nik' => '3403011005900004',
-                'address' => 'Jl. KH. Agus Salim No. 5, Wonosari, Gunungkidul',
-                'is_completed' => true,
-                'email_verified_at' => now(),
-                'initial_balance' => 1000000,
-            ],
-            [
-                'email' => 'ratna.kulonprogo@test.com',
-                'name' => 'Ratna Kusuma (Customer Kulon Progo)',
-                'password' => $defaultPassword,
-                'role' => 'customer',
-                'gender' => 'Perempuan',
-                'city_id' => $kulonprogoId,
-                'city' => $kulonprogoName,
-                'province' => $kulonprogoProv,
-                'kecamatan' => 'Wates',
-                'kelurahan' => 'Wates',
-                'verified' => true,
-                'status' => 'active',
-                'phone' => '081234560005',
-                'nik' => '3401016005950005',
-                'address' => 'Jl. Diponegoro No. 8, Wates, Kulon Progo',
-                'is_completed' => true,
-                'email_verified_at' => now(),
-                'initial_balance' => 1000000,
-            ],
-
-            // =========================================================================
-            // 4. MITRA TERVERIFIKASI (Yogyakarta & Sekitarnya / Saldo Rp 250.000)
+            // 3. MITRA 1: HENDRA WIJAYA (Kota Yogyakarta)
             // =========================================================================
             [
                 'email' => 'hendra.mitra@test.com',
-                'name' => 'Hendra Wijaya (Mitra)',
+                'name' => 'Hendra Wijaya',
                 'password' => $defaultPassword,
                 'role' => 'mitra',
                 'gender' => 'Laki-laki',
@@ -218,31 +119,15 @@ class UserSeeder extends Seeder
                 'address' => 'Jl. Kotabaru No. 10, Gondokusuman, Kota Yogyakarta',
                 'is_completed' => true,
                 'email_verified_at' => now(),
-                'initial_balance' => 250000,
+                'transaction_pin' => $defaultPin,
             ],
-            [
-                'email' => 'rina.mitra@test.com',
-                'name' => 'Rina Susanti (Mitra)',
-                'password' => $defaultPassword,
-                'role' => 'mitra',
-                'gender' => 'Perempuan',
-                'city_id' => $yogyaId,
-                'city' => $yogyaName,
-                'province' => $yogyaProv,
-                'kecamatan' => 'Mergangsan',
-                'kelurahan' => 'Brontokusuman',
-                'verified' => true,
-                'status' => 'active',
-                'phone' => '081234561002',
-                'nik' => '3471016508930002',
-                'address' => 'Jl. Kolonel Sugiyono No. 44, Brontokusuman, Yogyakarta',
-                'is_completed' => true,
-                'email_verified_at' => now(),
-                'initial_balance' => 250000,
-            ],
+
+            // =========================================================================
+            // 4. MITRA 2: DONI SETIAWAN (Kabupaten Sleman)
+            // =========================================================================
             [
                 'email' => 'doni.mitra@test.com',
-                'name' => 'Doni Setiawan (Mitra Sleman)',
+                'name' => 'Doni Setiawan',
                 'password' => $defaultPassword,
                 'role' => 'mitra',
                 'gender' => 'Laki-laki',
@@ -258,104 +143,67 @@ class UserSeeder extends Seeder
                 'address' => 'Jl. Magelang Km 4.5, Sinduadi, Mlati, Sleman',
                 'is_completed' => true,
                 'email_verified_at' => now(),
-                'initial_balance' => 250000,
-            ],
-            [
-                'email' => 'fitri.mitra@test.com',
-                'name' => 'Fitri Handayani (Mitra Bantul)',
-                'password' => $defaultPassword,
-                'role' => 'mitra',
-                'gender' => 'Perempuan',
-                'city_id' => $bantulId,
-                'city' => $bantulName,
-                'province' => $bantulProv,
-                'kecamatan' => 'Sewon',
-                'kelurahan' => 'Panggungharjo',
-                'verified' => true,
-                'status' => 'active',
-                'phone' => '081234561004',
-                'nik' => '3402016508930004',
-                'address' => 'Jl. Bantul Km 6, Panggungharjo, Sewon, Bantul',
-                'is_completed' => true,
-                'email_verified_at' => now(),
-                'initial_balance' => 250000,
-            ],
-            [
-                'email' => 'budi.mitra@test.com',
-                'name' => 'Budi Santoso (Mitra)',
-                'password' => $defaultPassword,
-                'role' => 'mitra',
-                'gender' => 'Laki-laki',
-                'city_id' => $yogyaId,
-                'city' => $yogyaName,
-                'province' => $yogyaProv,
-                'kecamatan' => 'Jetis',
-                'kelurahan' => 'Cokrodiningratan',
-                'verified' => true,
-                'status' => 'active',
-                'phone' => '081234561008',
-                'nik' => '3471011505920008',
-                'address' => 'Jl. AM Sangaji No. 12, Cokrodiningratan, Jetis, Kota Yogyakarta',
-                'is_completed' => true,
-                'email_verified_at' => now(),
-                'initial_balance' => 250000,
+                'transaction_pin' => $defaultPin,
             ],
 
             // =========================================================================
-            // 5. CUSTOMER PENDING JOGJA — data uji onboarding + antrean verifikasi admin
+            // 5. CUSTOMER 1: BUDI HARTONO (Kabupaten Sleman)
             // =========================================================================
             [
-                'email' => 'customer.pending@sayabantu.com',
-                'name' => 'Dewi Lestari (Pending Jogja)',
+                'email' => 'budi.sleman@test.com',
+                'name' => 'Budi Hartono',
+                'password' => $defaultPassword,
+                'role' => 'customer',
+                'gender' => 'Laki-laki',
+                'city_id' => $slemanId,
+                'city' => $slemanName,
+                'province' => $slemanProv,
+                'kecamatan' => 'Depok',
+                'kelurahan' => 'Caturtunggal',
+                'verified' => true,
+                'status' => 'active',
+                'phone' => '081234560002',
+                'nik' => '3404011505920002',
+                'address' => 'Jl. Gejayan No. 88, Caturtunggal, Depok, Sleman',
+                'is_completed' => true,
+                'email_verified_at' => now(),
+                'transaction_pin' => $defaultPin,
+            ],
+
+            // =========================================================================
+            // 6. CUSTOMER 2: DEWI RAHAYU (Kota Yogyakarta)
+            // =========================================================================
+            [
+                'email' => 'dewi.jogja@test.com',
+                'name' => 'Dewi Rahayu',
                 'password' => $defaultPassword,
                 'role' => 'customer',
                 'gender' => 'Perempuan',
                 'city_id' => $yogyaId,
                 'city' => $yogyaName,
                 'province' => $yogyaProv,
-                'kecamatan' => 'Danurejan',
-                'kelurahan' => 'Suryatmajan',
-                'verified' => false,
+                'kecamatan' => 'Gondokusuman',
+                'kelurahan' => 'Terban',
+                'verified' => true,
                 'status' => 'active',
-                'phone' => '081200000006',
-                'nik' => '3471016012970005',
-                'address' => 'Jl. Danurejan No. 15, Suryatmajan, Danurejan, Kota Yogyakarta',
-                'is_completed' => false,
+                'phone' => '081234560001',
+                'nik' => '3471015505950001',
+                'address' => 'Jl. C. Simanjuntak No. 25, Terban, Gondokusuman, Kota Yogyakarta',
+                'is_completed' => true,
                 'email_verified_at' => now(),
-                'initial_balance' => 0,
-            ],
-
-            // =========================================================================
-            // 6. MITRA PENDING JOGJA — data uji antrean verifikasi KTP admin
-            // =========================================================================
-            [
-                'email' => 'yusuf.mitra@test.com',
-                'name' => 'Yusuf Pratama (Pending Jogja)',
-                'password' => $defaultPassword,
-                'role' => 'mitra',
-                'gender' => 'Laki-laki',
-                'city_id' => $yogyaId,
-                'city' => $yogyaName,
-                'province' => $yogyaProv,
-                'kecamatan' => 'Umbulharjo',
-                'kelurahan' => 'Sorosutan',
-                'verified' => false,
-                'status' => 'active',
-                'phone' => '081234561005',
-                'nik' => '3471010101950001',
-                'address' => 'Jl. Umbulharjo No. 12, Sorosutan, Umbulharjo, Kota Yogyakarta',
-                'is_completed' => false,
-                'email_verified_at' => now(),
-                'initial_balance' => 0,
+                'transaction_pin' => $defaultPin,
             ],
         ];
 
         foreach ($accounts as $data) {
-            $initialBalance = $data['initial_balance'] ?? 0;
             unset($data['initial_balance']);
 
             if ($hasOccupation && ! isset($data['occupation'])) {
                 $data['occupation'] = ($data['role'] === 'mitra') ? 'Teknisi / Rekan Jasa' : 'Karyawan Swasta';
+            }
+
+            if ($hasPin && ! isset($data['transaction_pin'])) {
+                $data['transaction_pin'] = $defaultPin;
             }
 
             $user = User::updateOrCreate(
@@ -363,53 +211,18 @@ class UserSeeder extends Seeder
                 $data
             );
 
-            // Hubungkan Admin ke kota-kota kelolaannya (seluruh 5 wilayah DIY)
+            // Hubungkan Admin ke seluruh kota-kota kelolaannya di wilayah DIY
             if ($user->role === 'admin' && ! empty($user->city_id)) {
                 $user->managedCities()->sync($diyCityIds);
             }
 
-            // Pastikan saldo terisi di tabel user_balances, users.balance, dan balance_transactions
+            // Pastikan saldo awal adalah 0 untuk seluruh pengguna
             if (in_array($user->role, ['customer', 'kustomer', 'mitra'])) {
-                if ($initialBalance > 0) {
-                    \App\Models\BalanceTransaction::updateOrCreate(
-                        [
-                            'user_id' => $user->id,
-                            'type' => 'topup',
-                            'description' => 'Saldo Awal Akun Testing',
-                        ],
-                        [
-                            'amount' => $initialBalance,
-                            'status' => 'completed',
-                            'processed_at' => now(),
-                        ]
-                    );
-                }
-
                 UserBalance::updateOrCreate(
                     ['user_id' => $user->id],
-                    ['balance' => $initialBalance]
+                    ['balance' => 0]
                 );
-                $user->forceFill(['balance' => $initialBalance])->saveQuietly();
-            }
-
-            // Buat entri Registration untuk akun pending agar muncul di antrean verifikasi admin
-            if (! $user->verified && in_array($user->email, ['yusuf.mitra@test.com'])) {
-                Registration::updateOrCreate(
-                    ['email' => $user->email],
-                    [
-                        'role' => 'mitra',
-                        'full_name' => $user->name,
-                        'nik' => $user->nik,
-                        'place_of_birth' => 'Yogyakarta',
-                        'date_of_birth' => '1995-05-15',
-                        'gender' => $user->gender ?: 'Laki-laki',
-                        'address' => $user->address,
-                        'city' => $user->city,
-                        'city_id' => $user->city_id,
-                        'province' => $user->province,
-                        'status' => 'pending_verification',
-                    ]
-                );
+                $user->forceFill(['balance' => 0])->saveQuietly();
             }
         }
     }

@@ -306,9 +306,8 @@ new #[Layout('layouts.guest')] class extends Component {
             <div x-show="demoRole === 'customer'" class="space-y-1.5">
                 @php
                     $testCustomers = [
-                        ['name' => 'Dewi Rahayu', 'area' => 'Yogyakarta', 'email' => 'dewi.jogja@test.com', 'bal' => 'Rp 1jt', 'ver' => true, 'loc' => 'Gondokusuman'],
-                        ['name' => 'Budi Hartono', 'area' => 'Sleman', 'email' => 'budi.sleman@test.com', 'bal' => 'Rp 1jt', 'ver' => true, 'loc' => 'Depok'],
-                        ['name' => 'Siti Nurhaliza', 'area' => 'Jakarta Pusat', 'email' => 'customer@sayabantu.com', 'bal' => 'Rp 1jt', 'ver' => true, 'loc' => 'Gambir'],
+                        ['name' => 'Dewi Rahayu', 'area' => 'Yogyakarta', 'email' => 'dewi.jogja@test.com', 'bal' => 'Rp 0', 'ver' => true, 'loc' => 'Gondokusuman'],
+                        ['name' => 'Budi Hartono', 'area' => 'Sleman', 'email' => 'budi.sleman@test.com', 'bal' => 'Rp 0', 'ver' => true, 'loc' => 'Depok'],
                     ];
                 @endphp
                 @foreach ($testCustomers as $c)
@@ -344,10 +343,8 @@ new #[Layout('layouts.guest')] class extends Component {
             <div x-show="demoRole === 'mitra'" class="space-y-1.5">
                 @php
                     $testMitras = [
-                        ['name' => 'Budi Santoso', 'area' => 'Yogyakarta', 'email' => 'budi.mitra@test.com', 'bal' => 'Rp 250rb', 'loc' => 'Mitra Aktif (⭐ 4.8)'],
-                        ['name' => 'Hendra Wijaya', 'area' => 'Yogyakarta', 'email' => 'hendra.mitra@test.com', 'bal' => 'Rp 250rb', 'loc' => 'Gondokusuman'],
-                        ['name' => 'Rina Susanti', 'area' => 'Yogyakarta', 'email' => 'rina.mitra@test.com', 'bal' => 'Rp 250rb', 'loc' => 'Mergangsan'],
-                        ['name' => 'Doni Setiawan', 'area' => 'Sleman', 'email' => 'doni.mitra@test.com', 'bal' => 'Rp 250rb', 'loc' => 'Mlati'],
+                        ['name' => 'Hendra Wijaya', 'area' => 'Yogyakarta', 'email' => 'hendra.mitra@test.com', 'bal' => 'Rp 0', 'loc' => 'Gondokusuman'],
+                        ['name' => 'Doni Setiawan', 'area' => 'Sleman', 'email' => 'doni.mitra@test.com', 'bal' => 'Rp 0', 'loc' => 'Mlati'],
                     ];
                 @endphp
                 @foreach ($testMitras as $m)
@@ -384,8 +381,7 @@ new #[Layout('layouts.guest')] class extends Component {
                 @php
                     $testAdmins = [
                         ['name' => 'Super Admin', 'area' => 'Nasional', 'email' => 'superadmin@sayabantu.com', 'role' => 'Super Admin'],
-                        ['name' => 'Admin DI Yogyakarta', 'area' => 'Yogyakarta', 'email' => 'admin.jogja@test.com', 'role' => 'Admin Wilayah'],
-                        ['name' => 'Admin Jakarta Pusat', 'area' => 'Jakarta Pusat', 'email' => 'admin.jakarta@sayabantu.com', 'role' => 'Admin Wilayah'],
+                        ['name' => 'Admin DI Yogyakarta', 'area' => 'Yogyakarta', 'email' => 'admin.jogja@sayabantu.com', 'role' => 'Admin Wilayah'],
                     ];
                 @endphp
                 @foreach ($testAdmins as $a)

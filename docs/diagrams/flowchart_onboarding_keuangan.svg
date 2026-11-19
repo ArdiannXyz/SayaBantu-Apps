@@ -1,0 +1,270 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2600 1550" width="2600" height="1550" style="background:#ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+    <defs>
+        <pattern id="grid-sub" width="24" height="24" patternUnits="userSpaceOnUse">
+            <circle cx="2" cy="2" r="1.2" fill="#cbd5e1" opacity="0.6"/>
+        </pattern>
+        <filter id="sub-card-shadow" x="-5%" y="-5%" width="112%" height="112%">
+            <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#0f172a" flood-opacity="0.06"/>
+            <feDropShadow dx="0" dy="1" stdDeviation="2" flood-color="#0f172a" flood-opacity="0.04"/>
+        </filter>
+        <filter id="banner-shadow-sub" x="-3%" y="-5%" width="106%" height="115%">
+            <feDropShadow dx="0" dy="6" stdDeviation="12" flood-color="#0f172a" flood-opacity="0.07"/>
+        </filter>
+
+        <!-- Arrow Markers -->
+        <marker id="sub-arrow-blue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#2563eb" />
+        </marker>
+        <marker id="sub-arrow-green" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#059669" />
+        </marker>
+        <marker id="sub-arrow-amber" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#d97706" />
+        </marker>
+        <marker id="sub-arrow-red" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#dc2626" />
+        </marker>
+    </defs>
+
+    <rect width="2600" height="1550" fill="url(#grid-sub)" />
+
+    <!-- Header Banner -->
+    <rect x="50" y="30" width="2500" height="92" rx="14" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5" filter="url(#banner-shadow-sub)"/>
+    <rect x="50" y="30" width="10" height="92" rx="4" fill="#2563eb"/>
+    <g transform="translate(80, 50)">
+        <text x="0" y="24" fill="#0f172a" font-size="25" font-weight="800" letter-spacing="0.5">FLOWCHART ONBOARDING MITRA &amp; EKOSISTEM DOMPET DIGITAL SAYABANTU</text>
+        <text x="0" y="50" fill="#64748b" font-size="14.5">Alur Verifikasi KTP (KYC) Calon Mitra, Top Up Saldo Digital Otomatis via Midtrans Snap, dan Penarikan Saldo (Withdrawal)</text>
+    </g>
+
+    <!-- Section A: KYC Onboarding Mitra (Y: 150 to 570) -->
+    <rect x="50" y="145" width="2500" height="415" rx="12" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+    <rect x="50" y="145" width="2500" height="42" rx="12" fill="#eff6ff"/>
+    <line x1="50" y1="187" x2="2550" y2="187" stroke="#bfdbfe" stroke-width="1.5"/>
+    <text x="75" y="173" fill="#1d4ed8" font-size="16" font-weight="bold">BAGIAN 1: ALUR REGISTRASI &amp; VERIFIKASI IDENTITAS KTP (KYC) MITRA</text>
+
+    <!-- Section B: Top Up Midtrans (Y: 585 to 1005) -->
+    <rect x="50" y="585" width="2500" height="415" rx="12" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+    <rect x="50" y="585" width="2500" height="42" rx="12" fill="#ecfdf5"/>
+    <line x1="50" y1="627" x2="2550" y2="627" stroke="#a7f3d0" stroke-width="1.5"/>
+    <text x="75" y="613" fill="#047857" font-size="16" font-weight="bold">BAGIAN 2: ALUR TOP UP SALDO DIGITAL CUSTOMER VIA PAYMENT GATEWAY MIDTRANS</text>
+
+    <!-- Section C: Withdraw Saldo Mitra (Y: 1025 to 1445) -->
+    <rect x="50" y="1025" width="2500" height="415" rx="12" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+    <rect x="50" y="1025" width="2500" height="42" rx="12" fill="#fffbeb"/>
+    <line x1="50" y1="1067" x2="2550" y2="1067" stroke="#fde68a" stroke-width="1.5"/>
+    <text x="75" y="1053" fill="#b45309" font-size="16" font-weight="bold">BAGIAN 3: ALUR PENARIKAN SALDO (WITHDRAWAL) MITRA KE REKENING BANK</text>
+
+<g transform="translate(80,215)" filter="url(#sub-card-shadow)">
+<rect x="0" y="0" width="340" height="160" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+<rect x="0" y="0" width="6" height="160" rx="3" fill="#2563eb"/>
+<rect x="235" y="8" width="95" height="18" rx="9" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+<text x="283" y="20" fill="#2563eb" font-size="9" font-weight="bold" text-anchor="middle">REGISTER</text>
+<text x="16" y="24" fill="#2563eb" font-size="11" font-weight="bold">LANGKAH 1</text>
+<text x="16" y="45" fill="#0f172a" font-size="14.5" font-weight="bold">Registrasi Akun Baru</text>
+<text x="16" y="67" fill="#475569" font-size="11.5">• Calon mitra input Nama, Email, Password, No HP</text>
+<text x="16" y="83.5" fill="#475569" font-size="11.5">• Sistem menyimpan data akun di tabel users</text>
+<text x="16" y="100.0" fill="#475569" font-size="11.5">• Mengirimkan tautan aktivasi verifikasi email</text>
+</g>
+<g transform="translate(460,215)" filter="url(#sub-card-shadow)">
+<rect x="0" y="0" width="340" height="160" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+<rect x="0" y="0" width="6" height="160" rx="3" fill="#2563eb"/>
+<rect x="235" y="8" width="95" height="18" rx="9" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+<text x="283" y="20" fill="#2563eb" font-size="9" font-weight="bold" text-anchor="middle">VERIFY EMAIL</text>
+<text x="16" y="24" fill="#2563eb" font-size="11" font-weight="bold">LANGKAH 2</text>
+<text x="16" y="45" fill="#0f172a" font-size="14.5" font-weight="bold">Verifikasi Email</text>
+<text x="16" y="67" fill="#475569" font-size="11.5">• Calon mitra klik tautan verifikasi email</text>
+<text x="16" y="83.5" fill="#475569" font-size="11.5">• email_verified_at tercatat resmi di database</text>
+<text x="16" y="100.0" fill="#475569" font-size="11.5">• Akun terbuka untuk melengkapi biodata profil</text>
+</g>
+<g transform="translate(840,215)" filter="url(#sub-card-shadow)">
+<rect x="0" y="0" width="360" height="160" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+<rect x="0" y="0" width="6" height="160" rx="3" fill="#2563eb"/>
+<rect x="255" y="8" width="95" height="18" rx="9" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+<text x="303" y="20" fill="#2563eb" font-size="9" font-weight="bold" text-anchor="middle">KYC SUBMISSION</text>
+<text x="16" y="24" fill="#2563eb" font-size="11" font-weight="bold">LANGKAH 3</text>
+<text x="16" y="45" fill="#0f172a" font-size="14.5" font-weight="bold">Upload KTP & Biodata</text>
+<text x="16" y="67" fill="#475569" font-size="11.5">• Wajib melengkapi 16-digit NIK, Kota, Alamat</text>
+<text x="16" y="83.5" fill="#475569" font-size="11.5">• Upload foto fisik KTP & foto Selfie bersama KTP</text>
+<text x="16" y="100.0" fill="#475569" font-size="11.5">• Status pendaftaran: pending_verification</text>
+</g>
+<g transform="translate(1240,215)" filter="url(#sub-card-shadow)">
+<rect x="0" y="0" width="380" height="160" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+<rect x="0" y="0" width="6" height="160" rx="3" fill="#7c3aed"/>
+<rect x="275" y="8" width="95" height="18" rx="9" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+<text x="323" y="20" fill="#7c3aed" font-size="9" font-weight="bold" text-anchor="middle">ADMIN AUDIT</text>
+<text x="16" y="24" fill="#7c3aed" font-size="11" font-weight="bold">LANGKAH 4</text>
+<text x="16" y="45" fill="#0f172a" font-size="14.5" font-weight="bold">Review Admin Wilayah</text>
+<text x="16" y="67" fill="#475569" font-size="11.5">• Admin memeriksa kejelasan NIK & foto dokumen</text>
+<text x="16" y="83.5" fill="#475569" font-size="11.5">• Memastikan NIK tunggal dan tidak terduplikasi</text>
+<text x="16" y="100.0" fill="#475569" font-size="11.5">• Admin Wilayah memutuskan verifikasi identitas</text>
+</g>
+<g transform="translate(1660,215)" filter="url(#sub-card-shadow)">
+<rect x="0" y="0" width="390" height="160" rx="10" fill="#f0fdf4" stroke="#cbd5e1" stroke-width="1.5"/>
+<rect x="0" y="0" width="6" height="160" rx="3" fill="#059669"/>
+<rect x="285" y="8" width="95" height="18" rx="9" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+<text x="333" y="20" fill="#059669" font-size="9" font-weight="bold" text-anchor="middle">APPROVED</text>
+<text x="16" y="24" fill="#059669" font-size="11" font-weight="bold">KEPUTUSAN A</text>
+<text x="16" y="45" fill="#0f172a" font-size="14.5" font-weight="bold">Disetujui (Approved)</text>
+<text x="16" y="67" fill="#475569" font-size="11.5">• verified = true, status = 'active'</text>
+<text x="16" y="83.5" fill="#475569" font-size="11.5">• Mitra resmi terdaftar di Kota domisili</text>
+<text x="16" y="100.0" fill="#475569" font-size="11.5">• Mitra dapat langsung menerima & mengambil order!</text>
+</g>
+<g transform="translate(2090,215)" filter="url(#sub-card-shadow)">
+<rect x="0" y="0" width="390" height="160" rx="10" fill="#fff1f2" stroke="#cbd5e1" stroke-width="1.5"/>
+<rect x="0" y="0" width="6" height="160" rx="3" fill="#dc2626"/>
+<rect x="285" y="8" width="95" height="18" rx="9" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+<text x="333" y="20" fill="#dc2626" font-size="9" font-weight="bold" text-anchor="middle">REJECTED</text>
+<text x="16" y="24" fill="#dc2626" font-size="11" font-weight="bold">KEPUTUSAN B</text>
+<text x="16" y="45" fill="#0f172a" font-size="14.5" font-weight="bold">Ditolak (Rejected)</text>
+<text x="16" y="67" fill="#475569" font-size="11.5">• Admin menginputkan alasan penolakan</text>
+<text x="16" y="83.5" fill="#475569" font-size="11.5">• Notifikasi perbaikan dikirim ke calon mitra</text>
+<text x="16" y="100.0" fill="#475569" font-size="11.5">• Calon mitra dapat mengunggah ulang foto KTP</text>
+</g>
+<path d="M 420 295 L 460 295" fill="none" stroke="#2563eb" stroke-width="2.5" marker-end="url(#sub-arrow-blue)"/>
+<path d="M 800 295 L 840 295" fill="none" stroke="#2563eb" stroke-width="2.5" marker-end="url(#sub-arrow-blue)"/>
+<path d="M 1200 295 L 1240 295" fill="none" stroke="#2563eb" stroke-width="2.5" marker-end="url(#sub-arrow-blue)"/>
+<path d="M 1620 275 L 1660 275" fill="none" stroke="#059669" stroke-width="2.5" marker-end="url(#sub-arrow-green)"/>
+<path d="M 1620 325 C 1850 410, 1950 410, 2090 315" fill="none" stroke="#dc2626" stroke-width="2.5" marker-end="url(#sub-arrow-red)"/>
+<g transform="translate(80,650)" filter="url(#sub-card-shadow)">
+<rect x="0" y="0" width="340" height="160" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+<rect x="0" y="0" width="6" height="160" rx="3" fill="#059669"/>
+<rect x="235" y="8" width="95" height="18" rx="9" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+<text x="283" y="20" fill="#059669" font-size="9" font-weight="bold" text-anchor="middle">TOPUP REQ</text>
+<text x="16" y="24" fill="#059669" font-size="11" font-weight="bold">LANGKAH 1</text>
+<text x="16" y="45" fill="#0f172a" font-size="14.5" font-weight="bold">Pilih Nominal Top Up</text>
+<text x="16" y="67" fill="#475569" font-size="11.5">• Customer membuka menu Dompet di aplikasi</text>
+<text x="16" y="83.5" fill="#475569" font-size="11.5">• Memilih nominal instan / memasukkan nominal</text>
+<text x="16" y="100.0" fill="#475569" font-size="11.5">• Menekan tombol 'Lanjutkan Pembayaran'</text>
+</g>
+<g transform="translate(460,650)" filter="url(#sub-card-shadow)">
+<rect x="0" y="0" width="360" height="160" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+<rect x="0" y="0" width="6" height="160" rx="3" fill="#059669"/>
+<rect x="255" y="8" width="95" height="18" rx="9" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+<text x="303" y="20" fill="#059669" font-size="9" font-weight="bold" text-anchor="middle">MIDTRANS API</text>
+<text x="16" y="24" fill="#059669" font-size="11" font-weight="bold">LANGKAH 2</text>
+<text x="16" y="45" fill="#0f172a" font-size="14.5" font-weight="bold">Request Snap Token</text>
+<text x="16" y="67" fill="#475569" font-size="11.5">• Backend membuat baris transaksi pending</text>
+<text x="16" y="83.5" fill="#475569" font-size="11.5">• Memanggil Midtrans API membuat Snap Token</text>
+<text x="16" y="100.0" fill="#475569" font-size="11.5">• Midtrans mengembalikan snap_token & redirect url</text>
+</g>
+<g transform="translate(860,650)" filter="url(#sub-card-shadow)">
+<rect x="0" y="0" width="380" height="160" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+<rect x="0" y="0" width="6" height="160" rx="3" fill="#059669"/>
+<rect x="275" y="8" width="95" height="18" rx="9" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+<text x="323" y="20" fill="#059669" font-size="9" font-weight="bold" text-anchor="middle">SNAP POPUP</text>
+<text x="16" y="24" fill="#059669" font-size="11" font-weight="bold">LANGKAH 3</text>
+<text x="16" y="45" fill="#0f172a" font-size="14.5" font-weight="bold">Pembayaran Customer</text>
+<text x="16" y="67" fill="#475569" font-size="11.5">• Modal antarmuka Midtrans Snap muncul di layar</text>
+<text x="16" y="83.5" fill="#475569" font-size="11.5">• Customer memilih: VA BCA/Mandiri/BRI, QRIS, GoPay</text>
+<text x="16" y="100.0" fill="#475569" font-size="11.5">• Customer menyelesaikan proses transfer pembayaran</text>
+</g>
+<g transform="translate(1280,650)" filter="url(#sub-card-shadow)">
+<rect x="0" y="0" width="380" height="160" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+<rect x="0" y="0" width="6" height="160" rx="3" fill="#4f46e5"/>
+<rect x="275" y="8" width="95" height="18" rx="9" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+<text x="323" y="20" fill="#4f46e5" font-size="9" font-weight="bold" text-anchor="middle">SERVER WEBHOOK</text>
+<text x="16" y="24" fill="#4f46e5" font-size="11" font-weight="bold">LANGKAH 4</text>
+<text x="16" y="45" fill="#0f172a" font-size="14.5" font-weight="bold">Webhook HTTP Notification</text>
+<text x="16" y="67" fill="#475569" font-size="11.5">• Server Midtrans mengirimkan HTTP POST JSON</text>
+<text x="16" y="83.5" fill="#475569" font-size="11.5">• Backend SayaBantu memvalidasi Signature Key</text>
+<text x="16" y="100.0" fill="#475569" font-size="11.5">• Memeriksa status: 'settlement' / 'capture'</text>
+</g>
+<g transform="translate(1700,650)" filter="url(#sub-card-shadow)">
+<rect x="0" y="0" width="360" height="160" rx="10" fill="#f0fdf4" stroke="#cbd5e1" stroke-width="1.5"/>
+<rect x="0" y="0" width="6" height="160" rx="3" fill="#059669"/>
+<rect x="255" y="8" width="95" height="18" rx="9" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+<text x="303" y="20" fill="#059669" font-size="9" font-weight="bold" text-anchor="middle">BALANCE ADDED</text>
+<text x="16" y="24" fill="#059669" font-size="11" font-weight="bold">LANGKAH 5</text>
+<text x="16" y="45" fill="#0f172a" font-size="14.5" font-weight="bold">Kredit Saldo Otomatis</text>
+<text x="16" y="67" fill="#475569" font-size="11.5">• Status transaksi diperbarui menjadi 'success'</text>
+<text x="16" y="83.5" fill="#475569" font-size="11.5">• Saldo bertambah realtime di user_balances & users</text>
+<text x="16" y="100.0" fill="#475569" font-size="11.5">• Notifikasi pembayaran sukses dikirim ke Customer</text>
+</g>
+<g transform="translate(2100,650)" filter="url(#sub-card-shadow)">
+<rect x="0" y="0" width="380" height="160" rx="10" fill="#fff1f2" stroke="#cbd5e1" stroke-width="1.5"/>
+<rect x="0" y="0" width="6" height="160" rx="3" fill="#dc2626"/>
+<rect x="275" y="8" width="95" height="18" rx="9" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+<text x="323" y="20" fill="#dc2626" font-size="9" font-weight="bold" text-anchor="middle">FAIL / EXPIRE</text>
+<text x="16" y="24" fill="#dc2626" font-size="11" font-weight="bold">KASUS LAIN</text>
+<text x="16" y="45" fill="#0f172a" font-size="14.5" font-weight="bold">Transaksi Batal / Expired</text>
+<text x="16" y="67" fill="#475569" font-size="11.5">• Jika waktu bayar habis / dibatalkan di gateway</text>
+<text x="16" y="83.5" fill="#475569" font-size="11.5">• Status transaksi diperbarui: 'expired' / 'failed'</text>
+<text x="16" y="100.0" fill="#475569" font-size="11.5">• Saldo tidak berubah, transaksi ditutup rapi</text>
+</g>
+<path d="M 420 730 L 460 730" fill="none" stroke="#059669" stroke-width="2.5" marker-end="url(#sub-arrow-green)"/>
+<path d="M 820 730 L 860 730" fill="none" stroke="#059669" stroke-width="2.5" marker-end="url(#sub-arrow-green)"/>
+<path d="M 1240 730 L 1280 730" fill="none" stroke="#059669" stroke-width="2.5" marker-end="url(#sub-arrow-green)"/>
+<path d="M 1660 730 L 1700 730" fill="none" stroke="#059669" stroke-width="2.5" marker-end="url(#sub-arrow-green)"/>
+<path d="M 1660 760 C 1850 840, 1950 840, 2100 750" fill="none" stroke="#dc2626" stroke-width="2.5" marker-end="url(#sub-arrow-red)"/>
+<g transform="translate(80,1090)" filter="url(#sub-card-shadow)">
+<rect x="0" y="0" width="350" height="160" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+<rect x="0" y="0" width="6" height="160" rx="3" fill="#d97706"/>
+<rect x="245" y="8" width="95" height="18" rx="9" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+<text x="293" y="20" fill="#d97706" font-size="9" font-weight="bold" text-anchor="middle">REQ WITHDRAW</text>
+<text x="16" y="24" fill="#d97706" font-size="11" font-weight="bold">LANGKAH 1</text>
+<text x="16" y="45" fill="#0f172a" font-size="14.5" font-weight="bold">Permintaan Tarik Saldo</text>
+<text x="16" y="67" fill="#475569" font-size="11.5">• Mitra masuk ke menu Penarikan Saldo</text>
+<text x="16" y="83.5" fill="#475569" font-size="11.5">• Cek syarat: Akun verified & Saldo mencukupi</text>
+<text x="16" y="100.0" fill="#475569" font-size="11.5">• Memilih Rekening Bank & Input Nominal Tarik</text>
+</g>
+<g transform="translate(470,1090)" filter="url(#sub-card-shadow)">
+<rect x="0" y="0" width="360" height="160" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+<rect x="0" y="0" width="6" height="160" rx="3" fill="#d97706"/>
+<rect x="255" y="8" width="95" height="18" rx="9" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+<text x="303" y="20" fill="#d97706" font-size="9" font-weight="bold" text-anchor="middle">PIN SECURITY</text>
+<text x="16" y="24" fill="#d97706" font-size="11" font-weight="bold">LANGKAH 2</text>
+<text x="16" y="45" fill="#0f172a" font-size="14.5" font-weight="bold">Otorisasi PIN Keamanan</text>
+<text x="16" y="67" fill="#475569" font-size="11.5">• Mitra memasukkan 6-digit PIN Transaksi</text>
+<text x="16" y="83.5" fill="#475569" font-size="11.5">• Sistem memvalidasi hashed PIN (proteksi limit)</text>
+<text x="16" y="100.0" fill="#475569" font-size="11.5">• Saldo ditahan sementara dari dompet aktif</text>
+</g>
+<g transform="translate(870,1090)" filter="url(#sub-card-shadow)">
+<rect x="0" y="0" width="380" height="160" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+<rect x="0" y="0" width="6" height="160" rx="3" fill="#7c3aed"/>
+<rect x="275" y="8" width="95" height="18" rx="9" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+<text x="323" y="20" fill="#7c3aed" font-size="9" font-weight="bold" text-anchor="middle">FINANCE AUDIT</text>
+<text x="16" y="24" fill="#7c3aed" font-size="11" font-weight="bold">LANGKAH 3</text>
+<text x="16" y="45" fill="#0f172a" font-size="14.5" font-weight="bold">Verifikasi Admin / Finance</text>
+<text x="16" y="67" fill="#475569" font-size="11.5">• Admin memeriksa nomor rekening & nama pemilik</text>
+<text x="16" y="83.5" fill="#475569" font-size="11.5">• Memeriksa histori reputasi dan performa mitra</text>
+<text x="16" y="100.0" fill="#475569" font-size="11.5">• Persiapan pencairan transfer via internet banking</text>
+</g>
+<g transform="translate(1290,1090)" filter="url(#sub-card-shadow)">
+<rect x="0" y="0" width="380" height="160" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+<rect x="0" y="0" width="6" height="160" rx="3" fill="#d97706"/>
+<rect x="275" y="8" width="95" height="18" rx="9" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+<text x="323" y="20" fill="#d97706" font-size="9" font-weight="bold" text-anchor="middle">BANK TRANSFER</text>
+<text x="16" y="24" fill="#d97706" font-size="11" font-weight="bold">LANGKAH 4</text>
+<text x="16" y="45" fill="#0f172a" font-size="14.5" font-weight="bold">Transfer & Bukti Bayar</text>
+<text x="16" y="67" fill="#475569" font-size="11.5">• Admin mentransfer dana ke rekening bank Mitra</text>
+<text x="16" y="83.5" fill="#475569" font-size="11.5">• Admin wajib upload foto struk bukti transfer</text>
+<text x="16" y="100.0" fill="#475569" font-size="11.5">• Admin klik tombol 'Setujui Penarikan'</text>
+</g>
+<g transform="translate(1710,1090)" filter="url(#sub-card-shadow)">
+<rect x="0" y="0" width="360" height="160" rx="10" fill="#f0fdf4" stroke="#cbd5e1" stroke-width="1.5"/>
+<rect x="0" y="0" width="6" height="160" rx="3" fill="#059669"/>
+<rect x="255" y="8" width="95" height="18" rx="9" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+<text x="303" y="20" fill="#059669" font-size="9" font-weight="bold" text-anchor="middle">PAYOUT SUCCESS</text>
+<text x="16" y="24" fill="#059669" font-size="11" font-weight="bold">LANGKAH 5</text>
+<text x="16" y="45" fill="#0f172a" font-size="14.5" font-weight="bold">Pencairan Berhasil</text>
+<text x="16" y="67" fill="#475569" font-size="11.5">• Status withdraw_requests update menjadi 'approved'</text>
+<text x="16" y="83.5" fill="#475569" font-size="11.5">• Saldo dompet Mitra terpotong secara permanen</text>
+<text x="16" y="100.0" fill="#475569" font-size="11.5">• Notifikasi dana berhasil dicairkan dikirim ke Mitra</text>
+</g>
+<g transform="translate(2110,1090)" filter="url(#sub-card-shadow)">
+<rect x="0" y="0" width="370" height="160" rx="10" fill="#fff1f2" stroke="#cbd5e1" stroke-width="1.5"/>
+<rect x="0" y="0" width="6" height="160" rx="3" fill="#dc2626"/>
+<rect x="265" y="8" width="95" height="18" rx="9" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+<text x="313" y="20" fill="#dc2626" font-size="9" font-weight="bold" text-anchor="middle">WITHDRAW REJECT</text>
+<text x="16" y="24" fill="#dc2626" font-size="11" font-weight="bold">KASUS PENOLAKAN</text>
+<text x="16" y="45" fill="#0f172a" font-size="14.5" font-weight="bold">Penarikan Ditolak</text>
+<text x="16" y="67" fill="#475569" font-size="11.5">• Rekening tidak sesuai / terindikasi pelanggaran</text>
+<text x="16" y="83.5" fill="#475569" font-size="11.5">• Admin mengisi admin_notes alasan penolakan</text>
+<text x="16" y="100.0" fill="#475569" font-size="11.5">• Saldo yang ditahan dikembalikan utuh ke Mitra</text>
+</g>
+<path d="M 430 1170 L 470 1170" fill="none" stroke="#d97706" stroke-width="2.5" marker-end="url(#sub-arrow-amber)"/>
+<path d="M 830 1170 L 870 1170" fill="none" stroke="#d97706" stroke-width="2.5" marker-end="url(#sub-arrow-amber)"/>
+<path d="M 1250 1170 L 1290 1170" fill="none" stroke="#d97706" stroke-width="2.5" marker-end="url(#sub-arrow-amber)"/>
+<path d="M 1670 1170 L 1710 1170" fill="none" stroke="#059669" stroke-width="2.5" marker-end="url(#sub-arrow-green)"/>
+<path d="M 1670 1200 C 1860 1280, 1960 1280, 2110 1190" fill="none" stroke="#dc2626" stroke-width="2.5" marker-end="url(#sub-arrow-red)"/>
+</svg>
