@@ -71,6 +71,11 @@ class Categories extends Component
         $this->showCreateModal = true;
     }
 
+    public function selectIcon(string $emoji): void
+    {
+        $this->icon = $emoji;
+    }
+
     public function editCategory($id)
     {
         $this->resetForm();

@@ -179,45 +179,115 @@
 
     {{-- Create / Edit Modal --}}
     @if($showCreateModal)
-        <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-            <div class="bg-white rounded-xl shadow-lg w-11/12 max-w-md overflow-hidden flex flex-col max-h-[90vh]">
-                <div class="bg-primary-600 p-4 text-white flex justify-between items-center flex-shrink-0">
+        <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-2xs p-4">
+            <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]">
+                <div class="bg-primary-600 p-5 text-white flex justify-between items-center flex-shrink-0">
                     <div>
                         <h3 class="font-bold text-lg leading-tight">{{ $categoryId ? 'Edit Kategori' : 'Tambah Kategori Baru' }}</h3>
                         <p class="text-xs text-primary-100 mt-0.5">Lengkapi form untuk mengelola kategori bantuan</p>
                     </div>
-                    <button wire:click="closeModal" class="text-white/80 hover:text-white hover:bg-white/10 p-1.5 rounded-lg transition-colors">
+                    <button wire:click="closeModal" class="text-white/80 hover:text-white hover:bg-white/10 p-1.5 rounded-lg transition-colors cursor-pointer" title="Tutup">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                     </button>
                 </div>
 
-                <div class="p-6">
-                    <form wire:submit.prevent="saveCategory" class="space-y-6">
+                <div class="p-6 overflow-y-auto max-h-[80vh] no-scrollbar">
+                    <form wire:submit.prevent="saveCategory" class="space-y-5">
                         <div class="grid grid-cols-1 gap-5">
                             <div>
-                                <label class="text-xs font-medium text-gray-700">Nama Kategori</label>
-                                <input type="text" wire:model="name" class="w-full mt-1 px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="Misal: Rumah Tangga">
+                                <label class="text-xs font-semibold text-gray-700">Nama Kategori</label>
+                                <input type="text" wire:model="name" class="w-full mt-1.5 px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 shadow-2xs" placeholder="Misal: Rumah Tangga">
                                 @error('name') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
                             </div>
 
-                            <div>
-                                <label class="text-xs font-medium text-gray-700">Icon (Emoji/Teks) <span class="text-gray-400 font-normal">(Opsional)</span></label>
-                                <input type="text" wire:model="icon" class="w-full mt-1 px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="Misal: 🧹">
+                            <!-- Pilihan Icon (Emoji Selector) -->
+                            <div x-data="{
+                                activeTab: 'all',
+                                categories: {
+                                    'all': 'Semua',
+                                    'clean': 'Kebersihan',
+                                    'tech': 'Teknis & Tukang',
+                                    'delivery': 'Antar & Kirim',
+                                    'food': 'Makanan',
+                                    'service': 'Layanan & Khusus'
+                                },
+                                icons: {
+                                    'clean': ['🧹', '🧽', '🗑️', '🧺', '🧼', '🚿', '🪣', '🪦'],
+                                    'tech': ['🔧', '🔨', '🛠️', '🪛', '🔌', '💡', '🚰', '🪜', '🛋️', '🧱', '🧰', '🔒'],
+                                    'delivery': ['🛵', '📦', '🚚', '🚗', '🚲', '🛒', '🛍️', '🗺️', '⛽', '🏎️'],
+                                    'food': ['🍔', '🍕', '🍜', '🍱', '☕', '🧃', '🍎', '🍳', '🍞', '🥩'],
+                                    'service': ['🕵️', '🏃', '🐾', '👶', '🤝', '💼', '📝', '🩺', '💊', '💇', '🌱', '🪴', '📱', '💻', '📷', '🎯', '⭐', '✨']
+                                },
+                                getAllIcons() {
+                                    let all = [];
+                                    for (let k in this.icons) {
+                                        all = all.concat(this.icons[k]);
+                                    }
+                                    return all;
+                                }
+                            }">
+                                <div class="flex items-center justify-between mb-1.5">
+                                    <label class="text-xs font-semibold text-gray-700">Icon Kategori</label>
+                                    <button type="button" x-show="$wire.icon" @click="$wire.set('icon', '')" class="text-[11px] text-red-500 hover:text-red-700 font-medium cursor-pointer">
+                                        ✕ Kosongkan
+                                    </button>
+                                </div>
+
+                                <!-- Preview & Quick Input -->
+                                <div class="flex items-center gap-3 p-3 bg-gray-50 border border-gray-200 rounded-xl mb-2.5">
+                                    <div class="w-12 h-12 rounded-xl bg-white border-2 border-primary-500 flex items-center justify-center text-2xl shadow-2xs shrink-0 select-none">
+                                        <span x-text="$wire.icon || '❓'"></span>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <div class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Icon Terpilih</div>
+                                        <div class="text-xs font-bold text-gray-800 truncate" x-text="$wire.icon ? ('Emoji: ' + $wire.icon) : 'Klik salah satu opsi di bawah'"></div>
+                                    </div>
+                                    <div class="w-32 shrink-0">
+                                        <input type="text" wire:model.live="icon" maxlength="10" 
+                                            class="w-full px-2.5 py-1.5 text-center text-sm border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-primary-500 font-medium" 
+                                            placeholder="Ketik manual">
+                                    </div>
+                                </div>
+
+                                <!-- Opsi Pilihan Icon -->
+                                <div class="border border-gray-200 rounded-xl p-3 bg-white shadow-2xs">
+                                    <!-- Category Tabs -->
+                                    <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-2 mb-2 border-b border-gray-100">
+                                        <template x-for="(label, key) in categories" :key="key">
+                                            <button type="button" @click="activeTab = key"
+                                                :class="activeTab === key ? 'bg-primary-600 text-white shadow-2xs font-bold' : 'bg-gray-100 text-gray-600 hover:bg-gray-200 font-medium'"
+                                                class="px-2.5 py-1 text-[11px] rounded-lg whitespace-nowrap transition cursor-pointer"
+                                                x-text="label">
+                                            </button>
+                                        </template>
+                                    </div>
+
+                                    <!-- Grid Icon Emojis -->
+                                    <div class="grid grid-cols-7 sm:grid-cols-9 gap-2 max-h-40 overflow-y-auto no-scrollbar p-1">
+                                        <template x-for="item in (activeTab === 'all' ? getAllIcons() : (icons[activeTab] || []))" :key="item">
+                                            <button type="button" 
+                                                @click="$wire.set('icon', item)"
+                                                :class="$wire.icon === item ? 'bg-primary-100 border-primary-500 ring-2 ring-primary-500 scale-110 shadow-xs' : 'bg-gray-50/80 border-gray-200 hover:bg-primary-50 hover:border-primary-300 hover:scale-105'"
+                                                class="h-9 w-9 rounded-xl border flex items-center justify-center text-lg transition cursor-pointer select-none"
+                                                :title="item">
+                                                <span x-text="item"></span>
+                                            </button>
+                                        </template>
+                                    </div>
+                                </div>
                                 @error('icon') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
                             </div>
 
-
-
                             <div>
-                                <label class="text-xs font-medium text-gray-700">Deskripsi Singkat <span class="text-gray-400 font-normal">(Opsional)</span></label>
-                                <textarea wire:model="description" rows="3" class="w-full mt-1 px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="Deskripsi tentang kategori ini..."></textarea>
+                                <label class="text-xs font-semibold text-gray-700">Deskripsi Singkat <span class="text-gray-400 font-normal">(Opsional)</span></label>
+                                <textarea wire:model="description" rows="3" class="w-full mt-1.5 px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 shadow-2xs" placeholder="Deskripsi tentang kategori ini..."></textarea>
                                 @error('description') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
                             </div>
                         </div>
 
-                        <div class="pt-2 border-t flex items-center justify-end gap-3 mt-6">
-                            <button type="button" wire:click.prevent="closeModal" class="px-4 py-2 border border-gray-200 rounded-lg text-sm text-gray-700 hover:bg-gray-50">Batal</button>
-                            <button type="submit" class="px-4 py-2 bg-primary-600 text-white rounded-lg flex items-center gap-2 text-sm" wire:loading.attr="disabled">
+                        <div class="pt-3 border-t flex items-center justify-end gap-3 mt-6">
+                            <button type="button" wire:click.prevent="closeModal" class="px-4 py-2 border border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 cursor-pointer transition">Batal</button>
+                            <button type="submit" class="px-5 py-2 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-xl flex items-center gap-2 text-sm shadow-sm shadow-primary-500/20 cursor-pointer transition" wire:loading.attr="disabled">
                                 <svg wire:loading class="w-4 h-4 animate-spin" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path></svg>
                                 <span>{{ $categoryId ? 'Simpan Perubahan' : 'Tambah Kategori' }}</span>
                             </button>

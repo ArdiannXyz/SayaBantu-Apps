@@ -8,7 +8,6 @@ use Livewire\Attributes\Layout;
 use Livewire\Component;
 use Livewire\WithPagination;
 
-#[Layout('layouts.admin')]
 class Index extends Component
 {
     use WithPagination;
@@ -308,6 +307,10 @@ class Index extends Component
         $verifications = $query->with('user')->latest()->paginate($this->perPage);
         $selected = $this->selectedId ? Registration::with('user')->find($this->selectedId) : null;
 
-        return view('admin.verifications', compact('verifications', 'selected'));
+        $layout = (auth()->check() && auth()->user()->role === 'super_admin')
+            ? 'layouts.superadmin'
+            : 'layouts.admin';
+
+        return view('admin.verifications', compact('verifications', 'selected'))->layout($layout);
     }
 }

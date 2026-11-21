@@ -493,6 +493,85 @@
                         </div>
                     </div>
 
+                    {{-- Dokumen Identitas (KTP & Selfie) --}}
+                    <div class="mt-6 border-t border-gray-100 pt-5">
+                        <div class="flex items-center justify-between mb-3">
+                            <h4 class="text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center">
+                                <svg class="w-4 h-4 mr-1.5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                                </svg>
+                                Dokumen Identitas (KTP &amp; Foto Selfie)
+                            </h4>
+                            @if($selectedUser->verified)
+                                <span class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-green-100 text-green-800 border border-green-200">
+                                    Terverifikasi
+                                </span>
+                            @else
+                                <span class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-yellow-100 text-yellow-800 border border-yellow-200">
+                                    Belum Terverifikasi
+                                </span>
+                            @endif
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <!-- Foto Selfie -->
+                            <div class="bg-gray-50/70 p-3.5 rounded-xl border border-gray-200">
+                                <div class="text-xs font-semibold text-gray-700 mb-2 flex items-center justify-between">
+                                    <span>📸 Foto Selfie</span>
+                                    @if(!empty($selectedUser->selfie_url))
+                                        <a href="{{ $selectedUser->selfie_url }}" target="_blank" rel="noopener noreferrer" class="text-[11px] text-primary-600 hover:text-primary-700 hover:underline inline-flex items-center gap-1">
+                                            Buka Tab Baru &rarr;
+                                        </a>
+                                    @endif
+                                </div>
+                                @if(!empty($selectedUser->selfie_url))
+                                    <a href="{{ $selectedUser->selfie_url }}" target="_blank" rel="noopener noreferrer" class="block rounded-lg overflow-hidden border border-gray-200 hover:border-primary-500 transition shadow-2xs group bg-white">
+                                        <img src="{{ $selectedUser->selfie_url }}" alt="Foto Selfie {{ $selectedUser->name }}" class="w-full h-44 object-cover group-hover:scale-105 transition duration-300" />
+                                    </a>
+                                    <div class="mt-2 flex items-center justify-between text-xs">
+                                        <a href="{{ $selectedUser->selfie_url }}" target="_blank" class="text-blue-600 hover:underline">Perbesar</a>
+                                        <a href="{{ $selectedUser->selfie_url }}" download class="text-gray-600 hover:underline">Unduh</a>
+                                    </div>
+                                @else
+                                    <div class="w-full h-44 bg-gray-100/60 rounded-lg flex flex-col items-center justify-center text-gray-400 border border-dashed border-gray-300">
+                                        <svg class="w-10 h-10 mb-1.5 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                        </svg>
+                                        <span class="text-xs">Foto selfie belum diunggah</span>
+                                    </div>
+                                @endif
+                            </div>
+
+                            <!-- Foto KTP -->
+                            <div class="bg-gray-50/70 p-3.5 rounded-xl border border-gray-200">
+                                <div class="text-xs font-semibold text-gray-700 mb-2 flex items-center justify-between">
+                                    <span>🪪 Foto KTP</span>
+                                    @if(!empty($selectedUser->ktp_url))
+                                        <a href="{{ $selectedUser->ktp_url }}" target="_blank" rel="noopener noreferrer" class="text-[11px] text-primary-600 hover:text-primary-700 hover:underline inline-flex items-center gap-1">
+                                            Buka Tab Baru &rarr;
+                                        </a>
+                                    @endif
+                                </div>
+                                @if(!empty($selectedUser->ktp_url))
+                                    <a href="{{ $selectedUser->ktp_url }}" target="_blank" rel="noopener noreferrer" class="block rounded-lg overflow-hidden border border-gray-200 hover:border-primary-500 transition shadow-2xs group bg-white">
+                                        <img src="{{ $selectedUser->ktp_url }}" alt="Foto KTP {{ $selectedUser->name }}" class="w-full h-44 object-contain bg-white group-hover:scale-105 transition duration-300" />
+                                    </a>
+                                    <div class="mt-2 flex items-center justify-between text-xs">
+                                        <a href="{{ $selectedUser->ktp_url }}" target="_blank" class="text-blue-600 hover:underline">Perbesar</a>
+                                        <a href="{{ $selectedUser->ktp_url }}" download class="text-gray-600 hover:underline">Unduh</a>
+                                    </div>
+                                @else
+                                    <div class="w-full h-44 bg-gray-100/60 rounded-lg flex flex-col items-center justify-center text-gray-400 border border-dashed border-gray-300">
+                                        <svg class="w-10 h-10 mb-1.5 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                        </svg>
+                                        <span class="text-xs">Foto KTP belum diunggah</span>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+
                     {{-- Rating Summary --}}
                     @php
                         if ($selectedUser->isMitra()) {

@@ -172,22 +172,17 @@
             transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* Custom scrollbar untuk sidebar nav agar tetap rapi */
-        #admin-sidebar-nav::-webkit-scrollbar {
-            width: 4px;
+        /* Sembunyikan scrollbar pada sidebar dan seluruh area admin agar rapi (tetap bisa di-scroll) */
+        #admin-sidebar-nav::-webkit-scrollbar,
+        ::-webkit-scrollbar {
+            display: none !important;
+            width: 0 !important;
+            height: 0 !important;
         }
-        #admin-sidebar-nav::-webkit-scrollbar-thumb {
-            background: rgba(0, 102, 255, 0.2);
-            border-radius: 4px;
-        }
-
-        /* Custom scrollbar untuk admin sidebar */
-        #admin-sidebar-nav::-webkit-scrollbar {
-            width: 4px;
-        }
-        #admin-sidebar-nav::-webkit-scrollbar-thumb {
-            background: rgba(0, 102, 255, 0.2);
-            border-radius: 4px;
+        #admin-sidebar-nav,
+        html, body, * {
+            -ms-overflow-style: none !important;
+            scrollbar-width: none !important;
         }
 
         /* Pastikan elemen anak di dalam menu sidebar tidak memblokir event klik link atau tombol */
@@ -248,7 +243,7 @@
                 </div>
             </div>
 
-            <nav class="p-3 flex-1 overflow-y-auto" id="admin-sidebar-nav" @click="if ($event.target.closest('a')) sidebarOpen = false">
+            <nav class="p-3 flex-1 overflow-y-auto no-scrollbar [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden" id="admin-sidebar-nav" @click="if ($event.target.closest('a')) sidebarOpen = false">
                 <a href="{{ route('admin.dashboard') }}" wire:navigate
                     class="flex items-center mx-1 px-3 py-2.5 mb-1 text-xs font-medium leading-tight {{ request()->routeIs('admin.dashboard') ? 'text-white bg-gradient-to-r from-[#0066FF] to-[#0052CC] shadow-md shadow-blue-500/25 font-semibold' : 'text-slate-600 hover:text-[#0066FF] hover:bg-white/90 hover:shadow-2xs' }} rounded-xl transition cursor-pointer group">
                     <svg class="w-5 h-5 mr-3 flex-shrink-0 {{ request()->routeIs('admin.dashboard') ? 'text-white' : 'text-slate-400 group-hover:text-[#0066FF]' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>

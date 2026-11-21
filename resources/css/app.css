@@ -78,4 +78,18 @@
     .shadow-brand {
         box-shadow: 0 4px 14px 0 rgba(0, 152, 231, 0.35);
     }
+
+    /* Utilitas sembunyikan scrollbar agar tampilan mulus & tetap bisa di-scroll */
+    .no-scrollbar::-webkit-scrollbar,
+    .hide-scrollbar::-webkit-scrollbar {
+        display: none !important;
+        width: 0 !important;
+        height: 0 !important;
+    }
+
+    .no-scrollbar,
+    .hide-scrollbar {
+        -ms-overflow-style: none !important;
+        scrollbar-width: none !important;
+    }
 }

@@ -100,7 +100,9 @@ trait HasProfileCompleteness
             }
         }
         if ($path) {
-            return asset('storage/'.ltrim($path, '/'));
+            return \Illuminate\Support\Str::startsWith($path, ['http://', 'https://'])
+                ? $path
+                : asset('storage/'.ltrim($path, '/'));
         }
 
         return null;
@@ -118,7 +120,9 @@ trait HasProfileCompleteness
             }
         }
         if ($path) {
-            return asset('storage/'.ltrim($path, '/'));
+            return \Illuminate\Support\Str::startsWith($path, ['http://', 'https://'])
+                ? $path
+                : asset('storage/'.ltrim($path, '/'));
         }
 
         return null;

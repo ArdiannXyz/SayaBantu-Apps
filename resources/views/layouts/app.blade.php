@@ -1116,6 +1116,7 @@
             navItem.classList.add('text-primary-600', 'active');
         });
     </script>
+    <x-camera-modal />
 </body>
 
 </html>

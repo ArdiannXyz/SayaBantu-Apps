@@ -8,6 +8,7 @@ Route::middleware(['auth', 'verified', 'super_admin'])->prefix('superadmin')->na
     Route::get('/customers', \App\Livewire\SuperAdmin\Users::class)->name('customers');
     Route::get('/mitra', \App\Livewire\SuperAdmin\Users::class)->name('mitra');
     Route::get('/users', \App\Livewire\SuperAdmin\Users::class)->name('users');
+    Route::get('/verifications', \App\Livewire\Admin\Verifications\Index::class)->name('verifications');
     Route::get('/ratings', \App\Livewire\SuperAdmin\Ratings::class)->name('ratings.index');
     Route::get('/cities', \App\Livewire\SuperAdmin\Cities::class)->name('cities');
     Route::get('/categories', \App\Livewire\SuperAdmin\Categories::class)->name('categories');

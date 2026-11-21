@@ -27,8 +27,10 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        $defaultPassword = Hash::make('Sayabantu123!');
-        $defaultPin = Hash::make('123456');
+        $defaultPassword = Hash::make(env('SEED_DEFAULT_PASSWORD', 'Sayabantu123!'));
+        $superadminPassword = Hash::make(env('SUPERADMIN_PASSWORD', env('SEED_DEFAULT_PASSWORD', 'Sayabantu123!')));
+        $adminPassword = Hash::make(env('ADMIN_PASSWORD', env('SEED_DEFAULT_PASSWORD', 'Sayabantu123!')));
+        $defaultPin = Hash::make(env('DEFAULT_TRANSACTION_PIN', '123456'));
 
         $columns = Schema::getColumnListing('users');
         $hasOccupation = in_array('occupation', $columns);
@@ -60,9 +62,9 @@ class UserSeeder extends Seeder
             // 1. SUPER ADMIN (Nasional)
             // =========================================================================
             [
-                'email' => 'superadmin@sayabantu.com',
+                'email' => env('SUPERADMIN_EMAIL', 'superadmin@sayabantu.com'),
                 'name' => 'Super Admin (Nasional)',
-                'password' => $defaultPassword,
+                'password' => $superadminPassword,
                 'role' => 'super_admin',
                 'verified' => true,
                 'status' => 'active',
@@ -81,9 +83,9 @@ class UserSeeder extends Seeder
             // 2. ADMIN DI YOGYAKARTA
             // =========================================================================
             [
-                'email' => 'admin.jogja@sayabantu.com',
+                'email' => env('ADMIN_EMAIL', 'admin.jogja@sayabantu.com'),
                 'name' => 'Admin DI Yogyakarta',
-                'password' => $defaultPassword,
+                'password' => $adminPassword,
                 'role' => 'admin',
                 'city_id' => $yogyaId,
                 'city' => $yogyaName,

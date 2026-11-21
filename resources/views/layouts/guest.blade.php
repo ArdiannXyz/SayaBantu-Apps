@@ -137,6 +137,7 @@
             </div>
         @endif
     </div>
+    <x-camera-modal />
     @livewireScripts
 </body>
 

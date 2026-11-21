@@ -440,10 +440,10 @@
                         </div>
                     @endif
 
-                    <!-- Transfer Bank -->
+                    <!-- Transfer Bank & E-Wallet -->
                     <div class="mb-6">
                         <h3 class="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
-                            <span>🏦</span> TRANSFER BANK
+                            <span>💳</span> TRANSFER BANK & E-WALLET
                         </h3>
                         <div class="space-y-3">
                             @foreach($availableBanks as $bank)

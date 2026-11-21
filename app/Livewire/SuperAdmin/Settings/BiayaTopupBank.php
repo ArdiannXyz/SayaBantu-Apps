@@ -293,6 +293,18 @@ class BiayaTopupBank extends Component
         ];
 
         AppSetting::set('topup_payment_methods', json_encode($paymentMethods));
+
+        // Sinkronkan ke bank_channels
+        foreach ($this->payment_banks as $b) {
+            $code = strtoupper($b['code'] ?? '');
+            if (! empty($code)) {
+                \App\Models\BankChannel::where('code', $code)->update([
+                    'account_number' => $b['account_number'] ?? null,
+                    'account_name' => $b['account_name'] ?? null,
+                    'is_active' => ! empty($b['enabled']),
+                ]);
+            }
+        }
     }
 
     public function save()

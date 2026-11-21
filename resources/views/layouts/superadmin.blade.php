@@ -30,6 +30,10 @@
             'title' => 'Manajemen Administrator',
             'subtitle' => 'Kelola akun Super Admin (Nasional) dan Admin Wilayah dalam sistem'
         ],
+        'superadmin.verifications' => [
+            'title' => 'Verifikasi KTP & Dokumen',
+            'subtitle' => 'Kelola dan verifikasi identitas KTP dan foto selfie mitra seluruh Indonesia'
+        ],
         'superadmin.settings.help' => [
             'title' => 'Pengaturan Bantuan',
             'subtitle' => 'Kelola nominal minimal, radius mitra, dan biaya platform'
@@ -96,7 +100,10 @@
     $detectedSubtitle = $routeMeta[$currentRoute]['subtitle'] ?? null;
 
     if (!$detectedTitle) {
-        if (request()->routeIs('superadmin.users*')) {
+        if (request()->routeIs('superadmin.verifications*')) {
+            $detectedTitle = 'Verifikasi KTP & Dokumen';
+            $detectedSubtitle = 'Kelola dan verifikasi identitas KTP dan foto selfie mitra seluruh Indonesia';
+        } elseif (request()->routeIs('superadmin.users*')) {
             $detectedTitle = 'Kelola Pengguna';
             $detectedSubtitle = 'Kelola semua pengguna dalam sistem';
         } elseif (request()->routeIs('superadmin.ratings*')) {
@@ -199,13 +206,17 @@
             transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* Custom scrollbar untuk superadmin sidebar */
-        #superadmin-sidebar-nav::-webkit-scrollbar {
-            width: 4px;
+        /* Sembunyikan scrollbar pada sidebar dan seluruh area superadmin agar rapi (tetap bisa di-scroll) */
+        #superadmin-sidebar-nav::-webkit-scrollbar,
+        ::-webkit-scrollbar {
+            display: none !important;
+            width: 0 !important;
+            height: 0 !important;
         }
-        #superadmin-sidebar-nav::-webkit-scrollbar-thumb {
-            background: rgba(0, 102, 255, 0.2);
-            border-radius: 4px;
+        #superadmin-sidebar-nav,
+        html, body, * {
+            -ms-overflow-style: none !important;
+            scrollbar-width: none !important;
         }
 
         /* Pastikan elemen anak di dalam menu sidebar tidak memblokir event klik link atau tombol */
@@ -266,7 +277,7 @@
                 </div>
             </div>
 
-            <nav class="p-3 flex-1 overflow-y-auto" id="superadmin-sidebar-nav" @click="if ($event.target.closest('a')) sidebarOpen = false">
+            <nav class="p-3 flex-1 overflow-y-auto no-scrollbar [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden" id="superadmin-sidebar-nav" @click="if ($event.target.closest('a')) sidebarOpen = false">
                 <a href="{{ route('superadmin.dashboard') }}" wire:navigate
                     class="flex items-center mx-1 px-3 py-2.5 mb-1 text-xs font-medium leading-tight {{ request()->routeIs('superadmin.dashboard') ? 'text-white bg-gradient-to-r from-[#0066FF] to-[#0052CC] shadow-md shadow-blue-500/25 font-semibold' : 'text-slate-600 hover:text-[#0066FF] hover:bg-white/90 hover:shadow-2xs' }} rounded-xl transition cursor-pointer group">
                     <svg class="w-5 h-5 mr-3 flex-shrink-0 {{ request()->routeIs('superadmin.dashboard') ? 'text-white' : 'text-slate-400 group-hover:text-[#0066FF]' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -288,6 +299,15 @@
                             d="M16 11c1.657 0 3-1.343 3-3S17.657 5 16 5s-3 1.343-3 3 1.343 3 3 3zM6 21v-2a4 4 0 014-4h4a4 4 0 014 4v2" />
                     </svg>
                     <span>Manajemen Admin</span>
+                </a>
+
+                <a href="{{ route('superadmin.verifications') }}" wire:navigate
+                    class="flex items-center mx-1 px-3 py-2.5 mb-1 text-xs font-medium leading-tight {{ request()->routeIs('superadmin.verifications*') ? 'text-white bg-gradient-to-r from-[#0066FF] to-[#0052CC] shadow-md shadow-blue-500/25 font-semibold' : 'text-slate-600 hover:text-[#0066FF] hover:bg-white/90 hover:shadow-2xs' }} rounded-xl transition cursor-pointer group">
+                    <svg class="w-5 h-5 mr-3 flex-shrink-0 {{ request()->routeIs('superadmin.verifications*') ? 'text-white' : 'text-slate-400 group-hover:text-[#0066FF]' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                    </svg>
+                    <span>Verifikasi KTP</span>
                 </a>
 
                 <a href="{{ route('superadmin.customers') }}" wire:navigate

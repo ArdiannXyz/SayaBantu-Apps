@@ -56,8 +56,11 @@ class Registration extends Model
      */
     public function getSelfieUrlAttribute()
     {
-        if ($this->selfie_photo_path) {
-            return asset('storage/'.$this->selfie_photo_path);
+        $path = $this->selfie_photo_path ?: ($this->user?->selfie_photo ?? $this->user?->selfie_path);
+        if ($path) {
+            return \Illuminate\Support\Str::startsWith($path, ['http://', 'https://'])
+                ? $path
+                : asset('storage/'.ltrim($path, '/'));
         }
 
         return null;
@@ -68,8 +71,11 @@ class Registration extends Model
      */
     public function getKtpUrlAttribute()
     {
-        if ($this->ktp_photo_path) {
-            return asset('storage/'.$this->ktp_photo_path);
+        $path = $this->ktp_photo_path ?: ($this->user?->ktp_photo ?? $this->user?->ktp_path);
+        if ($path) {
+            return \Illuminate\Support\Str::startsWith($path, ['http://', 'https://'])
+                ? $path
+                : asset('storage/'.ltrim($path, '/'));
         }
 
         return null;

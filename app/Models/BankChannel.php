@@ -13,6 +13,8 @@ class BankChannel extends Model
         'code',
         'name',
         'category',
+        'account_number',
+        'account_name',
         'is_active',
         'order',
     ];
