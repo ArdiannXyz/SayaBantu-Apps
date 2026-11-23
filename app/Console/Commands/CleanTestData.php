@@ -209,24 +209,13 @@ class CleanTestData extends Command
             }
             $bar->advance();
 
-            // C. Bersihkan tabel user_balances (pertahankan super admin)
+            // C. Bersihkan tabel user_balances (role admin & superadmin bersih tanpa saldo)
             if (Schema::hasTable('user_balances')) {
-                $preservedUserIds = $keepAdmins ? array_merge($superAdminIds, $adminIds) : $superAdminIds;
-                $deletedBalances = DB::table('user_balances')
-                    ->whereNotIn('user_id', $preservedUserIds)
-                    ->delete();
-
-                // Reset saldo super admin menjadi 0 (bersih dari transaksi lama)
-                foreach ($superAdmins as $sa) {
-                    UserBalance::updateOrCreate(
-                        ['user_id' => $sa->id],
-                        ['balance' => 0]
-                    );
-                }
+                $deletedBalances = DB::table('user_balances')->delete();
 
                 $summary[] = [
                     'name' => 'user_balances (saldo user)',
-                    'status' => '<fg=green>Dibersihkan (Kecuali Super Admin)</>',
+                    'status' => '<fg=green>Dibersihkan Bersih</>',
                     'count' => $deletedBalances.' baris',
                 ];
             }

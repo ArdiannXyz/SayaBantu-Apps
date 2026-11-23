@@ -169,6 +169,8 @@
     @else
         <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicon-32x32.png') }}">
         <link rel="icon" type="image/svg+xml" href="{{ asset('icons/icon.svg') }}">
+        <link rel="shortcut icon" href="{{ asset('favicon.ico') }}">
+        <link rel="apple-touch-icon" href="{{ asset('icons/icon-192x192.png') }}">
     @endif
     <!-- Fonts: Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">

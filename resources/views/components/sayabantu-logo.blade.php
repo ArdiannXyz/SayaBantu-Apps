@@ -7,6 +7,7 @@
 ])
 
 @php
+    $isLight = filter_var($light, FILTER_VALIDATE_BOOLEAN);
     $textClasses = match($size) {
         'xs' => 'text-lg',
         'sm' => 'text-xl',
@@ -45,7 +46,7 @@
 
 <div {{ $attributes->merge(['class' => 'inline-flex flex-col items-center justify-center select-none ' . $topPadding]) }}>
     <div class="flex items-center justify-center font-black tracking-tight leading-none {{ $textClasses }}">
-        <span class="{{ $light ? 'text-white' : 'text-[#0066FF]' }}">saya</span>
+        <span class="{{ $isLight ? 'text-white' : 'text-[#0066FF]' }}">saya</span>
         
         <!-- OK Hand Icon on the letter 'b' — matches reference logo -->
         <span class="relative inline-flex items-center justify-center">
@@ -55,7 +56,7 @@
                 @else
                     <svg viewBox="0 0 80 92" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full pointer-events-none select-none">
                         <!-- Blue crescent/cuff at bottom -->
-                        <path d="M14 68 Q6 84 28 90 Q52 96 64 78 Q54 88 38 86 Q22 82 14 68Z" fill="#1565C0"/>
+                        <path d="M14 68 Q6 84 28 90 Q52 96 64 78 Q54 88 38 86 Q22 82 14 68Z" fill="{{ $isLight ? '#ffffff' : '#1565C0' }}"/>
 
                         <!-- OK hand (golden yellow, fill-rule evenodd creates white hole) -->
                         <path fill-rule="evenodd" clip-rule="evenodd"
@@ -89,15 +90,15 @@
                     </svg>
                 @endif
             </span>
-            <span class="{{ $light ? 'text-white' : 'text-[#0066FF]' }}">b</span>
+            <span class="{{ $isLight ? 'text-white' : 'text-[#0066FF]' }}">b</span>
         </span>
         
-        <span class="{{ $light ? 'text-white' : 'text-[#0066FF]' }}">antu</span>
-        <span class="text-amber-500 font-extrabold">.com</span>
+        <span class="{{ $isLight ? 'text-white' : 'text-[#0066FF]' }}">antu</span>
+        <span class="{{ $isLight ? 'text-amber-300' : 'text-amber-500' }} font-extrabold">.com</span>
     </div>
 
     @if($showTagline)
-        <p class="mt-1.5 text-xs font-medium {{ $light ? 'text-blue-100' : 'text-gray-500' }} text-center tracking-normal">
+        <p class="mt-1.5 text-xs font-medium {{ $isLight ? 'text-blue-100' : 'text-gray-500' }} text-center tracking-normal">
             {{ $tagline }}
         </p>
     @endif

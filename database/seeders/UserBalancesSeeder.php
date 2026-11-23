@@ -14,8 +14,13 @@ class UserBalancesSeeder extends Seeder
      */
     public function run(): void
     {
-        // Process users in chunks to avoid memory issues
-        User::query()->chunkById(200, function ($users) {
+        // Hapus saldo untuk role superadmin dan admin wilayah agar bersih
+        $adminUserIds = User::whereIn('role', ['super_admin', 'superadmin', 'admin', 'admin_wilayah'])->pluck('id');
+        UserBalance::whereIn('user_id', $adminUserIds)->delete();
+        User::whereIn('id', $adminUserIds)->update(['balance' => 0]);
+
+        // Process only customer & mitra users in chunks to avoid memory issues
+        User::whereIn('role', ['customer', 'kustomer', 'mitra'])->chunkById(200, function ($users) {
             foreach ($users as $user) {
                 // Calculate completed topups and deductions
                 // Normalize status checks: trim and lowercase to tolerate variations

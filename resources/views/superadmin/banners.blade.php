@@ -54,7 +54,7 @@
             <div>
                 <h1 class="text-xl font-extrabold text-gray-900 tracking-tight">Pengaturan Banner &amp; Tampilan Visual</h1>
                 <p class="text-xs text-gray-500 mt-1">
-                    Kelola iklan promosi customer, banner landing page, serta ikon branding aplikasi SayaBantu dalam satu tempat terpadu.
+                    Kelola iklan promosi (dashboard customer &amp; halaman bantuan), banner landing page, serta ikon branding aplikasi SayaBantu dalam satu tempat terpadu.
                 </p>
             </div>
 
@@ -62,7 +62,7 @@
             <div class="flex items-center gap-2 flex-wrap">
                 <div class="px-3 py-1.5 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center gap-2">
                     <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                    <span class="text-xs font-bold text-emerald-800">{{ $activePromosCount }} Iklan Customer Aktif</span>
+                    <span class="text-xs font-bold text-emerald-800">{{ $activePromosCount }} Iklan Promosi Aktif</span>
                 </div>
                 <div class="px-3 py-1.5 rounded-xl bg-purple-50 border border-purple-200 flex items-center gap-2">
                     <span class="text-xs font-bold text-purple-800">{{ count($homeBanners) }} Banner Beranda</span>
@@ -82,7 +82,7 @@
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
                 </svg>
-                <span>Iklan &amp; Promosi Customer</span>
+                <span>Iklan Promosi (Dashboard &amp; Bantuan)</span>
                 <span :class="activeTab === 'promos' ? 'bg-white/25 text-white' : 'bg-gray-200 text-gray-700'" class="px-2 py-0.5 rounded-full text-[10px] font-bold">
                     {{ count($promos) }}
                 </span>
@@ -124,8 +124,8 @@
             <div class="lg:col-span-7 bg-white rounded-2xl shadow-sm p-6 border border-gray-200">
                 <div class="flex items-center justify-between pb-4 mb-4 border-b border-gray-100">
                     <div>
-                        <h2 class="text-base font-bold text-gray-900">Daftar Iklan &amp; Promosi</h2>
-                        <p class="text-xs text-gray-500 mt-0.5">Tampil sebagai slider berputar di atas dashboard Customer dengan link kunjungi.</p>
+                        <h2 class="text-base font-bold text-gray-900">Daftar Iklan &amp; Promosi (Dashboard &amp; Bantuan)</h2>
+                        <p class="text-xs text-gray-500 mt-0.5">Tampil sebagai slider berputar di atas dashboard Customer dan halaman daftar bantuan publik.</p>
                     </div>
 
                     <button type="button" wire:click="openNewPromoModal"
@@ -244,8 +244,8 @@
             <div class="lg:col-span-5 bg-white rounded-2xl shadow-sm p-6 border border-gray-200 sticky top-6">
                 <div class="flex items-center justify-between pb-3 mb-4 border-b border-gray-100">
                     <div>
-                        <h2 class="text-sm font-bold text-gray-900">Simulasi Tampilan Customer</h2>
-                        <p class="text-[11px] text-gray-500">Pratinjau slider bergerak otomatis di HP pengguna</p>
+                        <h2 class="text-sm font-bold text-gray-900">Simulasi Tampilan Iklan</h2>
+                        <p class="text-[11px] text-gray-500">Pratinjau slider bergerak otomatis di HP pengguna (Dashboard &amp; Halaman Bantuan)</p>
                     </div>
                     <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
                         {{ $activePromosCount }} Aktif

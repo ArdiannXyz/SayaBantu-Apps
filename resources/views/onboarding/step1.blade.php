@@ -182,7 +182,7 @@
                 <!-- 5. ALAMAT LENGKAP DOMISILI -->
                 <div>
                     <label for="address" class="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">
-                        Alamat Lengkap Domisili Saat Ini (Kos, Kontrakan, atau Tempat Tinggal)
+                        Alamat Lengkap Domisili
                     </label>
                     <x-smart-address-input
                         name="address"
@@ -192,7 +192,7 @@
                         rows="2" 
                         required 
                         :value="old('address', $user->address ?? '')"
-                        placeholder="Ketik nama jalan, nomor kos/rumah, RT/RW tempat tinggal saat ini..."
+                        placeholder="Ketik alamat lengkap domisili..."
                     />
                     <x-input-error :messages="$errors->get('address')" class="mt-1" />
                 </div>

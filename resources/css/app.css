@@ -93,3 +93,126 @@
         scrollbar-width: none !important;
     }
 }
+
+/* =========================================================================
+   SweetAlert2 Modern Toast & Popup Styling (SayaBantu)
+   ========================================================================= */
+body.swal2-toast-shown .swal2-container {
+    height: auto !important;
+    max-height: 100vh !important;
+    padding: 0.75rem !important;
+    pointer-events: none !important;
+    z-index: 99999 !important;
+}
+
+body.swal2-toast-shown .swal2-container.swal2-top {
+    inset: 0.75rem auto auto 50% !important;
+    transform: translateX(-50%) !important;
+    width: auto !important;
+    max-width: min(94vw, 440px) !important;
+}
+
+body.swal2-toast-shown .swal2-container.swal2-top-end {
+    inset: 0.75rem 0.75rem auto auto !important;
+    width: auto !important;
+    max-width: min(94vw, 420px) !important;
+}
+
+.swal2-popup.swal2-toast,
+.sb-toast-popup {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    box-sizing: border-box !important;
+    width: auto !important;
+    min-width: 280px !important;
+    max-width: min(94vw, 440px) !important;
+    height: auto !important;
+    min-height: unset !important;
+    max-height: unset !important;
+    align-self: flex-start !important;
+    margin: 0 auto !important;
+    padding: 0.75rem 1rem !important;
+    gap: 0.75rem !important;
+    background: #ffffff !important;
+    color: #1f2937 !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 1rem !important;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05) !important;
+    pointer-events: auto !important;
+    overflow: hidden !important;
+}
+
+.swal2-popup.swal2-toast .swal2-icon {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 1.5rem !important;
+    min-width: 1.5rem !important;
+    height: 1.5rem !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    flex-shrink: 0 !important;
+    align-self: center !important;
+}
+
+.swal2-popup.swal2-toast .swal2-icon .swal2-icon-content {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100% !important;
+    height: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.swal2-popup.swal2-toast .swal2-icon .swal2-icon-content svg {
+    display: block !important;
+    width: 1.5rem !important;
+    height: 1.5rem !important;
+    flex-shrink: 0 !important;
+}
+
+/* Sembunyikan elemen animasi multi-div bawaan SweetAlert2 yang bertumpuk */
+.swal2-popup.swal2-toast .swal2-icon [class^='swal2-success-circular-line'],
+.swal2-popup.swal2-toast .swal2-icon .swal2-success-ring,
+.swal2-popup.swal2-toast .swal2-icon .swal2-success-fix,
+.swal2-popup.swal2-toast .swal2-icon [class^='swal2-success-line'],
+.swal2-popup.swal2-toast .swal2-icon [class^='swal2-x-mark-line'] {
+    display: none !important;
+}
+
+.swal2-popup.swal2-toast .swal2-title,
+.swal2-popup.swal2-toast h2:where(.swal2-title),
+.sb-toast-title {
+    margin: 0 !important;
+    padding: 0 !important;
+    font-size: 0.8125rem !important;
+    line-height: 1.25rem !important;
+    font-weight: 600 !important;
+    color: #111827 !important;
+    text-align: left !important;
+    flex: 1 1 auto !important;
+}
+
+.swal2-popup.swal2-toast .swal2-html-container,
+.swal2-popup.swal2-toast div:where(.swal2-html-container),
+.sb-toast-html {
+    margin: 0 !important;
+    padding: 0 !important;
+    font-size: 0.75rem !important;
+    line-height: 1rem !important;
+    color: #4b5563 !important;
+    text-align: left !important;
+}
+
+.swal2-popup.swal2-toast .swal2-timer-progress-bar-container {
+    height: 3px !important;
+}
+
+.swal2-popup.swal2-toast .swal2-timer-progress-bar {
+    background: #0066FF !important;
+}

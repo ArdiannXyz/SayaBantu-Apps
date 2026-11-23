@@ -51,7 +51,7 @@
                 <!-- Alamat Lengkap Domisili -->
                 <div>
                     <label class="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1.5">
-                        Alamat Lengkap Domisili (Jalan, RT/RW, No. Rumah)
+                        Alamat Lengkap Domisili
                     </label>
                     <x-smart-address-input 
                         name="address" 
@@ -60,7 +60,7 @@
                         rows="2" 
                         required 
                         :value="old('address')"
-                        placeholder="Ketik nama jalan, nomor rumah, RT/RW, atau gunakan saran cerdas..."
+                        placeholder="Ketik alamat lengkap domisili..."
                     />
                     @error('address') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>

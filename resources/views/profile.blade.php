@@ -4,7 +4,8 @@
     <div class="bg-slate-50/60 pb-2">
         @php
             $user = auth()->user() ? auth()->user()->fresh() : null;
-            $userBalance = \App\Models\UserBalance::where('user_id', optional($user)->id)->first();
+            $isAdminRole = in_array(optional($user)->role, ['super_admin', 'superadmin', 'admin', 'admin_wilayah']);
+            $userBalance = !$isAdminRole ? \App\Models\UserBalance::where('user_id', optional($user)->id)->first() : null;
             $customerBalance = $userBalance ? $userBalance->balance : 0;
 
             $isVerified = (bool) ($user->verified ?? false);
@@ -112,6 +113,7 @@
                 </div>
             </div>
 
+            @if(!$isAdminRole && (optional($user)->role === 'customer' || optional($user)->isCustomer()))
             <!-- Card Saldo / Wallet Berwarna -->
             <div class="px-5 mb-5">
                 <div class="relative overflow-hidden rounded-2xl p-4 bg-gradient-to-r from-[#0066FF] via-[#005AE0] to-[#0044B8] text-white shadow-lg shadow-blue-500/15 border border-white/20 flex items-center justify-between gap-3">
@@ -140,6 +142,7 @@
                     </a>
                 </div>
             </div>
+            @endif
 
             <!-- Bagian Konten Menu & Notifikasi -->
             <div class="px-5">
@@ -211,19 +214,37 @@
 
                 <!-- Menu List (Rounded-3xl container seperti Mitra) -->
                 <div class="divide-y divide-gray-100 bg-white rounded-3xl px-3 py-1 border border-gray-100 shadow-2xs">
-                    <!-- 1. Pesanan Saya -->
-                    <a href="{{ route('customer.helps.index') }}" wire:navigate 
-                       class="py-4 px-2 flex items-center justify-between hover:bg-slate-50/80 active:bg-slate-100/70 rounded-2xl transition group cursor-pointer">
-                        <div class="flex items-center gap-4 min-w-0">
-                            <svg class="w-5 h-5 text-slate-700 group-hover:text-[#0066FF] transition shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                    @if(!$isAdminRole)
+                        <!-- 1. Pesanan Saya -->
+                        <a href="{{ route('customer.helps.index') }}" wire:navigate 
+                           class="py-4 px-2 flex items-center justify-between hover:bg-slate-50/80 active:bg-slate-100/70 rounded-2xl transition group cursor-pointer">
+                            <div class="flex items-center gap-4 min-w-0">
+                                <svg class="w-5 h-5 text-slate-700 group-hover:text-[#0066FF] transition shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                                </svg>
+                                <span class="text-sm font-semibold text-gray-800 group-hover:text-[#0066FF] transition">Pesanan Saya</span>
+                            </div>
+                            <svg class="w-4 h-4 text-gray-400 group-hover:text-[#0066FF] transition shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                             </svg>
-                            <span class="text-sm font-semibold text-gray-800 group-hover:text-[#0066FF] transition">Pesanan Saya</span>
-                        </div>
-                        <svg class="w-4 h-4 text-gray-400 group-hover:text-[#0066FF] transition shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                        </svg>
-                    </a>
+                        </a>
+                    @else
+                        <!-- 1. Panel Kelola Admin -->
+                        <a href="{{ in_array(optional($user)->role, ['super_admin', 'superadmin']) ? route('superadmin.dashboard') : route('admin.dashboard') }}" wire:navigate 
+                           class="py-4 px-2 flex items-center justify-between hover:bg-slate-50/80 active:bg-slate-100/70 rounded-2xl transition group cursor-pointer">
+                            <div class="flex items-center gap-4 min-w-0">
+                                <svg class="w-5 h-5 text-slate-700 group-hover:text-[#0066FF] transition shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                                </svg>
+                                <span class="text-sm font-semibold text-gray-800 group-hover:text-[#0066FF] transition">
+                                    {{ in_array(optional($user)->role, ['super_admin', 'superadmin']) ? 'Panel Super Admin' : 'Panel Admin Wilayah' }}
+                                </span>
+                            </div>
+                            <svg class="w-4 h-4 text-gray-400 group-hover:text-[#0066FF] transition shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                            </svg>
+                        </a>
+                    @endif
 
                     @if($user && $user->role === 'customer')
                         <!-- 2. Alamat Saya (Multi-address Shopee style) -->
@@ -278,6 +299,7 @@
                         </a>
                     @endif
 
+                    @if(!$isAdminRole)
                     <!-- 3. Metode Pembayaran -->
                     <a href="{{ route('customer.topup') }}" wire:navigate 
                        class="py-4 px-2 flex items-center justify-between hover:bg-slate-50/80 active:bg-slate-100/70 rounded-2xl transition group cursor-pointer">
@@ -291,6 +313,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                         </svg>
                     </a>
+                    @endif
 
                     <!-- 4. Bantuan & FAQ -->
                     <a href="{{ route('customer.help-support') }}" wire:navigate 

@@ -5,25 +5,46 @@ import 'sweetalert2/dist/sweetalert2.min.css';
 window.Swal = Swal;
 
 // SayaBantu Modern Alert & Toast System
+const toastIcons = {
+    success: '<svg class="w-5 h-5 text-emerald-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>',
+    error: '<svg class="w-5 h-5 text-rose-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>',
+    warning: '<svg class="w-5 h-5 text-amber-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>',
+    info: '<svg class="w-5 h-5 text-[#0066FF] shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>',
+};
+
 const Toast = Swal.mixin({
     toast: true,
     position: 'top',
     showConfirmButton: false,
-    timer: 2400,
+    timer: 3500,
     timerProgressBar: true,
     didOpen: (toast) => {
         toast.addEventListener('mouseenter', Swal.stopTimer);
         toast.addEventListener('mouseleave', Swal.resumeTimer);
     },
     customClass: {
-        popup: 'rounded-2xl shadow-xl border border-gray-100 px-4 py-3 bg-white/95 backdrop-blur-md font-sans text-xs font-semibold text-gray-800 flex items-center gap-2.5',
-        title: 'text-xs font-bold text-gray-900',
+        popup: 'sb-toast-popup',
+        title: 'sb-toast-title',
+        htmlContainer: 'sb-toast-html',
     }
 });
 
 window.sbToast = function(title, icon = 'success') {
+    if (!title) return;
+
+    let finalIcon = icon;
+    const str = String(title).toLowerCase();
+    if (icon === 'success') {
+        if (/gagal|error|salah|rusak/i.test(str)) {
+            finalIcon = 'error';
+        } else if (/peringatan|perhatian|warning|kurang|harus|belum/i.test(str)) {
+            finalIcon = 'warning';
+        }
+    }
+
     return Toast.fire({
-        icon: icon,
+        icon: finalIcon,
+        iconHtml: toastIcons[finalIcon] || toastIcons.success,
         title: title
     });
 };

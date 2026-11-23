@@ -3,14 +3,54 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="color-scheme" content="only light">
     <meta name="supported-color-schemes" content="light">
-    <title>sayabantu - Platform Bantuan Sosial</title>
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700&display=swap" rel="stylesheet" />
+    <title>Daftar Bantuan Tersedia - sayabantu.com</title>
+    <meta name="description" content="Temukan daftar layanan bantuan serabutan yang mudah, cepat, dan terpercaya di sayabantu.com.">
+
+    @php
+        $dynamicAppIcon = \App\Models\AppSetting::get('app_icon');
+        $dynamicAppIconUrl = $dynamicAppIcon && \Illuminate\Support\Facades\Storage::disk('public')->exists($dynamicAppIcon) ? asset('storage/' . $dynamicAppIcon) : null;
+    @endphp
+    @if($dynamicAppIconUrl)
+        <link rel="icon" href="{{ $dynamicAppIconUrl }}">
+        <link rel="apple-touch-icon" href="{{ $dynamicAppIconUrl }}">
+    @else
+        <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicon-32x32.png') }}">
+        <link rel="icon" type="image/svg+xml" href="{{ asset('icons/icon.svg') }}">
+        <link rel="shortcut icon" href="{{ asset('favicon.ico') }}">
+    @endif
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @livewireStyles
+
     <style>
+        :root, html, body {
+            color-scheme: only light !important;
+        }
+        @media (prefers-color-scheme: dark) {
+            :root, html, body {
+                color-scheme: only light !important;
+                background-color: #f1f5f9 !important;
+                color: #0f172a !important;
+            }
+        }
+        /* Sembunyikan scrollbar visual bawaan */
+        ::-webkit-scrollbar {
+            display: none !important;
+            width: 0 !important;
+            height: 0 !important;
+        }
+        html, body, * {
+            -ms-overflow-style: none !important;
+            scrollbar-width: none !important;
+        }
         .header-pattern {
             position: relative;
             overflow: hidden;
@@ -20,217 +60,338 @@
             position: absolute;
             top: -50%;
             right: -10%;
-            width: 300px;
-            height: 300px;
+            width: 280px;
+            height: 280px;
             background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%);
             border-radius: 50%;
+            pointer-events: none;
         }
         .header-pattern::after {
             content: '';
             position: absolute;
             bottom: -30%;
             left: -5%;
-            width: 250px;
-            height: 250px;
+            width: 220px;
+            height: 220px;
             background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
             border-radius: 50%;
+            pointer-events: none;
         }
-        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        .hide-scrollbar::-webkit-scrollbar { display: none; }
     </style>
 </head>
 
-<body class="font-sans antialiased bg-gradient-to-br from-blue-50 via-white to-purple-50 overflow-hidden">
-    <div class="max-w-sm mx-auto h-screen flex flex-col overflow-hidden">
+<body class="min-h-screen min-h-[100dvh] bg-slate-100 font-sans text-slate-900 antialiased flex flex-col items-center sm:justify-start sm:py-4 sm:px-4">
 
-        <!-- Header (matching mitra/customer help pages) -->
-            <div class="px-5 pt-5 pb-8 relative overflow-hidden header-pattern" style="background: linear-gradient(135deg, #0066FF 0%, #0052cc 100%);">  
-                <div class="absolute top-0 right-0 w-40 h-40 bg-white/5 rounded-full -mr-20 -mt-20"></div>
-                <div class="absolute bottom-0 left-0 w-32 h-32 bg-white/5 rounded-full -ml-16 -mb-16"></div>
+    <!-- Centered Mobile Frame container matching landing page and modern mockups -->
+    <main class="w-full max-w-md min-h-screen min-h-[100dvh] sm:min-h-0 sm:h-auto sm:max-h-[calc(100dvh-2rem)] bg-slate-50 sm:rounded-[36px] sm:shadow-2xl sm:border sm:border-slate-200/80 flex flex-col justify-between overflow-y-auto overflow-x-hidden relative">
 
-                <div class="relative z-10">
-                    <div class="flex items-center justify-between text-white mb-3">
-                        <div class="text-center flex-1">
-                            <h1 class="text-lg font-bold">Bantuan</h1>
-                            <p class="text-xs text-white/90 mt-0.5">Temukan bantuan yang tersedia</p>
-                        </div>
+        <!-- Header Section -->
+        <header class="px-5 pt-5 pb-6 text-white relative header-pattern shrink-0" style="background: linear-gradient(135deg, #0066FF 0%, #0052cc 100%);">
+            <div class="relative z-10">
+                <!-- Top Nav Bar -->
+                <div class="flex items-center justify-between gap-3 mb-3">
+                    <a href="{{ route('home') }}"
+                       onclick="if (window.history.length > 1) { event.preventDefault(); window.history.back(); setTimeout(function() { window.location.href = '{{ route('home') }}'; }, 350); } else { window.location.href = '{{ route('home') }}'; }"
+                       class="w-9 h-9 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition active:scale-95 cursor-pointer shadow-xs"
+                       aria-label="Kembali"
+                       title="Kembali ke halaman sebelumnya">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M15 19l-7-7 7-7" />
+                        </svg>
+                    </a>
+
+                    <div class="flex items-center gap-1.5">
+                        <x-sayabantu-logo size="sm" :light="true" />
                     </div>
+
+                    <div class="w-9 h-9"></div>
                 </div>
 
-                <svg class="absolute -bottom-1 left-0 w-full pointer-events-none" viewBox="0 0 1440 72" preserveAspectRatio="none" aria-hidden="true" style="display: block; height: 28px; bottom: -2px;">
-                    <path d="M0,28 C360,76 1080,-4 1440,36 L1440,84 L0,84 Z" fill="#ffffff"></path>
-                </svg>
+                <!-- Title & Subtitle -->
+                <div class="text-center pt-1 pb-2">
+                    <h1 class="text-lg sm:text-xl font-extrabold text-white tracking-tight leading-snug">
+                        Daftar Bantuan Tersedia
+                    </h1>
+                    <p class="text-xs text-blue-100 mt-1 max-w-xs mx-auto leading-relaxed">
+                        Pilih jenis bantuan yang Anda butuhkan atau daftarkan diri Anda untuk mulai membantu.
+                    </p>
+                </div>
+
+                <!-- Search Input Bar -->
+                <div class="mt-3 relative">
+                    <div class="flex items-center gap-2.5 w-full bg-white px-4 py-2.5 rounded-full shadow-md">
+                        <svg class="w-4 h-4 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                        <input
+                            type="text"
+                            wire:model.live.debounce.300ms="search"
+                            placeholder="Cari jenis bantuan (misal: bersih, pindahan)..."
+                            class="flex-1 bg-transparent text-xs text-gray-800 placeholder-gray-400 outline-none border-none focus:ring-0 p-0"
+                        />
+                        @if($search)
+                            <button type="button" wire:click="$set('search', '')" class="text-gray-400 hover:text-gray-600 text-xs font-bold px-1 cursor-pointer">
+                                ✕
+                            </button>
+                        @endif
+                    </div>
+                </div>
             </div>
 
-            <!-- Home Banner -->
+            <!-- Soft Wave Bottom Curve -->
+            <svg class="absolute -bottom-1 left-0 w-full pointer-events-none" viewBox="0 0 1440 72" preserveAspectRatio="none" aria-hidden="true" style="display: block; height: 24px; bottom: -2px;">
+                <path d="M0,28 C360,76 1080,-4 1440,36 L1440,84 L0,84 Z" fill="#f8fafc"></path>
+            </svg>
+        </header>
+
+        <!-- Main Scrollable Content Area -->
+        <div class="flex-1 px-5 pt-3 pb-6 space-y-6">
+
+            <!-- Hero Banner / Iklan Promosi (Sinkron dengan Dashboard & Pengaturan SuperAdmin) -->
             @php
-                $homeBanners = json_decode((string) \App\Models\AppSetting::get('banner_home', '[]'), true) ?: [];
-                $defaultHomePromos = [
-                    [
-                        'title' => 'Selamat Datang di sayabantu',
-                        'desc' => 'Platform gotong royong terpercaya untuk saling membantu sesama.',
-                        'bg' => 'linear-gradient(135deg, #0284c7, #0369a1)',
-                        'tag' => 'sayabantu'
-                    ],
-                    [
-                        'title' => 'Bantuan Cepat & Terverifikasi',
-                        'desc' => 'Dapatkan pendampingan dari mitra terdekat yang siap membantu kapan saja.',
-                        'bg' => 'linear-gradient(135deg, #0d9488, #0f766e)',
-                        'tag' => 'Mitra Siaga'
-                    ],
-                    [
-                        'title' => 'Aman, Transparan & Terpercaya',
-                        'desc' => 'Setiap proses bantuan terpantau dengan standar keamanan tinggi.',
-                        'bg' => 'linear-gradient(135deg, #6366f1, #4f46e5)',
-                        'tag' => 'Terpercaya'
-                    ]
-                ];
-                $hasCustomHomeBanners = !empty($homeBanners) && count($homeBanners);
-                $homeBannerCount = $hasCustomHomeBanners ? count($homeBanners) : count($defaultHomePromos);
+                $rawPromos = \App\Models\AppSetting::get('dashboard_promos');
+                $promoList = [];
+                if ($rawPromos) {
+                    $decoded = json_decode((string) $rawPromos, true);
+                    if (is_array($decoded)) {
+                        $promoList = $decoded;
+                    }
+                }
+                if (empty($promoList)) {
+                    $legacyPromo = json_decode((string) \App\Models\AppSetting::get('dashboard_promo', '{}'), true) ?: [];
+                    if (!empty($legacyPromo['title'])) {
+                        $promoList = [$legacyPromo];
+                    } else {
+                        $promoList = [
+                            [
+                                'id' => 'promo_default',
+                                'layout' => 'standard',
+                                'is_active' => true,
+                                'badge' => 'sayabantu.com 🤝',
+                                'title' => 'Butuh bantuan untuk pekerjaan kecil hingga besar?',
+                                'description' => 'Pesan jasa serabutan cepat, mudah, dan terpercaya kapan saja.',
+                                'button_text' => 'Kunjungi',
+                                'button_link' => route('customer.helps.create'),
+                                'target_blank' => false,
+                                'image' => null,
+                            ]
+                        ];
+                    }
+                }
+
+                $activePromos = array_values(array_filter($promoList, fn($p) => ($p['is_active'] ?? true) == true));
+                $totalActivePromos = count($activePromos);
             @endphp
 
-            <div class="px-5 mt-4">
-                <div x-data="bannerSlider({{ $homeBannerCount }})"
-                    @touchstart="touchStart($event)"
-                    @touchmove="touchMove($event)"
-                    @touchend="touchEnd($event)"
-                    @mousedown="mouseDown($event)"
-                    @mousemove="mouseMove($event)"
-                    @mouseup="mouseUp($event)"
-                    @mouseleave="mouseLeave($event)"
-                    @mouseenter="stopAutoPlay()"
-                    class="relative rounded-2xl overflow-hidden shadow-md select-none group touch-pan-y cursor-grab active:cursor-grabbing bg-gray-100">
+            @if($totalActivePromos > 0)
+                <div class="mb-2 select-none relative group"
+                     wire:ignore.self
+                     x-data="heroPromoSlider({{ $totalActivePromos }}, 4500)"
+                     @touchstart="touchStart($event)"
+                     @touchmove="touchMove($event)"
+                     @touchend="touchEnd($event)"
+                     @mousedown="mouseDown($event)"
+                     @mousemove="mouseMove($event)"
+                     @mouseup="mouseUp($event)"
+                     @mouseleave="mouseLeave($event)"
+                     @mouseenter="stopAutoPlay()">
 
-                    <!-- Slides Track -->
-                    <div class="relative h-36 sm:h-40 overflow-hidden">
-                        <div class="flex h-full will-change-transform"
-                            :style="'transform: translateX(calc(-' + (current * 100) + '% + ' + dragOffset + 'px)); transition: ' + (isDragging ? 'none' : 'transform 500ms cubic-bezier(0.25, 1, 0.5, 1)')">
-                            @if($hasCustomHomeBanners)
-                                @foreach($homeBanners as $b)
-                                    <div class="flex-shrink-0 w-full h-full select-none">
-                                        <img src="{{ asset('storage/' . $b) }}"
-                                            alt="Banner Beranda"
-                                            draggable="false"
-                                            class="w-full h-full object-cover pointer-events-none select-none" />
-                                    </div>
+                    <div class="relative overflow-hidden rounded-2xl shadow-sm text-white"
+                         style="background: linear-gradient(135deg, #0066FF 0%, #0052cc 100%);">
+                        <!-- Decorative circles -->
+                        <div class="absolute -right-8 -bottom-8 w-36 h-36 bg-white/10 rounded-full blur-xl pointer-events-none"></div>
+                        <div class="absolute -left-6 -top-6 w-24 h-24 bg-white/10 rounded-full blur-lg pointer-events-none"></div>
+
+                        <!-- Slide Track -->
+                        <div class="relative w-full overflow-hidden">
+                            <div class="flex h-full will-change-transform"
+                                 :style="'transform: translateX(calc(-' + (current * 100) + '% + ' + dragOffset + 'px)); transition: ' + (isDragging ? 'none' : 'transform 450ms cubic-bezier(0.25, 1, 0.5, 1)')">
+                                
+                                @foreach($activePromos as $idx => $promo)
+                                    @php
+                                        $pLayout = $promo['layout'] ?? 'standard';
+                                        $pBadge = $promo['badge'] ?? '';
+                                        $pTitle = $promo['title'] ?? '';
+                                        $pDesc = $promo['description'] ?? '';
+                                        $pBtnText = $promo['button_text'] ?? 'Kunjungi';
+                                        $pLink = !empty($promo['button_link']) ? $promo['button_link'] : route('customer.helps.create');
+                                        $pTargetBlank = $promo['target_blank'] ?? false;
+                                        $pImage = $promo['image'] ?? null;
+                                        $pImageUrl = $pImage && \Illuminate\Support\Facades\Storage::disk('public')->exists($pImage)
+                                            ? asset('storage/' . $pImage)
+                                            : asset('images/sayabantu-mascot.jpg');
+                                        $pIsExternal = str_starts_with($pLink, 'http://') || str_starts_with($pLink, 'https://');
+                                        $pActionLink = auth()->check() ? $pLink : ($pIsExternal ? $pLink : route('register'));
+                                    @endphp
+
+                                    @if($pLayout === 'full_image')
+                                        <!-- Full Image Banner Layout (Poster Penuh Menyesuaikan Layar) -->
+                                        <a href="{{ $pActionLink }}"
+                                           @if($pIsExternal || $pTargetBlank) target="_blank" rel="noopener noreferrer" @else wire:navigate @endif
+                                           class="flex-shrink-0 w-full relative block overflow-hidden min-h-[175px] max-h-[220px] bg-gray-900 group/slide focus:outline-none">
+                                            <img src="{{ $pImageUrl }}" alt="{{ $pTitle ?: 'Promo SayaBantu' }}"
+                                                 class="w-full h-full min-h-[175px] max-h-[220px] object-cover transition-transform duration-500 group-hover/slide:scale-[1.02] pointer-events-none select-none">
+                                            
+                                            @if(!empty($pBadge) || !empty($pTitle) || !empty($pBtnText))
+                                                <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent flex items-end p-4 sm:p-5 pointer-events-none">
+                                                    <div class="w-full flex items-end justify-between gap-3">
+                                                        <div class="max-w-[70%]">
+                                                            @if(!empty($pBadge))
+                                                                <span class="inline-block px-2.5 py-0.5 rounded-full bg-white/20 backdrop-blur-md text-[10px] font-bold text-white mb-1.5 border border-white/20">
+                                                                    {{ $pBadge }}
+                                                                </span>
+                                                            @endif
+                                                            @if(!empty($pTitle))
+                                                                <h2 class="text-xs sm:text-sm font-extrabold text-white leading-snug drop-shadow line-clamp-1">
+                                                                    {{ $pTitle }}
+                                                                </h2>
+                                                            @endif
+                                                        </div>
+                                                        @if(!empty($pBtnText))
+                                                            <span class="inline-flex items-center gap-1 px-3 py-1 bg-white text-[#0066FF] font-bold text-xs rounded-full shadow-md">
+                                                                <span>{{ $pBtnText }}</span>
+                                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />
+                                                                </svg>
+                                                            </span>
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                            @endif
+                                        </a>
+                                    @else
+                                        <!-- Standard Card Layout (Teks di Kiri + Gambar/Maskot Proporsional di Kanan) -->
+                                        <div class="flex-shrink-0 w-full p-5 flex items-center justify-between gap-3 min-h-[175px]">
+                                            <div class="flex-1 max-w-[65%]">
+                                                @if(!empty($pBadge))
+                                                    <span class="inline-block px-2.5 py-0.5 rounded-full bg-white/20 backdrop-blur-md text-[10px] font-bold text-white mb-2">
+                                                        {{ $pBadge }}
+                                                    </span>
+                                                @endif
+                                                <h2 class="text-sm font-extrabold leading-snug line-clamp-2">
+                                                    {{ $pTitle ?: 'Butuh bantuan untuk pekerjaan kecil hingga besar?' }}
+                                                </h2>
+                                                @if(!empty($pDesc))
+                                                    <p class="text-[11px] text-blue-100 mt-1 line-clamp-2 leading-relaxed">
+                                                        {{ $pDesc }}
+                                                    </p>
+                                                @endif
+                                                <a href="{{ $pActionLink }}"
+                                                   @if($pIsExternal || $pTargetBlank) target="_blank" rel="noopener noreferrer" @else wire:navigate @endif
+                                                   class="mt-3.5 inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-white text-[#0066FF] hover:bg-blue-50 font-bold text-xs rounded-full shadow-md active:scale-95 transition">
+                                                    <span>{{ $pBtnText ?: 'Kunjungi' }}</span>
+                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />
+                                                    </svg>
+                                                </a>
+                                            </div>
+
+                                            <div class="w-24 h-24 sm:w-28 sm:h-28 shrink-0 flex items-center justify-center p-1">
+                                                <img src="{{ $pImageUrl }}" alt="{{ $pTitle }}" class="max-w-full max-h-full object-contain rounded-xl drop-shadow-md pointer-events-none select-none">
+                                            </div>
+                                        </div>
+                                    @endif
                                 @endforeach
-                            @else
-                                @foreach($defaultHomePromos as $promo)
-                                    <div class="flex-shrink-0 w-full h-full p-5 flex flex-col justify-center text-white relative select-none"
-                                        style="background: {{ $promo['bg'] }};">
-                                        <span class="inline-block self-start text-[10px] font-bold uppercase tracking-wider bg-white/20 backdrop-blur-sm px-2.5 py-0.5 rounded-full mb-1.5 border border-white/20">
-                                            {{ $promo['tag'] }}
-                                        </span>
-                                        <h3 class="font-extrabold text-lg sm:text-xl tracking-tight leading-snug drop-shadow-sm">
-                                            {{ $promo['title'] }}
-                                        </h3>
-                                        <p class="text-xs sm:text-sm text-white/90 font-normal mt-1 line-clamp-2 max-w-[85%]">
-                                            {{ $promo['desc'] }}
-                                        </p>
-                                    </div>
-                                @endforeach
-                            @endif
+                            </div>
                         </div>
+
+                        @if($totalActivePromos > 1)
+                            <!-- Navigation dots -->
+                            <div class="absolute bottom-2.5 right-4 flex items-center gap-1.5 z-20">
+                                @foreach($activePromos as $dotIdx => $dotPromo)
+                                    <button type="button" @click="goTo({{ $dotIdx }})"
+                                        class="h-1.5 rounded-full transition-all duration-300 cursor-pointer"
+                                        :class="current === {{ $dotIdx }} ? 'w-5 bg-white' : 'w-1.5 bg-white/40 hover:bg-white/70'">
+                                    </button>
+                                @endforeach
+                            </div>
+
+                            <!-- Left / Right Arrows -->
+                            <button type="button" @click="prev()"
+                                class="absolute left-1.5 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-black/20 hover:bg-black/40 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition z-20 cursor-pointer"
+                                title="Sebelumnya">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7" /></svg>
+                            </button>
+                            <button type="button" @click="next()"
+                                class="absolute right-1.5 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-black/20 hover:bg-black/40 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition z-20 cursor-pointer"
+                                title="Berikutnya">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" /></svg>
+                            </button>
+                        @endif
                     </div>
+                </div>
+            @endif
 
-                    @if($homeBannerCount > 1)
-                        <!-- Tombol Panah Kiri (Prev) -->
-                        <button type="button"
-                            @click.stop="prev()"
-                            @mousedown.stop
-                            @touchstart.stop
-                            class="absolute left-2.5 top-1/2 -translate-y-1/2 z-20 w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-black/40 hover:bg-black/70 active:scale-90 text-white flex items-center justify-center shadow-lg backdrop-blur-sm transition-all duration-200 cursor-pointer select-none"
-                            title="Banner Sebelumnya"
-                            aria-label="Banner Sebelumnya">
-                            <svg class="w-4 h-4 sm:w-5 sm:h-5 -translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7" />
-                            </svg>
-                        </button>
+            <!-- SECTION 1: DAFTAR KATEGORI BANTUAN -->
+            <div>
+                <div class="flex items-center justify-between mb-3">
+                    <div>
+                        <h2 class="text-sm font-extrabold text-gray-900 tracking-tight">
+                            Kategori Layanan Tersedia
+                        </h2>
+                        <p class="text-[11px] text-gray-500 mt-0.5">Klik salah satu bantuan di bawah untuk mendaftar & memesan:</p>
+                    </div>
+                </div>
 
-                        <!-- Tombol Panah Kanan (Next) -->
-                        <button type="button"
-                            @click.stop="next()"
-                            @mousedown.stop
-                            @touchstart.stop
-                            class="absolute right-2.5 top-1/2 -translate-y-1/2 z-20 w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-black/40 hover:bg-black/70 active:scale-90 text-white flex items-center justify-center shadow-lg backdrop-blur-sm transition-all duration-200 cursor-pointer select-none"
-                            title="Banner Selanjutnya"
-                            aria-label="Banner Selanjutnya">
-                            <svg class="w-4 h-4 sm:w-5 sm:h-5 translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />
-                            </svg>
-                        </button>
+                <div class="grid grid-cols-2 gap-2.5">
+                    @forelse($categories as $category)
+                        @php
+                            $targetUrl = auth()->check() 
+                                ? (auth()->user()->isCustomer() ? route('customer.helps.create', ['category_id' => $category->id]) : route('dashboard'))
+                                : route('register', ['category' => $category->id]);
+                        @endphp
+                        <a href="{{ $targetUrl }}" wire:navigate
+                           class="flex flex-col justify-between p-3.5 rounded-2xl bg-white border border-gray-200/80 hover:border-[#0066FF] hover:shadow-md hover:scale-[1.01] active:scale-[0.98] transition-all group cursor-pointer">
+                            <div>
+                                <div class="w-11 h-11 rounded-xl bg-blue-50 text-2xl flex items-center justify-center mb-2.5 group-hover:scale-110 transition-transform shadow-2xs">
+                                    <span>{{ $category->icon ?: '✨' }}</span>
+                                </div>
+                                <h3 class="text-xs font-extrabold text-gray-900 group-hover:text-[#0066FF] transition leading-snug line-clamp-1">
+                                    {{ $category->name }}
+                                </h3>
+                                <p class="text-[11px] text-gray-500 mt-1 line-clamp-2 leading-relaxed">
+                                    {{ $category->description ?: 'Bantuan serabutan cepat, mudah, dan terpercaya.' }}
+                                </p>
+                            </div>
 
-                        <!-- Indikator Dots -->
-                        <div class="absolute bottom-2.5 left-1/2 -translate-x-1/2 flex items-center gap-1.5 z-20 select-none">
-                            @for($i = 0; $i < $homeBannerCount; $i++)
-                                <button type="button"
-                                    @click.stop="goTo({{ $i }})"
-                                    @mousedown.stop
-                                    @touchstart.stop
-                                    :class="current === {{ $i }} ? 'w-5 bg-white shadow-md' : 'w-2 bg-white/60 hover:bg-white/90'"
-                                    class="h-2 rounded-full transition-all duration-300 cursor-pointer"
-                                    title="Slide {{ $i + 1 }}"
-                                    aria-label="Slide {{ $i + 1 }}">
-                                </button>
-                            @endfor
+                            <div class="mt-3 pt-2 border-t border-gray-100 flex items-center justify-between text-[11px] font-bold text-[#0066FF]">
+                                <span>Pilih Jasa</span>
+                                <svg class="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />
+                                </svg>
+                            </div>
+                        </a>
+                    @empty
+                        <div class="col-span-2 py-8 text-center bg-white rounded-2xl border border-dashed border-gray-300 p-6">
+                            <span class="text-3xl">🔍</span>
+                            <p class="text-xs font-bold text-gray-700 mt-2">Kategori tidak ditemukan</p>
+                            <p class="text-[11px] text-gray-500 mt-0.5">Coba cari dengan kata kunci lain.</p>
                         </div>
-                    @endif
+                    @endforelse
                 </div>
             </div>
 
-            <!-- Pekerjaan yang tersedia (Blur Preview sesuai mockup) -->
-            <div class="flex-1 px-5 pb-4">
-                <div class="mb-2.5">
-                    <h2 class="text-sm font-bold text-gray-800">Pekerjaan yang tersedia:</h2>
-                </div>
+        </div>
 
-                <!-- Gray Container with Rounded White Cards -->
-                <div class="bg-gray-200/90 rounded-2xl p-3.5 space-y-2.5 shadow-inner">
-                    @php
-                        $sampleJobs = [
-                            'Membersihkan rumput',
-                            'Membantu Pindahan Rumah',
-                            'Membersihkan Saluran Air',
-                            'Perbaikan Atap & Bangunan',
-                        ];
-                    @endphp
+        <!-- Sticky Bottom CTA Section (Tombol Lanjutkan) -->
+        <footer class="p-4 sm:p-5 bg-white border-t border-gray-100 sticky bottom-0 z-30 shadow-[0_-4px_20px_rgba(0,0,0,0.06)] shrink-0">
+            @php
+                $continueUrl = auth()->check() ? route('dashboard') : route('login');
+            @endphp
+            <a href="{{ $continueUrl }}" wire:navigate
+               class="w-full flex items-center justify-center gap-2 py-3.5 sm:py-4 rounded-full bg-[#0066FF] hover:bg-[#0055D4] active:scale-[0.98] text-white font-bold text-base shadow-md shadow-blue-500/25 transition cursor-pointer">
+                <span>Lanjutkan</span>
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
+            </a>
+        </footer>
 
-                    @foreach($sampleJobs as $job)
-                        <div onclick="window.location='{{ route('login') }}'"
-                             class="bg-white rounded-xl py-3.5 px-4 shadow-xs flex items-center justify-between cursor-pointer transition hover:shadow-md hover:scale-[1.01] active:scale-[0.98]">
-                            <span class="text-sm font-semibold text-gray-800 select-none blur-[4px] filter">
-                                {{ $job }}
-                            </span>
-                            <span class="text-xs text-primary-500 font-bold opacity-60">
-                                🔒 Login
-                            </span>
-                        </div>
-                    @endforeach
-                </div>
-            </div>
-
-            <!-- Bottom CTA -->
-            <div class="px-6 py-5 bg-white border-t border-gray-100">
-                <a href="{{ route('login') }}" wire:navigate class="block w-full text-white font-bold py-3.5 rounded-2xl text-center transition-all duration-200 shadow-lg active:scale-98" style="background: linear-gradient(135deg, #0066FF 0%, #0052cc 100%);">
-                    Mulai Berbagi Kebaikan
-                </a>
-                <p class="text-xs text-center text-gray-500 mt-2.5">
-                    Belum punya akun? 
-                    <a href="{{ route('login') }}" wire:navigate class="text-primary-600 font-bold hover:text-primary-700 underline">masuk sekarang</a>
-                </p>
-            </div>
-
-            <script>
-                document.addEventListener('DOMContentLoaded', function(){
-                    document.cookie = "shown_bantuan=; path=/; max-age=0;";
-                });
-            </script>
-
-    </div>
+    </main>
 
     <script>
-        if (typeof window.bannerSlider !== 'function') {
-            window.bannerSlider = function (totalSlides = 1, autoPlayMs = 4000) {
+        if (typeof window.heroPromoSlider !== 'function') {
+            window.heroPromoSlider = function (totalSlides = 1, autoPlayMs = 4500) {
                 return {
                     current: 0,
                     total: totalSlides,
@@ -330,18 +491,16 @@
                     },
 
                     mouseDown(e) {
-                        if (this.total <= 1 || e.button !== 0) return;
+                        if (this.total <= 1) return;
                         this.stopAutoPlay();
                         this.startX = e.clientX;
-                        this.startY = e.clientY;
                         this.dragOffset = 0;
                         this.isDragging = true;
                     },
 
                     mouseMove(e) {
                         if (!this.isDragging || this.total <= 1) return;
-                        const diffX = e.clientX - this.startX;
-                        this.dragOffset = diffX;
+                        this.dragOffset = e.clientX - this.startX;
                     },
 
                     mouseUp() {
@@ -360,14 +519,14 @@
                     mouseLeave() {
                         if (this.isDragging) {
                             this.mouseUp();
-                        } else {
-                            this.startAutoPlay();
                         }
                     }
                 };
             };
+            window.bannerSlider = window.heroPromoSlider;
         }
     </script>
+    @livewireScripts
 </body>
 
 </html>

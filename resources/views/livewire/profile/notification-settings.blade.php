@@ -89,6 +89,7 @@
         </button>
     </div>
 
+    @if(!in_array(auth()->user()?->role, ['super_admin', 'superadmin', 'admin', 'admin_wilayah']))
     <!-- Update Transaksi & Saldo -->
     <div class="flex items-center justify-between py-3 border-b border-gray-100">
         <div class="pr-4">
@@ -102,6 +103,7 @@
                 class="inline-block h-5 w-5 rounded-full bg-white shadow-md transition-transform duration-200"></span>
         </button>
     </div>
+    @endif
 
     <!-- Pengingat Bantuan -->
     <div class="flex items-center justify-between py-3 border-b border-gray-100">
@@ -131,6 +133,7 @@
         </button>
     </div>
 
+    @if(!in_array(auth()->user()?->role, ['super_admin', 'superadmin', 'admin', 'admin_wilayah']))
     <!-- Peringatan Saldo Rendah -->
     <div class="flex items-center justify-between py-3">
         <div class="pr-4">
@@ -144,6 +147,7 @@
                 class="inline-block h-5 w-5 rounded-full bg-white shadow-md transition-transform duration-200"></span>
         </button>
     </div>
+    @endif
 
     <!-- Interactive Audio & Feedback Script -->
     <script>

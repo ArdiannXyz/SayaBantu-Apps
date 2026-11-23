@@ -137,4 +137,28 @@ class ProfileTest extends TestCase
 
         $this->assertNotNull($user->fresh());
     }
+
+    public function test_superadmin_and_admin_do_not_see_saldo_or_topup_on_profile(): void
+    {
+        $superadmin = $this->user(['name' => 'Superadmin User', 'role' => 'super_admin']);
+        $admin = $this->user(['name' => 'Admin Wilayah User', 'role' => 'admin']);
+
+        $this->actingAs($superadmin)
+            ->get('/profile')
+            ->assertOk()
+            ->assertDontSee('Saldo / Wallet')
+            ->assertDontSee('Top Up')
+            ->assertDontSee('Pesanan Saya')
+            ->assertDontSee('Metode Pembayaran')
+            ->assertSee('Panel Super Admin');
+
+        $this->actingAs($admin)
+            ->get('/profile')
+            ->assertOk()
+            ->assertDontSee('Saldo / Wallet')
+            ->assertDontSee('Top Up')
+            ->assertDontSee('Pesanan Saya')
+            ->assertDontSee('Metode Pembayaran')
+            ->assertSee('Panel Admin Wilayah');
+    }
 }

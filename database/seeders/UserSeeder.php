@@ -23,7 +23,7 @@ class UserSeeder extends Seeder
      *
      * Password: Sayabantu123!
      * PIN Transaksi: 123456
-     * Seluruh saldo awal: Rp 0
+     * Saldo awal: Rp 0 (hanya untuk Customer & Mitra; Super Admin & Admin Wilayah bersih tanpa saldo)
      */
     public function run(): void
     {
@@ -218,8 +218,11 @@ class UserSeeder extends Seeder
                 $user->managedCities()->sync($diyCityIds);
             }
 
-            // Pastikan saldo awal adalah 0 untuk seluruh pengguna
-            if (in_array($user->role, ['customer', 'kustomer', 'mitra'])) {
+            // Untuk role superadmin dan admin wilayah, pastikan bersih tanpa saldo & tanpa record UserBalance
+            if (in_array($user->role, ['super_admin', 'superadmin', 'admin', 'admin_wilayah'])) {
+                UserBalance::where('user_id', $user->id)->delete();
+                $user->forceFill(['balance' => 0])->saveQuietly();
+            } elseif (in_array($user->role, ['customer', 'kustomer', 'mitra'])) {
                 UserBalance::updateOrCreate(
                     ['user_id' => $user->id],
                     ['balance' => 0]
