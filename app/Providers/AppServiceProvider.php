@@ -51,7 +51,7 @@ class AppServiceProvider extends ServiceProvider
      */
     private function configureRedirectsForAuthentication(): void
     {
-        $this->app['redirect']->macro('intended', function ($default = '/', $status = 302, $headers = [], $secure = null) {
+        Redirector::macro('intended', function ($default = '/', $status = 302, $headers = [], $secure = null) {
             $intended = session()->pull('url.intended');
 
             if ($intended && Auth::check()) {
