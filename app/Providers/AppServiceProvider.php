@@ -37,6 +37,11 @@ class AppServiceProvider extends ServiceProvider
         // Register BalanceTransaction observer to update user balances when transactions complete
         \App\Models\BalanceTransaction::observe(\App\Observers\BalanceTransactionObserver::class);
 
+        // Force HTTPS in production or behind secure proxies to prevent Mixed Content warnings on iOS/Safari
+        if ($this->app->environment('production') || request()->header('X-Forwarded-Proto') === 'https') {
+            \Illuminate\Support\Facades\URL::forceScheme('https');
+        }
+
         // Redirect authenticated users based on their role
         $this->configureRedirectsForAuthentication();
     }
