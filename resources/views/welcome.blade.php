@@ -5,7 +5,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="color-scheme" content="only light">
-    <meta name="supported-color-schemes" content="light">
+    <meta name="supported-color-schemes" content="only light">
+    <meta name="theme-color" content="#ffffff">
     <title>sayabantu.com - Jasa Serabutan, Mudah, Cepat, Terpercaya</title>
     <meta name="description" content="Temukan jasa serabutan yang mudah, cepat, dan terpercaya di sekitar Anda.">
 

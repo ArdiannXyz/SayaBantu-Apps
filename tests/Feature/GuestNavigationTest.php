@@ -73,4 +73,25 @@ class GuestNavigationTest extends TestCase
         $response->assertSuccessful();
         $response->assertSee(route('public.helps'));
     }
+
+    public function test_authenticated_user_with_string_city_can_access_public_helps(): void
+    {
+        $city = City::create(['name' => 'Kota Yogyakarta', 'province' => 'DI Yogyakarta', 'is_active' => true]);
+        Category::create(['name' => 'Kategori Test', 'is_active' => true]);
+
+        $user = \App\Models\User::factory()->create([
+            'role' => 'customer',
+            'city_id' => $city->id,
+            'city' => 'Kota Yogyakarta',
+        ]);
+
+        $this->actingAs($user)
+            ->get(route('public.helps'))
+            ->assertSuccessful()
+            ->assertSee('Kota Yogyakarta');
+
+        \Livewire\Livewire::actingAs($user)
+            ->test(\App\Livewire\Home\Index::class)
+            ->assertSet('userLocation', 'Kota Yogyakarta');
+    }
 }

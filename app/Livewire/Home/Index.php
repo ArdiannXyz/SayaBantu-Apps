@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\City;
 use App\Models\Help;
 use App\Models\UserBalance;
+use Livewire\Attributes\Renderless;
 use Livewire\Component;
 
 class Index extends Component
@@ -17,19 +18,38 @@ class Index extends Component
 
     public function mount()
     {
-        $user = auth()->user();
-        if ($user && $user->city) {
-            $this->userLocation = $user->city->name;
-        } elseif (session()->has('visitor_location')) {
+        if (session()->has('visitor_location')) {
             $this->userLocation = session('visitor_location');
-        } elseif (request()->header('CF-IPCity')) {
+            return;
+        }
+
+        $user = auth()->user();
+        if ($user) {
+            $userCity = $user->city_name;
+            if (empty($userCity)) {
+                if (is_string($user->city) && ! empty($user->city)) {
+                    $userCity = $user->city;
+                } elseif (is_object($user->city) && isset($user->city->name)) {
+                    $userCity = $user->city->name;
+                }
+            }
+
+            if (! empty($userCity)) {
+                $this->userLocation = $userCity;
+                return;
+            }
+        }
+
+        if (request()->header('CF-IPCity')) {
             $city = request()->header('CF-IPCity');
             $this->userLocation = str_contains(strtolower($city), 'jakarta') ? 'Kota Jakarta Pusat' : $city;
-        } else {
-            $this->userLocation = 'Kabupaten Bantul';
+            return;
         }
+
+        $this->userLocation = 'Kabupaten Bantul';
     }
 
+    #[Renderless]
     public function setLocation($location)
     {
         if (! empty($location)) {
@@ -82,7 +102,8 @@ class Index extends Component
             $balance = $userBalance ? (float) $userBalance->balance : 0;
         }
 
-        $radius = (int) AppSetting::get('mitra_search_radius', 5);
+        $radiusVal = (float) AppSetting::get('mitra_max_distance_km', AppSetting::get('max_help_radius_km', AppSetting::get('mitra_search_radius', 10)));
+        $radius = ($radiusVal == (int) $radiusVal) ? (int) $radiusVal : $radiusVal;
 
         // Order terakhir
         if ($user) {
@@ -104,18 +125,12 @@ class Index extends Component
                 ->get();
         }
 
-        $availableCities = City::where('is_active', true)
-            ->select('id', 'name')
-            ->orderBy('name')
-            ->get();
-
         return view('livewire.home.index', [
             'categories' => $categories,
             'balance' => $balance,
             'userLocation' => $this->userLocation,
             'radius' => $radius,
             'recentOrders' => $recentOrders,
-            'availableCities' => $availableCities,
         ]);
     }
 }

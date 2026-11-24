@@ -65,6 +65,7 @@ class TarifRadius extends Component
         AppSetting::set('default_urgent_nominal', (string) $this->default_urgent_nominal);
         AppSetting::set('mitra_max_distance_km', (string) $this->mitra_max_distance_km);
         AppSetting::set('max_help_radius_km', (string) $this->mitra_max_distance_km);
+        AppSetting::set('mitra_search_radius', (string) $this->mitra_max_distance_km);
         AppSetting::set('show_whatsapp_button', $this->show_whatsapp_button ? '1' : '0');
 
         session()->flash('message', 'Tarif, radius, dan pengaturan WhatsApp bantuan berhasil disimpan.');

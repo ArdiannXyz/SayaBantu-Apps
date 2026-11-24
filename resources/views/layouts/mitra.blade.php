@@ -5,7 +5,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="color-scheme" content="only light">
-    <meta name="supported-color-schemes" content="light">
+    <meta name="supported-color-schemes" content="only light">
+    <meta name="theme-color" content="#ffffff">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>{{ config('app.name', 'Mastulongmas') }} - Mitra</title>
@@ -169,20 +170,6 @@
             transition: color 0.15s ease;
             pointer-events: none;
         }
-
-        /* Indicator dot for active state */
-        .nav-item.active::after {
-            content: '';
-            position: absolute;
-            bottom: -2px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 4px;
-            height: 4px;
-            border-radius: 50%;
-            background: currentColor;
-            pointer-events: none;
-        }
     </style>
 </head>
 
@@ -254,7 +241,7 @@
 
                 <!-- Bottom Navigation Bar matching Gambar 1 Mockup: Beranda, Order, Penghasilan, Profil -->
                 <nav id="bottom-nav" class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md bg-white border-t border-gray-200/90 shadow-2xl z-40 sm:rounded-b-[36px]"
-                    style="background-color: #ffffff !important; padding-bottom: calc(0.35rem + env(safe-area-inset-bottom, 0px));">
+                    style="padding-bottom: calc(0.65rem + env(safe-area-inset-bottom, 0px));">
                     <div class="w-full flex items-center justify-around px-2 py-2">
                         <!-- 1. Beranda -->
                         <a href="{{ route('mitra.dashboard') }}" wire:navigate

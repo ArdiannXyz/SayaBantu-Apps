@@ -154,8 +154,9 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="color-scheme" content="light only">
-    <meta name="supported-color-schemes" content="light">
+    <meta name="color-scheme" content="only light">
+    <meta name="supported-color-schemes" content="only light">
+    <meta name="theme-color" content="#ffffff">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $pageTitle }} - sayabantu</title>
     <!-- Favicon & Icons -->
