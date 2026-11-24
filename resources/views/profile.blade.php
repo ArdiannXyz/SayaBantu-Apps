@@ -56,64 +56,114 @@
                     <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-white/10 rounded-full pointer-events-none"></div>
 
                     <div class="relative z-10 flex items-center justify-between gap-3.5">
-                        <!-- Avatar & User Info -->
-                        <div class="flex items-center gap-3.5 min-w-0">
-                            <!-- Foto Profil Pengguna -->
-                            <div class="relative group cursor-pointer shrink-0" 
-                                 onclick="Livewire.dispatch('openModal')"
-                                 title="Klik untuk ubah foto profil">
-                                <div class="w-16 h-16 rounded-full border-2 border-white ring-2 ring-white/30 shadow-md overflow-hidden bg-white/20 flex items-center justify-center">
-                                    <x-user-avatar :user="$user" class="w-full h-full object-cover text-white font-bold text-xl" />
+                        @if($user)
+                            <!-- Avatar & User Info -->
+                            <div class="flex items-center gap-3.5 min-w-0">
+                                <!-- Foto Profil Pengguna -->
+                                <div class="relative group cursor-pointer shrink-0" 
+                                     onclick="Livewire.dispatch('openModal')"
+                                     title="Klik untuk ubah foto profil">
+                                    <div class="w-16 h-16 rounded-full border-2 border-white ring-2 ring-white/30 shadow-md overflow-hidden bg-white/20 flex items-center justify-center">
+                                        <x-user-avatar :user="$user" class="w-full h-full object-cover text-white font-bold text-xl" />
+                                    </div>
+                                    <div class="absolute -bottom-0.5 -right-0.5 bg-white text-[#0066FF] p-1 rounded-full shadow-sm">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        </svg>
+                                    </div>
                                 </div>
-                                <div class="absolute -bottom-0.5 -right-0.5 bg-white text-[#0066FF] p-1 rounded-full shadow-sm">
-                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-                                    </svg>
+
+                                <!-- Nama & Status -->
+                                <div class="min-w-0 flex-1">
+                                    <h2 class="text-base font-extrabold text-white truncate leading-snug">
+                                        {{ trim(preg_replace('/\s*\((?:Mitra|Customer)[^)]*\)|\s*(?:Mitra|Customer)\b/i', '', $user->name ?? 'Pengguna')) }}
+                                    </h2>
+                                    <div class="flex items-center gap-2 mt-1 flex-wrap">
+                                        <span class="text-xs text-blue-100 font-semibold">Aktif</span>
+                                        <span class="w-1 h-1 rounded-full bg-blue-200 shrink-0"></span>
+                                        @if($isFullyVerified || $isVerified)
+                                            <span class="inline-flex items-center gap-1 bg-white text-[#0066FF] text-[10px] font-extrabold px-2 py-0.5 rounded-full shadow-2xs">
+                                                <svg class="w-3 h-3 text-[#0066FF] fill-current shrink-0" viewBox="0 0 24 24">
+                                                    <path fill-rule="evenodd" d="M8.603 3.799A4.49 4.49 0 0112 2.25c1.357 0 2.573.6 3.397 1.549a4.49 4.49 0 013.498 1.307 4.491 4.491 0 011.307 3.497A4.49 4.49 0 0121.75 12a4.49 4.49 0 01-1.549 3.397 4.491 4.491 0 01-1.307 3.497 4.491 4.491 0 01-3.497 1.307A4.49 4.49 0 0112 21.75a4.49 4.49 0 01-3.397-1.549 4.49 4.49 0 01-3.498-1.306 4.491 4.491 0 01-1.307-3.498A4.49 4.49 0 012.25 12c0-1.357.6-2.573 1.549-3.397a4.49 4.49 0 011.307-3.497 4.49 4.49 0 013.497-1.307zm7.007 6.387a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clip-rule="evenodd" />
+                                                </svg>
+                                                Terverifikasi
+                                            </span>
+                                        @elseif($hasDocs)
+                                            <span class="inline-flex items-center gap-1 bg-amber-400/25 text-amber-200 text-[10px] font-bold px-2 py-0.5 rounded-full border border-amber-300/30">
+                                                Proses Verifikasi
+                                            </span>
+                                        @else
+                                            <a href="{{ route('profile.settings.verification') }}" wire:navigate 
+                                               class="inline-flex items-center gap-1 bg-white/20 hover:bg-white/30 text-white text-[10px] font-bold px-2 py-0.5 rounded-full border border-white/30 transition">
+                                                Belum Verifikasi &rarr;
+                                            </a>
+                                        @endif
+                                    </div>
                                 </div>
                             </div>
 
-                            <!-- Nama & Status -->
-                            <div class="min-w-0 flex-1">
-                                <h2 class="text-base font-extrabold text-white truncate leading-snug">
-                                    {{ trim(preg_replace('/\s*\((?:Mitra|Customer)[^)]*\)|\s*(?:Mitra|Customer)\b/i', '', $user->name ?? 'Pengguna')) }}
-                                </h2>
-                                <div class="flex items-center gap-2 mt-1 flex-wrap">
-                                    <span class="text-xs text-blue-100 font-semibold">Aktif</span>
-                                    <span class="w-1 h-1 rounded-full bg-blue-200 shrink-0"></span>
-                                    @if($isFullyVerified || $isVerified)
-                                        <span class="inline-flex items-center gap-1 bg-white text-[#0066FF] text-[10px] font-extrabold px-2 py-0.5 rounded-full shadow-2xs">
-                                            <svg class="w-3 h-3 text-[#0066FF] fill-current shrink-0" viewBox="0 0 24 24">
-                                                <path fill-rule="evenodd" d="M8.603 3.799A4.49 4.49 0 0112 2.25c1.357 0 2.573.6 3.397 1.549a4.49 4.49 0 013.498 1.307 4.491 4.491 0 011.307 3.497A4.49 4.49 0 0121.75 12a4.49 4.49 0 01-1.549 3.397 4.491 4.491 0 01-1.307 3.497 4.491 4.491 0 01-3.497 1.307A4.49 4.49 0 0112 21.75a4.49 4.49 0 01-3.397-1.549 4.49 4.49 0 01-3.498-1.306 4.491 4.491 0 01-1.307-3.498A4.49 4.49 0 012.25 12c0-1.357.6-2.573 1.549-3.397a4.49 4.49 0 011.307-3.497 4.49 4.49 0 013.497-1.307zm7.007 6.387a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clip-rule="evenodd" />
-                                            </svg>
-                                            Terverifikasi
+                            <!-- Edit Profile Button -->
+                            <a href="{{ route('profile.edit') }}" wire:navigate aria-label="Edit Profil"
+                               class="p-2.5 bg-white/15 hover:bg-white/25 text-white rounded-xl transition flex-shrink-0 border border-white/20 shadow-xs active:scale-95">
+                                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                </svg>
+                            </a>
+                        @else
+                            <!-- Mode Tamu -->
+                            <div class="flex items-center gap-3.5 min-w-0">
+                                <div class="w-16 h-16 rounded-full border-2 border-white ring-2 ring-white/30 shadow-md overflow-hidden bg-white/20 flex items-center justify-center text-white text-2xl font-bold">
+                                    👤
+                                </div>
+                                <div class="min-w-0 flex-1">
+                                    <h2 class="text-base font-extrabold text-white truncate leading-snug">
+                                        Pengunjung Tamu
+                                    </h2>
+                                    <div class="flex items-center gap-2 mt-1 flex-wrap">
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-400 text-amber-950">
+                                            Mode Tamu
                                         </span>
-                                    @elseif($hasDocs)
-                                        <span class="inline-flex items-center gap-1 bg-amber-400/25 text-amber-200 text-[10px] font-bold px-2 py-0.5 rounded-full border border-amber-300/30">
-                                            Proses Verifikasi
-                                        </span>
-                                    @else
-                                        <a href="{{ route('profile.settings.verification') }}" wire:navigate 
-                                           class="inline-flex items-center gap-1 bg-white/20 hover:bg-white/30 text-white text-[10px] font-bold px-2 py-0.5 rounded-full border border-white/30 transition">
-                                            Belum Verifikasi &rarr;
-                                        </a>
-                                    @endif
+                                        <span class="text-xs text-blue-100 font-semibold">Belum Masuk</span>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <!-- Edit Profile Button -->
-                        <a href="{{ route('profile.edit') }}" wire:navigate aria-label="Edit Profil"
-                           class="p-2.5 bg-white/15 hover:bg-white/25 text-white rounded-xl transition flex-shrink-0 border border-white/20 shadow-xs active:scale-95">
-                            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                            </svg>
-                        </a>
+                            <a href="{{ route('login') }}" wire:navigate aria-label="Masuk ke Akun"
+                               class="px-3.5 py-1.5 bg-white text-[#0066FF] font-bold text-xs rounded-xl shadow-xs hover:bg-blue-50 active:scale-95 transition shrink-0">
+                                Masuk
+                            </a>
+                        @endif
                     </div>
                 </div>
             </div>
 
-            @if(!$isAdminRole && (optional($user)->role === 'customer' || optional($user)->isCustomer()))
+            @if(!$user)
+            <!-- Mode Tamu Action Card -->
+            <div class="px-5 mb-5">
+                <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200/90 rounded-2xl p-4 shadow-xs space-y-3">
+                    <div class="flex items-center gap-2.5">
+                        <span class="w-7 h-7 rounded-full bg-blue-100 text-[#0066FF] flex items-center justify-center font-bold text-xs shrink-0">★</span>
+                        <div>
+                            <h3 class="text-xs font-black text-slate-800">Daftar Akun Baru</h3>
+                            <p class="text-[11px] text-slate-500">Buat akun untuk memesan bantuan dan nikmati semua kemudahan.</p>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 pt-1">
+                        <a href="{{ route('register') }}" wire:navigate 
+                           class="py-2.5 px-3 rounded-xl bg-[#0066FF] hover:bg-blue-700 text-white font-bold text-xs text-center shadow-xs transition">
+                            Daftar Sekarang
+                        </a>
+                        <a href="{{ route('login') }}" wire:navigate 
+                           class="py-2.5 px-3 rounded-xl bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 font-bold text-xs text-center transition">
+                            Masuk Akun
+                        </a>
+                    </div>
+                </div>
+            </div>
+            @endif
+
+            @if($user && !$isAdminRole && ($user->role === 'customer' || $user->isCustomer()))
             <!-- Card Saldo / Wallet Berwarna -->
             <div class="px-5 mb-5">
                 <div class="relative overflow-hidden rounded-2xl p-4 bg-gradient-to-r from-[#0066FF] via-[#005AE0] to-[#0044B8] text-white shadow-lg shadow-blue-500/15 border border-white/20 flex items-center justify-between gap-3">
@@ -299,7 +349,7 @@
                         </a>
                     @endif
 
-                    @if(!$isAdminRole)
+                    @if($user && !$isAdminRole)
                     <!-- 3. Metode Pembayaran -->
                     <a href="{{ route('customer.topup') }}" wire:navigate 
                        class="py-4 px-2 flex items-center justify-between hover:bg-slate-50/80 active:bg-slate-100/70 rounded-2xl transition group cursor-pointer">
@@ -329,6 +379,7 @@
                         </svg>
                     </a>
 
+                    @if($user)
                     <!-- 5. Pengaturan -->
                     <a href="{{ route('profile.settings') }}" wire:navigate 
                        class="py-4 px-2 flex items-center justify-between hover:bg-slate-50/80 active:bg-slate-100/70 rounded-2xl transition group cursor-pointer">
@@ -343,8 +394,10 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                         </svg>
                     </a>
+                    @endif
                 </div>
 
+                @if($user)
                 <!-- Tombol Keluar (Outlined Pill Button) -->
                 <div class="mt-4 mb-2">
                     <button type="button" 
@@ -353,8 +406,10 @@
                         Keluar
                     </button>
                 </div>
+                @endif
             </div>
 
+            @if($user)
             <!-- Modal Ganti Foto Profil Livewire -->
             @livewire('customer.update-profile-photo')
 
@@ -385,6 +440,7 @@
                     </form>
                 </div>
             </div>
+            @endif
 
         </div>
     </div>

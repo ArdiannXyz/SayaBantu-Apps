@@ -189,7 +189,37 @@ class Create extends Component
         $this->minNominal = (int) AppSetting::get('min_help_nominal', 10000);
         $this->maxNominal = (int) AppSetting::get('max_help_nominal', 10000000);
 
+        if (session()->has('pending_help_order')) {
+            $draft = session('pending_help_order');
+            if (empty($this->title) && ! empty($draft['title'])) $this->title = $draft['title'];
+            if (empty($this->description) && ! empty($draft['description'])) $this->description = $draft['description'];
+            if (empty($this->category_id) && ! empty($draft['category_id'])) $this->category_id = (string) $draft['category_id'];
+            if (empty($this->other_category) && ! empty($draft['other_category'])) $this->other_category = $draft['other_category'];
+            if (empty($this->amount) && ! empty($draft['amount'])) $this->amount = $draft['amount'];
+            if (empty($this->city_id) && ! empty($draft['city_id'])) $this->city_id = (string) $draft['city_id'];
+            if (empty($this->location) && ! empty($draft['location'])) $this->location = $draft['location'];
+            if (empty($this->full_address) && ! empty($draft['full_address'])) $this->full_address = $draft['full_address'];
+            if (! empty($draft['latitude'])) $this->latitude = (float) $draft['latitude'];
+            if (! empty($draft['longitude'])) $this->longitude = (float) $draft['longitude'];
+            if (! empty($draft['help_type'])) $this->help_type = $draft['help_type'];
+            if (! empty($draft['scheduled_date'])) $this->scheduled_date = $draft['scheduled_date'];
+            if (! empty($draft['scheduled_time'])) $this->scheduled_time = $draft['scheduled_time'];
+            if (! empty($draft['equipment_provided'])) $this->equipment_provided = $draft['equipment_provided'];
+        }
+
         $user = auth()->user();
+        if ($user) {
+            if ($user->isMitra()) {
+                return redirect()->route('mitra.dashboard');
+            }
+            if ($user->isAdmin() || $user->isSuperAdmin()) {
+                return redirect()->route('dashboard');
+            }
+            if (! $user->isOnboarded()) {
+                return redirect()->route('onboarding.step1');
+            }
+        }
+
         if ($user && ! $user->isProfileComplete()) {
             $this->isProfileComplete = false;
             $this->missingProfileFields = array_values($user->getMissingProfileFields());
@@ -707,7 +737,30 @@ class Create extends Component
     public function save()
     {
         $user = auth()->user();
-        if (! $user || ! $user->isProfileComplete()) {
+        if (! $user) {
+            session(['pending_help_order' => [
+                'title' => $this->title,
+                'description' => $this->description,
+                'category_id' => $this->category_id,
+                'other_category' => $this->other_category,
+                'amount' => $this->amount,
+                'city_id' => $this->city_id,
+                'location' => $this->location,
+                'full_address' => $this->full_address,
+                'latitude' => $this->latitude,
+                'longitude' => $this->longitude,
+                'help_type' => $this->help_type,
+                'scheduled_date' => $this->scheduled_date,
+                'scheduled_time' => $this->scheduled_time,
+                'equipment_provided' => $this->equipment_provided,
+            ]]);
+
+            session()->flash('info', 'Silakan daftar akun terlebih dahulu untuk melanjutkan dan menerbitkan pesanan bantuan Anda.');
+
+            return redirect()->route('register');
+        }
+
+        if (! $user->isProfileComplete()) {
             $missing = implode(', ', optional($user)->getMissingProfileFields() ?? []);
             session()->flash('error', "Harap lengkapi profil Anda ({$missing}) terlebih dahulu sebelum mengajukan bantuan.");
 
@@ -874,6 +927,28 @@ class Create extends Component
     public function prepareConfirm()
     {
         $user = auth()->user();
+        if (! $user) {
+            session(['pending_help_order' => [
+                'title' => $this->title,
+                'description' => $this->description,
+                'category_id' => $this->category_id,
+                'other_category' => $this->other_category,
+                'amount' => $this->amount,
+                'city_id' => $this->city_id,
+                'location' => $this->location,
+                'full_address' => $this->full_address,
+                'latitude' => $this->latitude,
+                'longitude' => $this->longitude,
+                'help_type' => $this->help_type,
+                'scheduled_date' => $this->scheduled_date,
+                'scheduled_time' => $this->scheduled_time,
+                'equipment_provided' => $this->equipment_provided,
+            ]]);
+
+            session()->flash('info', 'Silakan daftar akun terlebih dahulu untuk melanjutkan dan menerbitkan pesanan bantuan Anda.');
+
+            return redirect()->route('register');
+        }
 
         if ($user && ! $user->canCreateMoreHelps()) {
             if (! $user->hasVerifiedEmail()) {

@@ -83,6 +83,22 @@ class Index extends Component
 
     public $customCancelReason = '';
 
+    public function mount()
+    {
+        if (auth()->check()) {
+            $user = auth()->user();
+            if ($user->isMitra()) {
+                return redirect()->route('mitra.dashboard');
+            }
+            if ($user->isAdmin() || $user->isSuperAdmin()) {
+                return redirect()->route('dashboard');
+            }
+            if (! $user->isOnboarded()) {
+                return redirect()->route('onboarding.step1');
+            }
+        }
+    }
+
     // Reset pagination ketika user mengetik di kolom search
     public function updatingSearch()
     {
@@ -749,6 +765,25 @@ class Index extends Component
     public function render()
     {
         $user = auth()->user();
+
+        if (! $user) {
+            return view('livewire.customer.helps.index', [
+                'helps' => new \Illuminate\Pagination\LengthAwarePaginator([], 0, 10),
+                'counts' => [
+                    'semua' => 0,
+                    'diproses' => 0,
+                    'waiting_customer_confirmation' => 0,
+                    'menunggu_mitra' => 0,
+                    'selesai' => 0,
+                    'batal' => 0,
+                    'ditolak' => 0,
+                    'komplain' => 0,
+                ],
+                'pendingOrders' => collect([]),
+                'cities' => City::where('is_active', true)->get(),
+                'isGuest' => true,
+            ]);
+        }
 
         // Auto-confirm bantuan yang sudah lewat 24 jam menunggu konfirmasi kini
         // dijalankan oleh scheduler (helps:auto-confirm), bukan di dalam render.

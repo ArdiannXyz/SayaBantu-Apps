@@ -71,17 +71,24 @@
                 'onboarding.step1', 'onboarding.step2', 'onboarding.step3', 'onboarding.step4',
                 'onboarding.biodata', 'onboarding.password', 'verification.notice'
             ]);
+            $prevUrl = url()->previous();
+            $prevPath = parse_url((string) $prevUrl, PHP_URL_PATH) ?? '';
+            $isInternalPrev = !empty($prevUrl) 
+                && str_contains($prevUrl, request()->getHost()) 
+                && !in_array($prevPath, ['', '/', '/login', '/register', '/logout', '/admin/login']);
+
             $backUrl = match($currentRoute) {
                 'onboarding.step4' => route('onboarding.step3'),
                 'onboarding.step3' => route('onboarding.step2'),
                 'onboarding.step2' => route('onboarding.step1'),
                 'onboarding.step1', 'onboarding.biodata' => route('register', ['role' => session('reg_account.role', 'customer')]),
                 'onboarding.password' => route('onboarding.step4'),
-                'register' => route('register.choose-role'),
-                'register.choose-role' => route('login'),
+                'register' => $isInternalPrev ? $prevUrl : route('public.helps'),
+                'register.choose-role' => $isInternalPrev ? $prevUrl : route('public.helps'),
                 'password.request', 'password.reset' => route('login'),
-                'login', 'admin.login' => url('/'),
-                default => url('/'),
+                'login' => $isInternalPrev ? $prevUrl : route('public.helps'),
+                'admin.login' => route('public.helps'),
+                default => route('public.helps'),
             };
         @endphp
 
@@ -89,6 +96,7 @@
             <!-- Clean Modern Mobile Top Bar matching mockups -->
             <div class="px-5 pt-4 pb-2 flex items-center justify-between z-10 shrink-0">
                 <a href="{{ $backUrl }}"
+                   wire:navigate
                    class="w-10 h-10 rounded-full flex items-center justify-center text-gray-700 hover:bg-gray-100 active:scale-95 transition cursor-pointer"
                    aria-label="Kembali">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">

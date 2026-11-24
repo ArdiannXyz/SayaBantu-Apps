@@ -66,7 +66,7 @@
 
                 <div class="relative z-10">
                     <div class="flex items-center justify-between text-white mb-3">
-                        <a href="{{ route('customer.dashboard') }}" wire:navigate aria-label="Kembali ke Dashboard"
+                        <a href="{{ auth()->check() ? route('customer.dashboard') : route('public.helps') }}" wire:navigate aria-label="Kembali"
                             class="p-2 hover:bg-white/20 rounded-lg transition inline-flex items-center">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -91,6 +91,23 @@
 
             <!-- Content -->
             <div class="bg-white px-5 pt-3 pb-8 -mt-[1px]">
+                @guest
+                    <div class="mb-4 bg-gradient-to-r from-blue-50 to-indigo-50/70 border border-blue-200/80 rounded-2xl p-3.5 flex items-center justify-between gap-3 shadow-2xs">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-full bg-[#0066FF] text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-sm">
+                                ★
+                            </div>
+                            <div>
+                                <div class="text-xs font-black text-slate-800">Mode Tamu / Eksplorasi</div>
+                                <div class="text-[11px] text-slate-500 leading-snug">Pilih layanan dan isi rincian bantuan. Anda akan diarahkan untuk mendaftar akun saat mengirim pesanan.</div>
+                            </div>
+                        </div>
+                        <a href="{{ route('login') }}" wire:navigate class="px-3 py-1.5 bg-white text-[#0066FF] text-xs font-bold rounded-xl border border-blue-200 shadow-2xs hover:bg-blue-50 active:scale-95 transition shrink-0">
+                            Masuk
+                        </a>
+                    </div>
+                @endguest
+
                 @if(!$isProfileComplete)
                     <div class="py-6 text-center">
                         <div class="w-16 h-16 bg-amber-50 border border-amber-100 rounded-2xl flex items-center justify-center mx-auto mb-4 text-amber-500 shadow-2xs">
@@ -899,7 +916,7 @@
                                 wire:loading.attr="disabled"
                                 wire:target="prepareConfirm"
                                 class="flex-1 inline-flex items-center justify-center bg-gradient-to-r from-blue-500 to-blue-600 text-white px-5 py-3 text-sm rounded-lg font-semibold hover:from-blue-600 hover:to-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg active:scale-[0.99] cursor-pointer">
-                                <span wire:loading.remove wire:target="prepareConfirm">Kirim Permintaan</span>
+                                <span wire:loading.remove wire:target="prepareConfirm">{{ auth()->check() ? 'Kirim Permintaan' : 'Daftar & Pesan Bantuan' }}</span>
                                 <span wire:loading wire:target="prepareConfirm" class="inline-flex items-center gap-2">
                                     <svg class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
                                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>

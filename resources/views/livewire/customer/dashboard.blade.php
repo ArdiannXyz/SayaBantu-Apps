@@ -178,6 +178,7 @@
     <!-- Main Content Body -->
     <div class="px-5 pt-4 pb-6">
         @php
+            $promosEnabled = filter_var(\App\Models\AppSetting::get('dashboard_promos_enabled', true), FILTER_VALIDATE_BOOLEAN);
             $rawPromos = \App\Models\AppSetting::get('dashboard_promos');
             $promoList = [];
             if ($rawPromos) {
@@ -211,7 +212,7 @@
             $totalActivePromos = count($activePromos);
         @endphp
 
-        @if($totalActivePromos > 0)
+        @if($promosEnabled && $totalActivePromos > 0)
             <!-- Hero Banner / Iklan Promosi Dashboard (Mendukung 1 atau Banyak Iklan Berputar) -->
             <div class="mb-5 select-none relative group"
                  wire:ignore.self
@@ -247,15 +248,16 @@
                                         ? asset('storage/' . $pImage)
                                         : asset('images/sayabantu-mascot.jpg');
                                     $pIsExternal = str_starts_with($pLink, 'http://') || str_starts_with($pLink, 'https://');
+                                    $isFullImage = ($pLayout === 'full_image') || (!empty($pImage) && empty($promo['title']) && empty($promo['description']));
                                 @endphp
 
-                                @if($pLayout === 'full_image')
+                                @if($isFullImage)
                                     <!-- Full Image Banner Layout (Poster Penuh Menyesuaikan Layar) -->
                                     <a href="{{ $pLink }}"
                                        @if($pIsExternal || $pTargetBlank) target="_blank" rel="noopener noreferrer" @else wire:navigate @endif
-                                       class="flex-shrink-0 w-full relative block overflow-hidden min-h-[175px] max-h-[220px] bg-gray-900 group/slide focus:outline-none">
+                                       class="flex-shrink-0 w-full relative block overflow-hidden aspect-[16/9] sm:aspect-[2/1] min-h-[160px] max-h-[220px] bg-blue-900 group/slide focus:outline-none">
                                         <img src="{{ $pImageUrl }}" alt="{{ $pTitle ?: 'Promo SayaBantu' }}"
-                                             class="w-full h-full min-h-[175px] max-h-[220px] object-cover transition-transform duration-500 group-hover/slide:scale-[1.02] pointer-events-none select-none">
+                                             class="w-full h-full object-cover transition-transform duration-500 group-hover/slide:scale-[1.02] pointer-events-none select-none">
                                         
                                         @if(!empty($pBadge) || !empty($pTitle) || !empty($pBtnText))
                                             <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent flex items-end p-4 sm:p-5 pointer-events-none">

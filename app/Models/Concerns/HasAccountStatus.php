@@ -100,4 +100,9 @@ trait HasAccountStatus
     {
         return $this->status === 'active';
     }
+
+    public function isOnboarded(): bool
+    {
+        return (bool) ($this->is_completed ?? false);
+    }
 }

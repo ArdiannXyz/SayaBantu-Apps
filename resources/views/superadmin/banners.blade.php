@@ -137,6 +137,37 @@
                     </button>
                 </div>
 
+                <!-- Saklar Utama (Master Switch ON/OFF) Tampilan Banner Promosi -->
+                <div class="mb-5 p-4 rounded-2xl border {{ $promosEnabled ? 'border-emerald-200 bg-emerald-50/60' : 'border-amber-200 bg-amber-50/70' }} transition">
+                    <div class="flex items-center justify-between gap-4">
+                        <div class="flex items-center gap-3.5 min-w-0">
+                            <div class="w-10 h-10 rounded-xl {{ $promosEnabled ? 'bg-emerald-100 text-emerald-600' : 'bg-amber-100 text-amber-600' }} flex items-center justify-center shrink-0">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
+                                </svg>
+                            </div>
+                            <div class="min-w-0">
+                                <div class="flex items-center gap-2">
+                                    <h3 class="text-xs font-bold text-gray-900">Saklar Utama Banner Promosi</h3>
+                                    <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full {{ $promosEnabled ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-amber-100 text-amber-800 border border-amber-300' }}">
+                                        {{ $promosEnabled ? 'TAYANG (ON)' : 'DISEMBUNYIKAN (OFF)' }}
+                                    </span>
+                                </div>
+                                <p class="text-[11px] {{ $promosEnabled ? 'text-emerald-700' : 'text-amber-800' }} mt-0.5 leading-relaxed">
+                                    {{ $promosEnabled ? 'Banner promosi sedang aktif dan tampil di halaman Bantuan & Dashboard Customer.' : 'Banner promosi sedang dimatikan total. Slider iklan tidak akan muncul di aplikasi.' }}
+                                </p>
+                            </div>
+                        </div>
+
+                        <button type="button" 
+                                wire:click="togglePromosEnabled"
+                                class="shrink-0 relative inline-flex h-6 w-12 items-center rounded-full transition-colors focus:outline-none cursor-pointer {{ $promosEnabled ? 'bg-emerald-600' : 'bg-gray-300' }}"
+                                title="Klik untuk On/Off Banner Promosi">
+                            <span class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform shadow-xs {{ $promosEnabled ? 'translate-x-7' : 'translate-x-1' }}"></span>
+                        </button>
+                    </div>
+                </div>
+
                 <div class="space-y-3">
                     @forelse($promos as $idx => $promo)
                         @php
@@ -247,10 +278,22 @@
                         <h2 class="text-sm font-bold text-gray-900">Simulasi Tampilan Iklan</h2>
                         <p class="text-[11px] text-gray-500">Pratinjau slider bergerak otomatis di HP pengguna (Dashboard &amp; Halaman Bantuan)</p>
                     </div>
-                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
-                        {{ $activePromosCount }} Aktif
-                    </span>
+                    <div class="flex items-center gap-1.5">
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full {{ $promosEnabled ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-amber-50 text-amber-700 border border-amber-200' }}">
+                            {{ $promosEnabled ? 'Tayang (ON)' : 'Sembunyi (OFF)' }}
+                        </span>
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
+                            {{ $activePromosCount }} Aktif
+                        </span>
+                    </div>
                 </div>
+
+                @if(!$promosEnabled)
+                    <div class="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-800 text-xs flex items-center gap-2">
+                        <svg class="w-4 h-4 text-amber-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                        <span><strong>Catatan:</strong> Saklar utama sedang dimatikan. Slider iklan saat ini tidak tampil di sisi customer/pengunjung.</span>
+                    </div>
+                @endif
 
                 @php
                     $previewActivePromos = array_values(array_filter($promos, fn($p) => ($p['is_active'] ?? true) == true));

@@ -2,6 +2,13 @@
 
 use Illuminate\Support\Facades\Route;
 
+// Rute customer & mode tamu yang dapat diakses publik tanpa login
+Route::prefix('customer')->name('customer.')->group(function () {
+    Route::get('/helps/create', \App\Livewire\Customer\Helps\Create::class)->name('helps.create');
+    Route::get('/helps', \App\Livewire\Customer\Helps\Index::class)->name('helps.index');
+    Route::get('/chat/{help?}', \App\Livewire\Customer\Chat::class)->name('chat');
+});
+
 // Rute customer (prefix, nama, dan middleware milik role ini).
 // Catatan: jangan panggil ->middleware() lagi setelah ini — pemanggilan kedua
 // akan menimpa daftar middleware, sehingga 'auth' dan 'onboarded' hilang.
@@ -13,10 +20,8 @@ Route::middleware(['auth', 'onboarded', 'customer'])
         Route::get('/dashboard', \App\Livewire\Customer\Dashboard::class)->name('dashboard');
 
         // Helps Management
-        Route::get('/helps/create', \App\Livewire\Customer\Helps\Create::class)->name('helps.create');
         Route::get('/helps/history', \App\Livewire\Customer\Helps\History::class)->name('helps.history');
         Route::get('/helps/{id}/detail', \App\Livewire\Customer\Helps\Detail::class)->name('helps.detail');
-        Route::get('/helps', \App\Livewire\Customer\Helps\Index::class)->name('helps.index');
 
         // Notifications
         Route::get('/notifications', \App\Livewire\Customer\Notifications\Index::class)->name('notifications.index');
@@ -42,9 +47,6 @@ Route::middleware(['auth', 'onboarded', 'customer'])
         Route::get('/withdraw/history', [\App\Http\Controllers\WithdrawController::class, 'withdrawHistory'])->name('withdraw.history');
         Route::get('/withdraw/success/{withdraw}', [\App\Http\Controllers\WithdrawController::class, 'showSuccess'])->name('withdraw.success');
         Route::get('/withdraw/rejected/{withdraw}', [\App\Http\Controllers\WithdrawController::class, 'showRejected'])->name('withdraw.rejected');
-
-        // Chat
-        Route::get('/chat/{help?}', \App\Livewire\Customer\Chat::class)->name('chat');
 
         // Alamat Saya (Multi-address Shopee-style)
         Route::get('/addresses', \App\Livewire\Customer\Addresses\Index::class)->name('addresses');

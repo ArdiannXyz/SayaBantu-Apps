@@ -28,6 +28,19 @@ class Chat extends Component
 
     public function mount($help = null)
     {
+        if (auth()->check()) {
+            $user = auth()->user();
+            if ($user->isMitra()) {
+                return redirect()->route('mitra.dashboard');
+            }
+            if ($user->isAdmin() || $user->isSuperAdmin()) {
+                return redirect()->route('dashboard');
+            }
+            if (! $user->isOnboarded()) {
+                return redirect()->route('onboarding.step1');
+            }
+        }
+
         $this->user = Auth::user();
 
         // If help is provided via route parameter, open that conversation immediately.

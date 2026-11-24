@@ -274,18 +274,27 @@
             @endauth
 
             <!-- Bottom Navigation Bar: Fluid full width on mobile, max-w-md centered on desktop -->
-            @auth
-                <nav id="bottom-nav" class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md bg-white border-t border-gray-200/90 shadow-2xl z-40 sm:rounded-b-[36px]"
-                    style="background-color: #ffffff !important; padding-bottom: calc(0.35rem + env(safe-area-inset-bottom, 0px));">
-                    <div class="w-full flex items-center justify-around px-2 py-2">
-                        <!-- Beranda -->
-                        <a href="{{ route('customer.dashboard') }}" wire:navigate
-                            class="nav-item flex-1 flex flex-col items-center justify-center py-1 px-0.5 min-w-0 transition-colors {{ request()->routeIs('customer.dashboard') ? 'text-[#0066FF] font-bold active' : 'text-gray-400 hover:text-gray-700' }}">
+            <nav id="bottom-nav" class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md bg-white border-t border-gray-200/90 shadow-2xl z-40 sm:rounded-b-[36px]"
+                style="background-color: #ffffff !important; padding-bottom: calc(0.35rem + env(safe-area-inset-bottom, 0px));">
+                <div class="w-full flex items-center justify-around px-2 py-2">
+                    <!-- Beranda -->
+                    <a href="{{ auth()->check() ? route('customer.dashboard') : route('public.helps') }}" wire:navigate
+                        class="nav-item flex-1 flex flex-col items-center justify-center py-1 px-0.5 min-w-0 transition-colors {{ request()->routeIs('customer.dashboard') || request()->routeIs('public.helps') ? 'text-[#0066FF] font-bold active' : 'text-gray-400 hover:text-gray-700' }}">
+                        <svg class="w-6 h-6 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="{{ request()->routeIs('customer.dashboard') || request()->routeIs('public.helps') ? '2.5' : '1.8' }}"
+                                d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                        </svg>
+                        <span class="nav-label text-[11px] tracking-tight truncate max-w-full text-center mt-1">Beranda</span>
+                    </a>
+
+                        <!-- Buat Order -->
+                        <a href="{{ route('customer.helps.create') }}" wire:navigate
+                            class="nav-item flex-1 flex flex-col items-center justify-center py-1 px-0.5 min-w-0 transition-colors {{ request()->routeIs('customer.helps.create') ? 'text-[#0066FF] font-bold active' : 'text-gray-400 hover:text-gray-700' }}">
                             <svg class="w-6 h-6 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="{{ request()->routeIs('customer.dashboard') ? '2.5' : '1.8' }}"
-                                    d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="{{ request()->routeIs('customer.helps.create') ? '2.5' : '1.8' }}"
+                                    d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
-                            <span class="nav-label text-[11px] tracking-tight truncate max-w-full text-center mt-1">Beranda</span>
+                            <span class="nav-label text-[11px] tracking-tight truncate max-w-full text-center mt-1">Buat Order</span>
                         </a>
 
                         <!-- Pesanan -->
@@ -354,14 +363,15 @@
                         </a>
                     </div>
                 </nav>
-            @endauth
         </div>
     </div>
 
     @livewireScripts
     @stack('scripts')
     {{-- Realtime notifications for customer (invisible) --}}
-    @livewire('customer.realtime-notifications')
+    @auth
+        @livewire('customer.realtime-notifications')
+    @endauth
 
     <script>
         if (!window._customerNotifScriptLoaded) {
@@ -1109,11 +1119,11 @@
             if (!container) return;
 
             container.querySelectorAll('a.nav-item').forEach(el => {
-                el.classList.remove('text-primary-600', 'active');
+                el.classList.remove('text-[#0066FF]', 'text-primary-600', 'font-bold', 'active');
                 el.classList.add('text-gray-400');
             });
             navItem.classList.remove('text-gray-400');
-            navItem.classList.add('text-primary-600', 'active');
+            navItem.classList.add('text-[#0066FF]', 'font-bold', 'active');
         });
     </script>
     <x-camera-modal />

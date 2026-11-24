@@ -123,6 +123,9 @@ Route::group([], function () {
     Route::post('/onboarding/step4', [OnboardingController::class, 'storeStep4'])->name('onboarding.step4.store');
 });
 
+// Halaman Profil (Bisa diakses Pengunjung dalam Mode Tamu maupun Pengguna Terdaftar)
+Route::view('/profile', 'profile')->name('profile');
+
 // =========================================================================
 // 4. AUTHENTICATED ROUTES (DIKUNCI DENGAN MIDDLEWARE ONBOARDED)
 // =========================================================================
@@ -186,7 +189,6 @@ Route::middleware(['auth', 'onboarded'])->group(function () {
     // ========================================
     // SHARED ROUTES (Profile & Account)
     // ========================================
-    Route::view('/profile', 'profile')->name('profile');
     Route::view('/profile/edit', 'profile.edit')->name('profile.edit');
     Route::get('/profile/addresses', \App\Livewire\Customer\Addresses\Index::class)
         ->name('profile.addresses')

@@ -61,7 +61,7 @@
             
             <div class="relative z-10 w-full">
                 <div class="flex items-center justify-between text-white mb-3">
-                    <a href="{{ route('customer.dashboard') }}" wire:navigate aria-label="Kembali ke Dashboard" class="p-2 hover:bg-white/20 rounded-lg transition inline-flex items-center">
+                    <a href="{{ auth()->check() ? route('customer.dashboard') : route('public.helps') }}" wire:navigate aria-label="Kembali" class="p-2 hover:bg-white/20 rounded-lg transition inline-flex items-center">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
                         </svg>
@@ -811,13 +811,39 @@
                                 actionType="secondary" 
                             />
                         @else
-                            <x-empty-state 
-                                icon="clipboard" 
-                                title="Belum Ada Permintaan Bantuan" 
-                                description="Mulai buat permintaan bantuan baru untuk mendapatkan bantuan dari mitra terdekat." 
-                                actionText="Buat Permintaan Baru" 
-                                :actionUrl="route('customer.helps.create')" 
-                            />
+                            @guest
+                                <div class="bg-white rounded-3xl p-6 text-center border border-slate-100 shadow-xs max-w-sm mx-auto my-4 space-y-4">
+                                    <div class="w-16 h-16 rounded-2xl bg-blue-50 text-[#0066FF] flex items-center justify-center mx-auto shadow-2xs">
+                                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" /></svg>
+                                    </div>
+                                    <div>
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800 mb-2">Mode Tamu</span>
+                                        <h3 class="text-base font-bold text-slate-800">Belum Ada Riwayat Pesanan</h3>
+                                        <p class="text-xs text-slate-500 mt-1 leading-relaxed">
+                                            Anda sedang menjelajah dalam mode tamu. Silakan masuk atau daftar akun untuk melihat pesanan aktif dan riwayat bantuan Anda.
+                                        </p>
+                                    </div>
+                                    <div class="pt-2 flex flex-col gap-2">
+                                        <a href="{{ route('register') }}" wire:navigate class="w-full py-2.5 rounded-xl bg-[#0066FF] text-white font-bold text-xs shadow-sm hover:bg-blue-700 transition">
+                                            Daftar Akun Baru
+                                        </a>
+                                        <a href="{{ route('login') }}" wire:navigate class="w-full py-2.5 rounded-xl bg-slate-100 text-slate-700 font-bold text-xs hover:bg-slate-200 transition">
+                                            Masuk ke Akun
+                                        </a>
+                                        <a href="{{ route('customer.helps.create') }}" wire:navigate class="w-full py-2.5 rounded-xl text-[#0066FF] font-bold text-xs hover:underline transition">
+                                            + Buat Pesanan Baru
+                                        </a>
+                                    </div>
+                                </div>
+                            @else
+                                <x-empty-state 
+                                    icon="clipboard" 
+                                    title="Belum Ada Permintaan Bantuan" 
+                                    description="Mulai buat permintaan bantuan baru untuk mendapatkan bantuan dari mitra terdekat." 
+                                    actionText="Buat Permintaan Baru" 
+                                    :actionUrl="route('customer.helps.create')" 
+                                />
+                            @endguest
                         @endif
                     @endif
                 @endforelse

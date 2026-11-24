@@ -25,6 +25,8 @@ class Banners extends Component
     public $iconUpload = null;
 
     // Dashboard Promos / Ads (Multiple Items)
+    public bool $promosEnabled = true;
+
     public array $promos = [];
 
     // Modal & Form State for Add / Edit Promo
@@ -56,6 +58,7 @@ class Banners extends Component
     {
         $this->homeBanners = json_decode((string) AppSetting::get('banner_home', '[]'), true) ?: [];
         $this->appIcon = AppSetting::get('app_icon', null);
+        $this->promosEnabled = filter_var(AppSetting::get('dashboard_promos_enabled', true), FILTER_VALIDATE_BOOLEAN);
 
         // Load multiple promos
         $rawPromos = AppSetting::get('dashboard_promos');
@@ -236,6 +239,13 @@ class Banners extends Component
             Log::error('Error saving dashboard promo: '.$e->getMessage());
             session()->flash('error', 'Gagal menyimpan iklan promosi: '.$e->getMessage());
         }
+    }
+
+    public function togglePromosEnabled(): void
+    {
+        $this->promosEnabled = ! $this->promosEnabled;
+        AppSetting::set('dashboard_promos_enabled', $this->promosEnabled ? '1' : '0');
+        session()->flash('message', 'Pengaturan banner promosi berhasil diubah: ' . ($this->promosEnabled ? 'Banner Ditampilkan (ON)' : 'Banner Disembunyikan (OFF)'));
     }
 
     public function togglePromoActive(string $id)
