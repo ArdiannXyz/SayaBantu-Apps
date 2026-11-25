@@ -396,7 +396,7 @@
                         <div class="pt-2.5 border-t border-slate-100 flex items-center justify-between gap-3">
                             <!-- Left: Price -->
                             <div>
-                                <span class="text-base font-black text-[#0066FF] tracking-tight">Rp {{ number_format($help->amount, 0, ',', '.') }}</span>
+                                <span class="text-base font-black text-[#0066FF] tracking-tight">{{ format_rupiah($help->amount) }}</span>
                             </div>
 
                             <!-- Right: Action Buttons -->
@@ -708,7 +708,7 @@
             document.getElementById('previewTitle').textContent = title;
             const cleanCategory = (category || 'Lainnya').replace(/^[\p{Extended_Pictographic}\uFE0F\u200D\s]+/u, '').trim();
             document.getElementById('previewCategory').textContent = cleanCategory || 'Lainnya';
-            document.getElementById('previewAmount').textContent = 'Rp ' + amount.toLocaleString('id-ID');
+            document.getElementById('previewAmount').textContent = (window.formatRupiah || (x => 'Rp ' + Number(x || 0).toLocaleString('id-ID')))(amount);
             const schedEl = document.getElementById('previewScheduled');
             if (schedEl) {
                 if (scheduled && scheduled.length) {

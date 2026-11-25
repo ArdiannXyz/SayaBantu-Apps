@@ -58,8 +58,8 @@
                         </div>
                         <div class="min-w-0 flex-1">
                             <div class="text-xs font-semibold text-blue-900/70 truncate" title="Total Fee Platform Bantuan">Total Fee Platform</div>
-                            <div class="text-lg sm:text-xl font-black text-gray-900 leading-tight my-0.5 truncate" title="Rp {{ number_format($helpTotalFee ?? 0, 0, ',', '.') }}">
-                                Rp {{ number_format($helpTotalFee ?? 0, 0, ',', '.') }}
+                            <div class="text-lg sm:text-xl font-black text-gray-900 leading-tight my-0.5 truncate" title="{{ format_rupiah($helpTotalFee ?? 0) }}">
+                                {{ format_rupiah($helpTotalFee ?? 0) }}
                             </div>
                             <div class="text-xs text-blue-600 font-semibold truncate">Customer + Mitra</div>
                         </div>
@@ -75,8 +75,8 @@
                         </div>
                         <div class="min-w-0 flex-1">
                             <div class="text-xs font-semibold text-indigo-900/70 truncate" title="Fee Platform Bulan Ini">Fee Bulan Ini</div>
-                            <div class="text-lg sm:text-xl font-black text-indigo-700 leading-tight my-0.5 truncate" title="Rp {{ number_format($helpFeeMonth ?? 0, 0, ',', '.') }}">
-                                Rp {{ number_format($helpFeeMonth ?? 0, 0, ',', '.') }}
+                            <div class="text-lg sm:text-xl font-black text-indigo-700 leading-tight my-0.5 truncate" title="{{ format_rupiah($helpFeeMonth ?? 0) }}">
+                                {{ format_rupiah($helpFeeMonth ?? 0) }}
                             </div>
                             <div class="text-xs text-indigo-600 font-semibold truncate">{{ now()->translatedFormat('F Y') }}</div>
                         </div>
@@ -92,8 +92,8 @@
                         </div>
                         <div class="min-w-0 flex-1">
                             <div class="text-xs font-semibold text-amber-900/70 truncate" title="Rata-rata Fee per Bantuan">Rata-rata Fee / Bantuan</div>
-                            <div class="text-lg sm:text-xl font-black text-amber-700 leading-tight my-0.5 truncate" title="Rp {{ number_format($avgHelpFee ?? 0, 0, ',', '.') }}">
-                                Rp {{ number_format($avgHelpFee ?? 0, 0, ',', '.') }}
+                            <div class="text-lg sm:text-xl font-black text-amber-700 leading-tight my-0.5 truncate" title="{{ format_rupiah($avgHelpFee ?? 0) }}">
+                                {{ format_rupiah($avgHelpFee ?? 0) }}
                             </div>
                             <div class="text-xs text-amber-600 font-semibold truncate">Customer + Mitra</div>
                         </div>
@@ -157,7 +157,7 @@
                                 <div class="flex justify-between items-center text-xs">
                                     <span class="text-gray-600 font-medium">Total Perolehan:</span>
                                     <span class="text-base font-medium text-blue-700">
-                                         Rp {{ number_format($helpBreakdown['customer']['total'] ?? 0, 0, ',', '.') }}
+                                         {{ format_rupiah($helpBreakdown['customer']['total'] ?? 0) }}
                                     </span>
                                 </div>
                                 <div class="flex justify-between items-center text-xs pt-2 border-t border-blue-200/80">
@@ -191,7 +191,7 @@
                                 <div class="flex justify-between items-center text-xs">
                                     <span class="text-gray-600 font-medium">Total Perolehan:</span>
                                     <span class="text-base font-medium text-emerald-700">
-                                         Rp {{ number_format($helpBreakdown['mitra']['total'] ?? 0, 0, ',', '.') }}
+                                         {{ format_rupiah($helpBreakdown['mitra']['total'] ?? 0) }}
                                     </span>
                                 </div>
                                 <div class="flex justify-between items-center text-xs pt-2 border-t border-emerald-200/80">
@@ -406,7 +406,7 @@
                                 callbacks: {
                                     label: function (context) {
                                         const v = context.raw ?? context.parsed?.y ?? 0;
-                                        return 'Fee Platform: Rp ' + Number(v).toLocaleString('id-ID');
+                                        return 'Fee Platform: ' + (window.formatRupiah ? window.formatRupiah(v) : 'Rp ' + Number(v).toLocaleString('id-ID'));
                                     }
                                 }
                             }
@@ -425,7 +425,7 @@
                                 beginAtZero: true,
                                 ticks: {
                                     callback: function (v) { 
-                                        if (v >= 1000000) return 'Rp ' + (v / 1000000).toFixed(1) + 'M';
+                                        if (v >= 1000000) return window.formatRupiah ? window.formatRupiah(v) : (Number.isInteger(v) && v % 10000 === 0 ? ('Rp ' + (v / 1000000).toFixed(2).replace(/\.?0+$/, '').replace('.', ',') + ' jt') : ('Rp ' + Number(v).toLocaleString('id-ID')));
                                         if (v >= 1000) return 'Rp ' + (v / 1000).toFixed(0) + 'k';
                                         return 'Rp ' + Number(v).toLocaleString('id-ID'); 
                                     },

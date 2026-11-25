@@ -52,7 +52,7 @@ class HelpTakenNotification extends Notification
             'help_amount' => $this->help->amount,
             'mitra_id' => $this->mitra->id,
             'mitra_name' => $this->mitra->name,
-            'message' => "Bantuan Anda '{$this->help->title}' senilai Rp ".number_format((float) $this->help->amount, 0, ',', '.')." telah diambil oleh {$this->mitra->name}",
+            'message' => "Bantuan Anda '{$this->help->title}' senilai ".format_rupiah((float) $this->help->amount)." telah diambil oleh {$this->mitra->name}",
             'type' => 'help_taken',
         ];
     }

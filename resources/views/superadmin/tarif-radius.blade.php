@@ -43,7 +43,7 @@
             </div>
             <div class="min-w-0 flex-1">
                 <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Min. Bantuan Reguler</p>
-                <p class="text-lg sm:text-xl font-extrabold text-slate-900 truncate">Rp {{ number_format((int) ($min_help_nominal ?? 10000), 0, ',', '.') }}</p>
+                <p class="text-lg sm:text-xl font-extrabold text-slate-900 truncate">{{ format_rupiah((int) ($min_help_nominal ?? 10000)) }}</p>
                 <span class="text-[11px] text-blue-600 font-semibold">Tarif dasar pesanan biasa</span>
             </div>
         </div>
@@ -57,7 +57,7 @@
             </div>
             <div class="min-w-0 flex-1">
                 <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Min. Bantuan Prioritas</p>
-                <p class="text-lg sm:text-xl font-extrabold text-slate-900 truncate">Rp {{ number_format((int) ($default_urgent_nominal ?? 50000), 0, ',', '.') }}</p>
+                <p class="text-lg sm:text-xl font-extrabold text-slate-900 truncate">{{ format_rupiah((int) ($default_urgent_nominal ?? 50000)) }}</p>
                 <span class="text-[11px] text-amber-600 font-semibold">Tarif dasar pesanan urgent</span>
             </div>
         </div>

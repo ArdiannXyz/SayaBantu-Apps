@@ -35,7 +35,7 @@
                 <div class="bg-gray-50 border border-gray-200 rounded-2xl p-4 space-y-3">
                     <div class="flex justify-between text-xs">
                         <span class="text-gray-500">Jumlah Penarikan:</span>
-                        <span class="font-bold text-gray-900 text-sm">Rp {{ number_format($withdraw->amount, 0, ',', '.') }}</span>
+                        <span class="font-bold text-gray-900 text-sm">{{ format_rupiah($withdraw->amount) }}</span>
                     </div>
                     <div class="flex justify-between text-xs">
                         <span class="text-gray-500">Bank / E-Wallet:</span>
@@ -64,7 +64,7 @@
 
                 <div class="p-3.5 bg-emerald-50 border border-emerald-200 rounded-2xl text-xs text-emerald-800 flex items-center gap-2.5">
                     <svg class="w-4 h-4 text-emerald-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
-                    <span>Saldo sebesar <strong>Rp {{ number_format($withdraw->amount, 0, ',', '.') }}</strong> telah dikembalikan ke saldo akun Anda.</span>
+                    <span>Saldo sebesar <strong>{{ format_rupiah($withdraw->amount) }}</strong> telah dikembalikan ke saldo akun Anda.</span>
                 </div>
 
                 <div class="flex gap-2.5 pt-2">

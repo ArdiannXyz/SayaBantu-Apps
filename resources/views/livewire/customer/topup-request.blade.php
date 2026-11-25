@@ -54,7 +54,7 @@
                         </div>
                         <div class="flex justify-between">
                             <span class="text-gray-500">Nominal Transfer:</span>
-                            <span class="font-bold text-amber-700">Rp {{ number_format($pendingTransaction->total_payment ?: $pendingTransaction->amount, 0, ',', '.') }}</span>
+                            <span class="font-bold text-amber-700">{{ format_rupiah($pendingTransaction->total_payment ?: $pendingTransaction->amount) }}</span>
                         </div>
                         <div class="flex justify-between">
                             <span class="text-gray-500">Waktu Pengajuan:</span>
@@ -191,7 +191,7 @@
                     <!-- Quick Amount Buttons -->
                     <div class="mb-2">
                         <label class="block text-sm font-medium text-gray-700 mb-1">Nominal Cepat:</label>
-                        <div class="grid grid-cols-5 gap-1.5 sm:gap-2">
+                        <div class="grid grid-cols-3 min-[380px]:grid-cols-5 gap-1.5 sm:gap-2">
                             <button type="button" wire:click="setQuickAmount(20000)"
                                 class="px-1.5 sm:px-3 py-2 text-xs sm:text-sm font-bold text-center rounded-lg border-2 {{ $amount == 20000 ? 'border-primary-500 bg-primary-50 text-primary-700' : 'border-gray-200 text-gray-700 hover:border-primary-300' }}">
                                 20K
@@ -287,16 +287,16 @@
                     <div class="space-y-2">
                         <div class="flex justify-between text-sm">
                             <span class="text-gray-700">Nominal Top-Up</span>
-                            <span class="font-semibold text-gray-900">Rp {{ number_format($amount, 0, ',', '.') }}</span>
+                            <span class="font-semibold text-gray-900">{{ format_rupiah($amount) }}</span>
                         </div>
                         <div class="flex justify-between text-sm">
                             <span class="text-gray-700">Biaya Admin</span>
-                            <span class="font-semibold text-gray-900">Rp {{ number_format($adminFee, 0, ',', '.') }}</span>
+                            <span class="font-semibold text-gray-900">{{ format_rupiah($adminFee) }}</span>
                         </div>
                         <div class="border-t border-primary-200 my-2"></div>
                         <div class="flex justify-between text-lg">
                             <span class="font-bold text-primary-900">Total Bayar</span>
-                            <span class="font-bold text-primary-600">Rp {{ number_format($totalPayment, 0, ',', '.') }}</span>
+                            <span class="font-bold text-primary-600">{{ format_rupiah($totalPayment) }}</span>
                         </div>
                     </div>
                 </div>
@@ -371,7 +371,7 @@
                 <!-- Total yang harus dibayar -->
                 <div class="bg-primary-600 text-white rounded-xl p-4 mb-6 text-center">
                     <p class="text-sm mb-1">Total yang harus dibayar:</p>
-                    <p class="text-3xl font-bold">Rp {{ number_format($totalPayment, 0, ',', '.') }}</p>
+                    <p class="text-3xl font-bold">{{ format_rupiah($totalPayment) }}</p>
                 </div>
 
                 <form wire:submit.prevent="submitRequest">
@@ -431,7 +431,7 @@
                                             @endif
                                             <div class="mt-3 text-xs text-gray-500 space-y-1">
                                                 <p>✓ Bisa pakai GoPay, OVO, Dana, LinkAja, ShopeePay, dll</p>
-                                                <p>✓ Transfer sesuai nominal: <strong class="text-primary-600">Rp {{ number_format($totalPayment, 0, ',', '.') }}</strong></p>
+                                                <p>✓ Transfer sesuai nominal: <strong class="text-primary-600">{{ format_rupiah($totalPayment) }}</strong></p>
                                             </div>
                                         </div>
                                     </div>
@@ -499,7 +499,7 @@
                         @if ($proofOfPayment)
                             <div class="mt-4">
                                 <p class="text-sm font-medium text-gray-700 mb-2">Preview:</p>
-                                <img src="{{ $proofOfPayment->temporaryUrl() }}" class="max-w-xs rounded-xl shadow-lg">
+                                <img src="{{ $proofOfPayment->temporaryUrl() }}" class="w-full max-w-xs mx-auto rounded-xl shadow-lg object-contain">
                             </div>
                         @endif
                     </div>

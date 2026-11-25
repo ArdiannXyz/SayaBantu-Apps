@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sayabantu-v4';
+const CACHE_NAME = 'sayabantu-v6';
 const ASSETS_TO_CACHE = [
   '/',
   '/manifest.json',
@@ -78,3 +78,106 @@ self.addEventListener('fetch', (event) => {
     })
   );
 });
+
+// =========================================================================
+// Web Push Notifications
+// =========================================================================
+self.addEventListener('push', (event) => {
+  let data = {};
+  if (event.data) {
+    try {
+      data = event.data.json();
+    } catch (e) {
+      data = {
+        title: 'SayaBantu',
+        body: event.data.text()
+      };
+    }
+  }
+
+  const title = data.title || 'SayaBantu';
+  const options = {
+    body: data.body || 'Anda memiliki pemberitahuan baru di SayaBantu.',
+    icon: data.icon || '/icons/icon-192x192.png',
+    badge: data.badge || '/icons/icon-192x192.png',
+    vibrate: data.vibrate || [200, 100, 200],
+    tag: data.tag || 'sayabantu-notification',
+    renotify: true,
+    requireInteraction: Boolean(data.requireInteraction),
+    timestamp: Date.now(),
+    data: {
+      url: data.url || '/',
+      type: data.type || 'info',
+      time: Date.now()
+    },
+    actions: [
+      { action: 'open', title: 'Buka' },
+      { action: 'close', title: 'Tutup' }
+    ]
+  };
+
+  if (data.image) {
+    options.image = data.image;
+  }
+
+  // Selalu tampilkan notifikasi native OS / perangkat (Windows Action Center via Edge/Chrome,
+  // heads-up notification tray di Android) baik saat tab aktif, diminimize, maupun ditutup.
+  event.waitUntil(
+    Promise.all([
+      self.registration.showNotification(title, options),
+      clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients) => {
+        windowClients.forEach((client) => {
+          if (client.visibilityState === 'visible') {
+            client.postMessage({
+              type: 'SAYABANTU_PUSH_SYNC',
+              payload: {
+                title,
+                body: options.body,
+                url: options.data.url,
+                icon: options.icon,
+                tag: options.tag,
+                type: options.data.type,
+              }
+            });
+          }
+        });
+      })
+    ])
+  );
+});
+
+// Notification Click Event (Buka URL tujuan saat notifikasi di-klik di HP / desktop)
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+
+  if (event.action === 'close') {
+    return;
+  }
+
+  const targetUrl = (event.notification.data && event.notification.data.url)
+    ? event.notification.data.url
+    : '/';
+
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients) => {
+      for (let client of windowClients) {
+        if (client.url === targetUrl && 'focus' in client) {
+          return client.focus();
+        }
+      }
+      for (let client of windowClients) {
+        if (client.url.startsWith(self.location.origin) && 'focus' in client) {
+          return client.focus().then(() => {
+            if ('navigate' in client) {
+              return client.navigate(targetUrl);
+            }
+          });
+        }
+      }
+      if (clients.openWindow) {
+        return clients.openWindow(targetUrl);
+      }
+    })
+  );
+});
+

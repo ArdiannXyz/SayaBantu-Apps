@@ -140,7 +140,7 @@ class WithdrawController extends Controller
             'amount.required' => 'Jumlah penarikan wajib diisi.',
             'amount.integer' => 'Jumlah penarikan harus berupa angka.',
             'amount.min' => 'Jumlah penarikan minimal Rp 10.000.',
-            'amount.max' => 'Saldo Anda tidak mencukupi untuk penarikan sebesar Rp '.number_format((int) $request->input('amount', 0), 0, ',', '.').'. Saldo tersedia: Rp '.number_format($userBalance, 0, ',', '.').'.',
+            'amount.max' => 'Saldo Anda tidak mencukupi untuk penarikan sebesar '.format_rupiah((int) $request->input('amount', 0)).'. Saldo tersedia: '.format_rupiah($userBalance).'.',
             'bank_account_id.required' => 'Silakan pilih rekening bank atau e-wallet tujuan.',
             'bank_account_id.exists' => 'Rekening tujuan tidak valid.',
             'pin.required' => 'PIN transaksi 6 digit wajib diisi.',
@@ -166,12 +166,12 @@ class WithdrawController extends Controller
 
         // Business checks: minimum balance
         if ($userBalance < 10000) {
-            return back()->withErrors(['amount' => 'Saldo Anda tidak mencukupi untuk melakukan penarikan. Minimal saldo adalah Rp 10.000 (Saldo Anda: Rp '.number_format($userBalance, 0, ',', '.').').'])->withInput();
+            return back()->withErrors(['amount' => 'Saldo Anda tidak mencukupi untuk melakukan penarikan. Minimal saldo adalah Rp 10.000 (Saldo Anda: '.format_rupiah($userBalance).').'])->withInput();
         }
 
         // Business checks: amount exceeds available balance
         if ($amount > $userBalance) {
-            return back()->withErrors(['amount' => 'Jumlah penarikan (Rp '.number_format($amount, 0, ',', '.').') melebihi saldo tersedia Anda (Rp '.number_format($userBalance, 0, ',', '.').').'])->withInput();
+            return back()->withErrors(['amount' => 'Jumlah penarikan ('.format_rupiah($amount).') melebihi saldo tersedia Anda ('.format_rupiah($userBalance).').'])->withInput();
         }
 
         // Business checks: pending requests

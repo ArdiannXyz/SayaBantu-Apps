@@ -130,4 +130,31 @@ class BankSettingsTest extends TestCase
         $this->assertNotNull($bank);
         $this->assertGreaterThan(0, $bank->order);
     }
+
+    public function test_qris_save_and_bank_status_toggles_include_confirmation_prompts(): void
+    {
+        $channel = BankChannel::updateOrCreate(
+            ['code' => 'BCA'],
+            [
+                'name' => 'Bank BCA',
+                'category' => 'bank',
+                'account_number' => '1234567890',
+                'account_name' => 'PT SayaBantu',
+                'is_active' => true,
+                'order' => 1,
+            ]
+        );
+
+        Livewire::actingAs($this->superAdmin)
+            ->test(BankSettings::class)
+            ->assertSee('wire:confirm="Apakah Anda yakin ingin menyimpan dan menerapkan pengaturan QRIS ini?"', false)
+            ->assertSee('Apakah Anda yakin ingin menonaktifkan metode pembayaran QRIS?', false)
+            ->assertSee('Apakah Anda yakin ingin menonaktifkan status saluran Bank BCA?', false);
+
+        Livewire::actingAs($this->superAdmin)
+            ->test(\App\Livewire\SuperAdmin\Settings\BiayaTopupBank::class)
+            ->assertSee('wire:confirm="Apakah Anda yakin ingin menyimpan dan menerapkan pengaturan QRIS ini?"', false)
+            ->assertSee('Apakah Anda yakin ingin menonaktifkan metode pembayaran QRIS?', false)
+            ->assertSee('Apakah Anda yakin ingin menonaktifkan status rekening', false);
+    }
 }

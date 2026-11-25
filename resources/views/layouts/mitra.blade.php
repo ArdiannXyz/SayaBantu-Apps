@@ -8,8 +8,9 @@
     <meta name="supported-color-schemes" content="only light">
     <meta name="theme-color" content="#ffffff">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="sb-authenticated" content="{{ auth()->check() ? '1' : '0' }}">
 
-    <title>{{ config('app.name', 'Mastulongmas') }} - Mitra</title>
+    <title>{{ $title ?? (config('app.name', 'SayaBantu') . ' - Mitra') }}</title>
     <!-- Favicon & Icons -->
     @php
         $dynamicAppIcon = \App\Models\AppSetting::get('app_icon');
@@ -174,60 +175,15 @@
 </head>
 
 <body class="font-sans antialiased bg-slate-100 flex flex-col items-center sm:justify-start sm:pt-2 sm:pb-6 sm:px-4 min-h-screen min-h-[100dvh]">
+    @include('partials.flash-push-toast')
+
+    <!-- Global notification (app push style: top on mobile, bottom-right on laptop) -->
+    <div id="mitra-global-notification" class="sb-push-dock">
+        <div id="mitra-global-notification-inner" class="w-full"></div>
+    </div>
+
     <!-- Centered Mobile Frame container matching login page -->
     <div class="w-full max-w-md h-screen h-[100dvh] sm:h-[840px] sm:max-h-[calc(100dvh-1rem)] bg-gray-50 sm:rounded-[36px] sm:shadow-2xl sm:border sm:border-slate-200/80 flex flex-col relative overflow-hidden">
-            <!-- Floating Top Flash Notification Pop-Up (Instant Render) -->
-            @if (session()->has('message') || session()->has('success') || session()->has('error') || session()->has('status'))
-                <div id="flash-toast"
-                    x-data="{ show: true }"
-                    x-show="show"
-                    x-init="setTimeout(() => { show = false; }, 3000)"
-                    class="fixed left-1/2 -translate-x-1/2 z-[999999] max-w-sm w-[92%] pointer-events-auto transition-all duration-300 transform"
-                    style="top: calc(1rem + env(safe-area-inset-top, 0px));">
-                    @if (session()->has('error'))
-                        <div class="bg-white border border-red-200 text-gray-900 px-4 py-3 rounded-2xl shadow-2xl flex items-center gap-3">
-                            <div class="w-8 h-8 rounded-full bg-red-100 text-red-600 flex items-center justify-center flex-shrink-0 shadow-xs">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
-                                </svg>
-                            </div>
-                            <div class="flex-1 min-w-0">
-                                <div class="text-xs font-bold text-red-900">Perhatian</div>
-                                <div class="text-[11px] text-gray-600 leading-snug">{{ session('error') }}</div>
-                            </div>
-                            <button @click="show = false; document.getElementById('flash-toast')?.remove();" class="text-gray-400 hover:text-gray-600 p-1 text-xs">✕</button>
-                        </div>
-                    @else
-                        <div class="bg-white border border-emerald-200 text-gray-900 px-4 py-3 rounded-2xl shadow-2xl flex items-center gap-3">
-                            <div class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center flex-shrink-0 shadow-xs">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
-                                </svg>
-                            </div>
-                            <div class="flex-1 min-w-0">
-                                <div class="text-xs font-bold text-emerald-900">Berhasil</div>
-                                <div class="text-[11px] text-gray-600 leading-snug">{{ session('message') ?? session('success') ?? session('status') }}</div>
-                            </div>
-                            <button @click="show = false; document.getElementById('flash-toast')?.remove();" class="text-gray-400 hover:text-gray-600 p-1 text-xs">✕</button>
-                        </div>
-                    @endif
-                </div>
-                <script>
-                    setTimeout(function() {
-                        var toast = document.getElementById('flash-toast');
-                        if (toast) {
-                            toast.style.opacity = '0';
-                            toast.style.transition = 'opacity 0.4s ease';
-                            setTimeout(function() { toast.remove(); }, 400);
-                        }
-                    }, 3000);
-                </script>
-            @endif
-
-            <!-- Global notification (toast) for mitra actions -->
-            <div id="mitra-global-notification" class="fixed left-1/2 -translate-x-1/2 pointer-events-none w-full max-w-md px-3 z-[99999]" style="top: calc(0.75rem + env(safe-area-inset-top, 0px));">
-                <div id="mitra-global-notification-inner" class="w-full"></div>
-            </div>
             <!-- Content -->
             <div class="flex flex-col flex-1 min-h-0">
                 <!-- Livewire slot -->
@@ -328,6 +284,7 @@
 
     @livewireScripts
     @include('partials.help-modal')
+    @include('partials.ktp-rejected-modal')
 
     {{-- Realtime notifications poll component (invisible) --}}
     @livewire('mitra.realtime-notifications')
@@ -338,6 +295,10 @@
         window._lastMitraNotification = window._lastMitraNotification || { key: '', time: 0 };
         function showMitraNotification(argObj) {
             try {
+                if (typeof window.sbShowPushToast === 'function') {
+                    window.sbShowPushToast(argObj);
+                    return;
+                }
                 let options = argObj || {};
                 if (Array.isArray(options)) {
                     options = options[0] || {};
@@ -666,7 +627,18 @@
         // Global interactive toast popup - guarded against wire:navigate re-execution
         window._lastMitraFlashToast = window._lastMitraFlashToast || { msg: '', time: 0 };
         if (!window.showGlobalFlashToast) {
-        window.showGlobalFlashToast = function(message, type = 'success') {
+        window.showGlobalFlashToast = function(message, type = 'success', url = null) {
+            if (typeof window.sbShowPushToast === 'function') {
+                window.sbShowPushToast({
+                    title: type === 'error' ? 'Perhatian' : (type === 'info' ? 'Informasi' : 'Berhasil'),
+                    message: message,
+                    type: type,
+                    url: url || '#',
+                    timeout: 5000,
+                    sound: false,
+                });
+                return;
+            }
             const now = Date.now();
             if (window._lastMitraFlashToast.msg === message && (now - window._lastMitraFlashToast.time) < 2000) {
                 return;
@@ -678,19 +650,26 @@
 
             const toast = document.createElement('div');
             toast.id = 'flash-toast';
-            toast.className = 'fixed top-4 left-1/2 -translate-x-1/2 z-[999999] max-w-sm w-[92%] pointer-events-auto transition-all duration-300 transform';
+            toast.className = 'sb-push-dock transition-all duration-300';
             
             const isError = type === 'error';
-            const borderColor = isError ? 'border-red-200' : 'border-emerald-200';
-            const iconBg = isError ? 'bg-red-100 text-red-600' : 'bg-emerald-100 text-emerald-600';
-            const titleColor = isError ? 'text-red-900' : 'text-emerald-900';
-            const title = isError ? 'Perhatian' : 'Berhasil';
+            const isInfo = type === 'info';
+            const borderColor = isError ? 'border-red-200' : (isInfo ? 'border-blue-200' : 'border-emerald-200');
+            const iconBg = isError ? 'bg-red-100 text-red-600' : (isInfo ? 'bg-blue-100 text-blue-600' : 'bg-emerald-100 text-emerald-600');
+            const titleColor = isError ? 'text-red-900' : (isInfo ? 'text-blue-900' : 'text-emerald-900');
+            const title = isError ? 'Perhatian' : (isInfo ? 'Informasi' : 'Berhasil');
             const iconSvg = isError 
                 ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />'
-                : '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />';
+                : (isInfo
+                    ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />'
+                    : '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />');
+
+            const actionHtml = url && url !== '#'
+                ? `<span class="text-[11px] font-bold text-[#0066FF] whitespace-nowrap">Lihat →</span>`
+                : '';
 
             toast.innerHTML = `
-                <div class="bg-white border ${borderColor} text-gray-900 px-4 py-3 rounded-2xl shadow-2xl flex items-center gap-3 animate-fade-in">
+                <div class="bg-white border ${borderColor} text-gray-900 px-4 py-3 rounded-2xl shadow-2xl flex items-center gap-3 animate-fade-in ${url && url !== '#' ? 'cursor-pointer hover:bg-slate-50' : ''}">
                     <div class="w-8 h-8 rounded-full ${iconBg} flex items-center justify-center flex-shrink-0 shadow-xs">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             ${iconSvg}
@@ -700,9 +679,16 @@
                         <div class="text-xs font-bold ${titleColor}">${title}</div>
                         <div class="text-[11px] text-gray-600 leading-snug">${message}</div>
                     </div>
-                    <button onclick="this.closest('#flash-toast').remove()" class="text-gray-400 hover:text-gray-600 p-1 text-xs">✕</button>
+                    ${actionHtml}
+                    <button type="button" onclick="event.stopPropagation(); this.closest('#flash-toast').remove()" class="text-gray-400 hover:text-gray-600 p-1 text-xs">✕</button>
                 </div>
             `;
+
+            if (url && url !== '#') {
+                toast.firstElementChild.addEventListener('click', () => {
+                    window.location.href = url;
+                });
+            }
 
             document.body.appendChild(toast);
 
@@ -827,6 +813,14 @@
         });
     </script>
     <x-camera-modal />
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js').catch(() => {});
+            });
+        }
+    </script>
+    @include('partials.push-optin-banner')
     @stack('scripts')
 </body>
 

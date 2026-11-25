@@ -25,19 +25,19 @@
 
 					{{-- Stats Cards --}}
 					<div class="grid grid-cols-3 gap-2">
-						<div class="bg-white/10 backdrop-blur-sm rounded-xl p-3 text-center">
-							<div class="text-2xl font-bold text-white">{{ $completedHelps->total() ?? 0 }}</div>
-							<div class="text-xs text-white/80 mt-1">Selesai</div>
+						<div class="bg-white/10 backdrop-blur-sm rounded-xl p-2.5 sm:p-3 text-center min-w-0">
+							<div class="text-xl sm:text-2xl font-bold text-white">{{ $completedHelps->total() ?? 0 }}</div>
+							<div class="text-[11px] sm:text-xs text-white/80 mt-1">Selesai</div>
 						</div>
 
-						<div class="bg-white/10 backdrop-blur-sm rounded-xl p-3 text-center">
-							<div class="text-xs text-white/80 mb-1">Total Nilai</div>
-							<div class="text-sm font-bold text-white">Rp {{ number_format($completedHelps->sum('amount') ?? 0, 0, ',', '.') }}</div>
+						<div class="bg-white/10 backdrop-blur-sm rounded-xl p-2.5 sm:p-3 text-center min-w-0">
+							<div class="text-[11px] sm:text-xs text-white/80 mb-1">Total Nilai</div>
+							<div class="text-xs sm:text-sm font-bold text-white truncate">{{ format_rupiah($completedHelps->sum('amount') ?? 0) }}</div>
 						</div>
 
-						<div class="bg-white/10 backdrop-blur-sm rounded-xl p-3 text-center">
-							<div class="text-2xl font-bold text-white">{{ $completedHelps->unique('mitra_id')->count() ?? 0 }}</div>
-							<div class="text-xs text-white/80 mt-1">Mitra</div>
+						<div class="bg-white/10 backdrop-blur-sm rounded-xl p-2.5 sm:p-3 text-center min-w-0">
+							<div class="text-xl sm:text-2xl font-bold text-white">{{ $completedHelps->unique('mitra_id')->count() ?? 0 }}</div>
+							<div class="text-[11px] sm:text-xs text-white/80 mt-1">Mitra</div>
 						</div>
 					</div>
 				</div>
@@ -82,7 +82,7 @@
 											</div>
 
 											<div class="text-right flex-shrink-0">
-												<div class="text-sm font-bold" style="color: #0066FF;">Rp {{ number_format($help->amount ?? 0, 0, ',', '.') }}</div>
+												<div class="text-sm font-bold" style="color: #0066FF;">{{ format_rupiah($help->amount ?? 0) }}</div>
 												@if($help->status === 'rejected')
 													<span class="inline-flex items-center px-2 py-0.5 rounded-full bg-red-100 text-red-700 text-xs font-semibold mt-1">
 														<svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/></svg>
@@ -136,7 +136,7 @@
 													<h4 class="text-xs font-bold text-emerald-800 mb-1 flex items-center gap-1">
 														✓ Pengembalian Dana (Refund) Disetujui
 													</h4>
-													<p class="text-xs text-emerald-700">Dana sebesar Rp {{ number_format($help->amount + ($help->admin_fee ?? 0), 0, ',', '.') }} telah dikembalikan ke saldo akun Anda.</p>
+													<p class="text-xs text-emerald-700">Dana sebesar {{ format_rupiah($help->amount + ($help->admin_fee ?? 0)) }} telah dikembalikan ke saldo akun Anda.</p>
 													@if($help->complaint_admin_notes)
 														<p class="text-xs text-emerald-800 mt-1 font-medium">Catatan Admin: {{ $help->complaint_admin_notes }}</p>
 													@endif

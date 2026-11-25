@@ -68,7 +68,8 @@ class BalanceTransaction extends Model
     }
 
     /**
-     * Scope query to only genuine top-up transactions (excluding partner payouts, order income, and refunds)
+     * Scope query to only genuine top-up transactions (excluding partner payouts, order income, and refunds).
+     * Includes top-up requests from both Customer and Mitra accounts.
      */
     public function scopeTopupRequests($query)
     {
@@ -79,17 +80,19 @@ class BalanceTransaction extends Model
                     ->orWhere('description', 'like', 'Topup%')
                     ->orWhereNotNull('request_code');
             })
-            ->where('description', 'not like', 'Pendapatan Bantuan%')
-            ->where('description', 'not like', 'Auto-confirm Bantuan%')
-            ->where('description', 'not like', '%Refund%')
-            ->where('description', 'not like', '%Pengembalian%')
-            ->where('description', 'not like', 'Penyesuaian%')
+            ->where(function ($q) {
+                $q->whereNull('description')
+                    ->orWhere(function ($dq) {
+                        $dq->where('description', 'not like', 'Pendapatan Bantuan%')
+                            ->where('description', 'not like', 'Auto-confirm Bantuan%')
+                            ->where('description', 'not like', '%Refund%')
+                            ->where('description', 'not like', '%Pengembalian%')
+                            ->where('description', 'not like', 'Penyesuaian%');
+                    });
+            })
             ->where(function ($q) {
                 $q->whereNull('order_id')
                     ->orWhere('order_id', 'not like', 'HELP-%');
-            })
-            ->whereHas('user', function ($uq) {
-                $uq->where('role', '!=', 'mitra');
             });
     }
 

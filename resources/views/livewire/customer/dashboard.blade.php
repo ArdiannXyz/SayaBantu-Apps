@@ -351,21 +351,21 @@
 
         <!-- Saldo Customer Quick Card matching Gambar 2 -->
         <div class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 mb-5">
-            <div class="flex items-center justify-between">
-                <div>
+            <div class="flex flex-wrap items-center justify-between gap-3">
+                <div class="min-w-0 flex-1">
                     <div class="flex items-center gap-1.5 text-xs text-gray-500 font-medium">
-                        <svg class="w-4 h-4 text-[#0066FF]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-4 h-4 text-[#0066FF] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
                         </svg>
                         <span>Saldo Saya</span>
                     </div>
 
-                    <div class="flex items-center gap-2 mt-1" x-data="{ show: false }">
-                        <h2 class="text-xl font-black text-gray-900 tracking-tight" x-show="show">
-                            Rp {{ number_format($balance ?? 0, 0, ',', '.') }}
+                    <div class="flex items-center gap-2 mt-1 min-w-0" x-data="{ show: false }">
+                        <h2 class="text-lg sm:text-xl font-black text-gray-900 tracking-tight truncate" x-show="show">
+                            {{ format_rupiah($balance ?? 0) }}
                         </h2>
-                        <h2 class="text-xl font-black text-gray-900 tracking-tight" x-show="!show">Rp ••••••</h2>
-                        <button @click="show = !show" class="p-1 hover:bg-gray-100 rounded-lg transition text-gray-400 hover:text-gray-700" title="Tampilkan / Sembunyikan Saldo">
+                        <h2 class="text-lg sm:text-xl font-black text-gray-900 tracking-tight" x-show="!show">Rp ••••••</h2>
+                        <button @click="show = !show" class="p-1 hover:bg-gray-100 rounded-lg transition text-gray-400 hover:text-gray-700 shrink-0" title="Tampilkan / Sembunyikan Saldo">
                             <svg class="w-4 h-4" x-show="!show" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
                             </svg>
@@ -377,17 +377,17 @@
                     </div>
                 </div>
 
-                <div class="flex items-center gap-2">
+                <div class="flex flex-wrap items-center gap-1.5 sm:gap-2 shrink-0">
                     <a href="{{ route('customer.topup') }}" wire:navigate
-                       class="px-3.5 py-1.5 rounded-full text-xs font-bold text-white bg-[#0066FF] hover:bg-blue-700 transition shadow-xs flex items-center gap-1 active:scale-95">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                       class="px-3 sm:px-3.5 py-1.5 rounded-full text-xs font-bold text-white bg-[#0066FF] hover:bg-blue-700 transition shadow-xs flex items-center gap-1 active:scale-95 whitespace-nowrap">
+                        <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
                         </svg>
                         <span>Top Up</span>
                     </a>
                     <a href="{{ route('customer.withdraw.form') }}" wire:navigate
-                       class="px-3.5 py-1.5 rounded-full text-xs font-bold text-white bg-[#0066FF] hover:bg-blue-700 transition shadow-xs flex items-center gap-1 active:scale-95" title="Tarik Saldo">
-                        <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                       class="px-3 sm:px-3.5 py-1.5 rounded-full text-xs font-bold text-white bg-[#0066FF] hover:bg-blue-700 transition shadow-xs flex items-center gap-1 active:scale-95 whitespace-nowrap" title="Tarik Saldo">
+                        <svg class="w-3.5 h-3.5 text-white shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
                         </svg>
                         <span>Tarik</span>
@@ -582,7 +582,7 @@
                                                 @endif
                                             @endif
                                         </div>
-                                        <span class="text-xs font-bold whitespace-nowrap" style="color: #0066FF;">Rp {{ number_format($help->amount, 0, ',', '.') }}</span>
+                                        <span class="text-xs font-bold whitespace-nowrap" style="color: #0066FF;">{{ format_rupiah($help->amount) }}</span>
                                     </div>
                                     <div class="mb-1.5 flex items-center gap-1.5 flex-wrap">
                                         @if(in_array($help->status, ['menunggu_pembayaran', 'menunggu_mitra', 'mencari_mitra']))
@@ -672,7 +672,7 @@
                             <div>
                                 <p class="text-xs text-gray-500 mb-1">Nominal Bantuan</p>
                                 <p class="text-2xl font-bold" style="color: var(--brand-600)">
-                                    Rp {{ number_format(data_get($selectedHelpData, 'amount', 0), 0, ',', '.') }}
+                                    {{ format_rupiah(data_get($selectedHelpData, 'amount', 0)) }}
                                 </p>
                             </div>
                             <div class="text-right">

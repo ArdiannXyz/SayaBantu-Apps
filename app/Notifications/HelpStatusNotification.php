@@ -42,8 +42,8 @@ class HelpStatusNotification extends Notification
              $this->help->admin_notes &&
              str_contains(strtolower($this->help->admin_notes), 'auto-confirm'));
 
-        $formattedAmount = 'Rp '.number_format($this->help->amount + ($this->help->admin_fee ?? 0), 0, ',', '.');
-        $formattedMitraAmount = 'Rp '.number_format($this->help->getMitraPayoutAmount(), 0, ',', '.');
+        $formattedAmount = format_rupiah($this->help->amount + ($this->help->admin_fee ?? 0));
+        $formattedMitraAmount = format_rupiah($this->help->getMitraPayoutAmount());
         $helpTitle = $this->help->title ?? 'Bantuan #'.($this->help->id ?? '');
         $customerName = $this->help->customer?->name ?? 'Customer';
 

@@ -31,7 +31,7 @@
     <form wire:submit="save" class="space-y-6">
         <!-- KTP Upload -->
         <div>
-            <div class="flex items-center justify-between mb-2">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
                 <label class="block text-sm font-bold text-gray-900">Foto KTP</label>
                 <div class="flex items-center gap-2">
                     <button type="button" onclick="openDirectCamera('ktp-upload', 'ktp')" class="inline-flex items-center gap-1.5 text-xs font-semibold text-[#0066FF] hover:text-[#0052CC] bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg transition cursor-pointer">
@@ -97,7 +97,7 @@
 
         <!-- Selfie Upload -->
         <div>
-            <div class="flex items-center justify-between mb-2">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
                 <label class="block text-sm font-bold text-gray-900">Foto Selfie (Wajah & KTP)</label>
                 <div class="flex items-center gap-2">
                     <button type="button" onclick="openDirectCamera('selfie-upload', 'selfie')" class="inline-flex items-center gap-1.5 text-xs font-semibold text-[#0066FF] hover:text-[#0052CC] bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg transition cursor-pointer">

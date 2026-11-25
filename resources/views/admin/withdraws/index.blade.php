@@ -208,7 +208,7 @@
                                     @endif
                                 </td>
                                 <td class="px-2.5 py-2.5 whitespace-nowrap">
-                                    <div class="text-xs font-bold text-gray-900">Rp {{ number_format($item->amount, 0, ',', '.') }}</div>
+                                    <div class="text-xs font-bold text-gray-900">{{ format_rupiah($item->amount) }}</div>
                                 </td>
                                 <td class="px-2.5 py-2.5 whitespace-nowrap">
                                     <div class="text-xs font-semibold text-gray-800">{{ $item->bank_code }}</div>

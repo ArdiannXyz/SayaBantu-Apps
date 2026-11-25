@@ -67,7 +67,7 @@
                     <div class="text-right">
                         <div class="font-bold {{ $transaction->type === 'topup' ? 'text-green-600' : 'text-red-600' }}">
                             {{ $transaction->type === 'topup' ? '+' : '-' }} Rp
-                            {{ number_format($transaction->amount, 0, ',', '.') }}
+                            {{ format_nominal($transaction->amount) }}
                         </div>
                         <div
                             class="text-xs px-2 py-1 rounded-full {{ $transaction->status === 'completed' ? 'bg-green-100 text-green-700' : ($transaction->status === 'pending' ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700') }} mt-1">

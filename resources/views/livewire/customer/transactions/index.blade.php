@@ -40,7 +40,7 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-[11px] text-gray-500 font-medium">Saldo Tersedia</p>
-                        <p class="text-xl font-black text-gray-900 mt-0.5 tracking-tight">Rp {{ number_format($user->balance ?? 0, 0, ',', '.') }}</p>
+                        <p class="text-xl font-black text-gray-900 mt-0.5 tracking-tight">{{ format_rupiah($user->balance ?? 0) }}</p>
                     </div>
                     <div class="flex items-center gap-2">
                         <a href="{{ route('customer.topup') }}" wire:navigate class="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl transition shadow-xs flex items-center gap-1.5">
@@ -146,7 +146,7 @@
 
                                         <div class="text-right flex-shrink-0">
                                             <span class="text-sm font-extrabold text-emerald-600 block">
-                                                + Rp {{ number_format($t->amount, 0, ',', '.') }}
+                                                + {{ format_rupiah($t->amount) }}
                                             </span>
                                             @if($t->status === 'waiting_approval')
                                                 <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 mt-1">
@@ -237,7 +237,7 @@
 
                                         <div class="text-right flex-shrink-0">
                                             <span class="text-sm font-extrabold text-red-600 block">
-                                                - Rp {{ number_format(abs($t->amount), 0, ',', '.') }}
+                                                - {{ format_rupiah(abs($t->amount)) }}
                                             </span>
                                             <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800 mt-1">
                                                 ✓ Terbayar ke Mitra
@@ -351,7 +351,7 @@
                         @if($isRejected)
                             <p class="text-[11px] font-bold text-rose-600 uppercase tracking-wider">Pengajuan Top-Up</p>
                             <p class="text-2xl font-black mt-0.5 text-gray-400 line-through">
-                                Rp {{ number_format(abs($selectedTransaction['amount']), 0, ',', '.') }}
+                                {{ format_rupiah(abs($selectedTransaction['amount'])) }}
                             </p>
                             <span class="inline-block mt-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-rose-50 text-rose-700 border border-rose-200">
                                 Dana tidak masuk ke saldo
@@ -359,7 +359,7 @@
                         @elseif($isWaiting)
                             <p class="text-[11px] font-bold text-amber-600 uppercase tracking-wider">Pengajuan Top-Up</p>
                             <p class="text-2xl font-black mt-0.5 text-amber-600">
-                                Rp {{ number_format(abs($selectedTransaction['amount']), 0, ',', '.') }}
+                                {{ format_rupiah(abs($selectedTransaction['amount'])) }}
                             </p>
                             <span class="inline-block mt-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-50 text-amber-700 border border-amber-200">
                                 Menunggu verifikasi admin
@@ -367,7 +367,7 @@
                         @else
                             <p class="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Nominal Mutasi</p>
                             <p class="text-2xl font-black mt-0.5 {{ $isTopup ? 'text-emerald-600' : 'text-rose-600' }}">
-                                {{ $isTopup ? '+' : '-' }} Rp {{ number_format(abs($selectedTransaction['amount']), 0, ',', '.') }}
+                                {{ $isTopup ? '+' : '-' }} {{ format_rupiah(abs($selectedTransaction['amount'])) }}
                             </p>
                         @endif
                     </div>
@@ -448,14 +448,14 @@
                         @if(!empty($selectedTransaction['admin_fee']) && $selectedTransaction['admin_fee'] > 0)
                             <div class="flex justify-between items-center gap-2">
                                 <span class="text-gray-500">Biaya Admin</span>
-                                <span class="font-medium text-gray-900">Rp {{ number_format($selectedTransaction['admin_fee'], 0, ',', '.') }}</span>
+                                <span class="font-medium text-gray-900">{{ format_rupiah($selectedTransaction['admin_fee']) }}</span>
                             </div>
                         @endif
 
                         @if(!empty($selectedTransaction['total_payment']) && $selectedTransaction['total_payment'] > 0)
                             <div class="flex justify-between items-center gap-2 border-t border-gray-200/70 pt-2 font-bold">
                                 <span class="text-gray-700">Total Ditransfer</span>
-                                <span class="text-blue-600 text-sm">Rp {{ number_format($selectedTransaction['total_payment'], 0, ',', '.') }}</span>
+                                <span class="text-blue-600 text-sm">{{ format_rupiah($selectedTransaction['total_payment']) }}</span>
                             </div>
                         @endif
 

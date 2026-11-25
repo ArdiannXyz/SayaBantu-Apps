@@ -52,7 +52,7 @@
                     <div>
                         <p class="text-xs font-semibold text-blue-100 mb-1">Saldo Tersedia</p>
                         <h2 class="text-2xl font-black text-white tracking-tight">
-                            Rp {{ number_format($user->balance ?? 0, 0, ',', '.') }}
+                            {{ format_rupiah($user->balance ?? 0) }}
                         </h2>
                     </div>
                     <div class="text-white/95 mt-1">
@@ -206,7 +206,7 @@
                             <div>
                                 <h4 class="font-bold text-xs text-amber-950">Saldo Belum Mencukupi</h4>
                                 <p class="text-xs text-amber-800 mt-1 leading-relaxed">
-                                    Saldo Anda saat ini adalah <strong>Rp {{ number_format($user->balance ?? 0, 0, ',', '.') }}</strong>. Minimal saldo untuk melakukan penarikan saldo adalah <strong>Rp 10.000</strong>.
+                                    Saldo Anda saat ini adalah <strong>{{ format_rupiah($user->balance ?? 0) }}</strong>. Minimal saldo untuk melakukan penarikan saldo adalah <strong>Rp 10.000</strong>.
                                 </p>
                             </div>
                         </div>
@@ -273,7 +273,7 @@
                                 <label class="block text-xs font-bold text-slate-800">Jumlah Penarikan <span class="text-red-500">*</span></label>
                                 @if(($user->balance ?? 0) >= 10000 && $user->hasVerifiedEmail())
                                     <button type="button" id="btn-tarik-semua" class="text-[11px] font-bold text-[#0066FF] hover:text-[#0052CC] hover:underline cursor-pointer">
-                                        Tarik Semua (Rp {{ number_format($user->balance, 0, ',', '.') }})
+                                        Tarik Semua ({{ format_rupiah($user->balance) }})
                                     </button>
                                 @endif
                             </div>
@@ -570,7 +570,8 @@
                     }
 
                     if (val > userBalance) {
-                        feedback.innerHTML = `<span class="text-red-600 font-semibold">Melebihi saldo tersedia (Maksimal Rp ${userBalance.toLocaleString('id-ID')})</span>`;
+                        const fMaxBal = (window.formatRupiah || (x => 'Rp ' + Number(x || 0).toLocaleString('id-ID')))(userBalance);
+                        feedback.innerHTML = `<span class="text-red-600 font-semibold">Melebihi saldo tersedia (Maksimal ${fMaxBal})</span>`;
                         if (submitBtn) {
                             submitBtn.disabled = true;
                             submitBtn.className = 'flex-1 px-4 py-3 text-xs font-bold rounded-xl shadow-sm transition-all text-white bg-red-400 cursor-not-allowed';
@@ -586,7 +587,8 @@
                         }
                         return false;
                     } else if (val >= 10000) {
-                        feedback.innerHTML = `<span class="text-emerald-600 font-semibold">✓ Nominal valid: Rp ${val.toLocaleString('id-ID')}</span>`;
+                        const fValid = (window.formatRupiah || (x => 'Rp ' + Number(x || 0).toLocaleString('id-ID')))(val);
+                        feedback.innerHTML = `<span class="text-emerald-600 font-semibold">✓ Nominal valid: ${fValid}</span>`;
                         if (submitBtn) {
                             submitBtn.disabled = false;
                             submitBtn.className = 'flex-1 px-4 py-3 text-xs font-bold rounded-xl shadow-md transition-all text-white bg-[#0066FF] hover:bg-[#0052CC] active:scale-95 cursor-pointer inline-flex items-center justify-center gap-1.5';
@@ -638,7 +640,8 @@
                     
                     // Isi data ringkasan ke dalam modal
                     if (summaryAmount && amountInput) {
-                        summaryAmount.textContent = 'Rp ' + (amountInput.value || '0');
+                        const rawSummary = parseInt((amountInput.value || '0').replace(/\D/g, ''), 10) || 0;
+                        summaryAmount.textContent = (window.formatRupiah || (x => 'Rp ' + Number(x || 0).toLocaleString('id-ID')))(rawSummary);
                     }
                     
                     const selectedBank = document.querySelector('input[name="bank_account_id"]:checked');

@@ -41,15 +41,17 @@ class TopupRejected extends Notification
      */
     public function toMail(object $notifiable): MailMessage
     {
+        $topupRoute = ($notifiable->role ?? null) === 'mitra' ? 'mitra.topup' : 'customer.topup';
+
         return (new MailMessage)
             ->subject('Request Top-Up Saldo Ditolak')
             ->greeting('Halo '.$notifiable->name.',')
             ->line('Mohon maaf, request top-up saldo Anda telah ditolak oleh admin.')
             ->line('Kode Request: '.$this->transaction->request_code)
-            ->line('Nominal: Rp '.number_format($this->transaction->amount, 0, ',', '.'))
+            ->line('Nominal: '.format_rupiah($this->transaction->amount))
             ->line('Alasan Penolakan: '.$this->transaction->rejection_reason)
             ->line('Silakan periksa kembali bukti transfer Anda dan ajukan request baru.')
-            ->action('Buat Request Baru', route('customer.topup'))
+            ->action('Buat Request Baru', route($topupRoute))
             ->line('Jika ada pertanyaan, silakan hubungi customer service kami.');
     }
 
@@ -60,6 +62,8 @@ class TopupRejected extends Notification
      */
     public function toArray(object $notifiable): array
     {
+        $historyRoute = ($notifiable->role ?? null) === 'mitra' ? 'mitra.topup.history' : 'customer.topup.history';
+
         return [
             'type' => 'topup_rejected',
             'title' => '❌ Request Top-Up Ditolak',
@@ -68,7 +72,7 @@ class TopupRejected extends Notification
             'amount' => $this->transaction->amount,
             'rejection_reason' => $this->transaction->rejection_reason,
             'message' => 'Request top-up saldo Anda ditolak. Alasan: '.($this->transaction->rejection_reason ?: 'Bukti transfer tidak valid.'),
-            'url' => route('customer.topup.history'),
+            'url' => route($historyRoute),
         ];
     }
 }

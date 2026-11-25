@@ -252,7 +252,7 @@ class HelpsApproved extends Component
         } catch (\Throwable $e) {
         }
 
-        session()->flash('message', 'Komplain bantuan #'.$help->id.' disetujui. Dana sebesar Rp '.number_format($help->amount + ($help->admin_fee ?? 0), 0, ',', '.').' telah dikembalikan ke saldo customer.');
+        session()->flash('message', 'Komplain bantuan #'.$help->id.' disetujui. Dana sebesar '.format_rupiah($help->amount + ($help->admin_fee ?? 0)).' telah dikembalikan ke saldo customer.');
         $this->closeDecisionModal();
         $this->closeDetailModal();
     }
@@ -287,7 +287,7 @@ class HelpsApproved extends Component
         } catch (\Throwable $e) {
         }
 
-        session()->flash('message', 'Komplain bantuan #'.$help->id.' ditolak. Pesanan dinyatakan selesai dan dana sebesar Rp '.number_format($help->amount, 0, ',', '.').' telah dicairkan ke saldo mitra.');
+        session()->flash('message', 'Komplain bantuan #'.$help->id.' ditolak. Pesanan dinyatakan selesai dan dana sebesar '.format_rupiah($help->amount).' telah dicairkan ke saldo mitra.');
         $this->closeDecisionModal();
         $this->closeDetailModal();
     }

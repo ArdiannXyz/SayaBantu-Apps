@@ -176,7 +176,7 @@
                                             @endif
                                         </div>
                                         <span class="text-xs font-bold whitespace-nowrap text-emerald-600">
-                                            Rp {{ number_format($netMitra, 0, ',', '.') }}
+                                            {{ format_rupiah($netMitra) }}
                                             <span class="text-[10px] text-gray-400 font-normal">(Netto)</span>
                                         </span>
                                     </div>

@@ -331,11 +331,11 @@ class Create extends Component
             $num = (float) $value;
             if ($num > $this->maxNominal) {
                 $this->amount = $this->maxNominal;
-                $this->addError('amount', 'Nominal maksimal Rp '.number_format($this->maxNominal, 0, ',', '.'));
+                $this->addError('amount', 'Nominal maksimal '.format_rupiah($this->maxNominal));
             } elseif ($num < $this->minNominal) {
                 $msg = $this->help_type === 'urgent'
-                    ? 'Nominal bantuan prioritas / urgent minimal Rp '.number_format($this->minNominal, 0, ',', '.')
-                    : 'Nominal minimal Rp '.number_format($this->minNominal, 0, ',', '.');
+                    ? 'Nominal bantuan prioritas / urgent minimal '.format_rupiah($this->minNominal)
+                    : 'Nominal minimal '.format_rupiah($this->minNominal);
                 $this->addError('amount', $msg);
             } else {
                 $this->resetErrorBag('amount');
@@ -365,7 +365,7 @@ class Create extends Component
             $this->auto_cancel_minutes = $this->auto_cancel_minutes ?: 30;
 
             if (! empty($this->amount) && (float) $this->amount < $urgentMin) {
-                $this->addError('amount', 'Nominal minimal untuk bantuan prioritas / urgent adalah Rp '.number_format($urgentMin, 0, ',', '.'));
+                $this->addError('amount', 'Nominal minimal untuk bantuan prioritas / urgent adalah '.format_rupiah($urgentMin));
             } else {
                 $this->resetErrorBag(['scheduled_date', 'scheduled_time', 'amount', 'auto_cancel_minutes']);
             }
@@ -382,7 +382,7 @@ class Create extends Component
             }
 
             if (! empty($this->amount) && (float) $this->amount < $this->minNominal) {
-                $this->addError('amount', 'Nominal minimal Rp '.number_format($this->minNominal, 0, ',', '.'));
+                $this->addError('amount', 'Nominal minimal '.format_rupiah($this->minNominal));
             } else {
                 $this->resetErrorBag(['scheduled_date', 'scheduled_time', 'amount', 'auto_cancel_minutes']);
             }
@@ -720,7 +720,7 @@ class Create extends Component
         'amount.required' => 'Nominal uang harus diisi',
         'amount.numeric' => 'Nominal harus berupa angka',
         'amount.min' => 'Nominal tidak boleh kurang dari nilai minimal yang ditetapkan',
-        'amount.max' => 'Nominal maksimal Rp 10.000.000',
+        'amount.max' => 'Nominal maksimal Rp 10 jt',
         'category_id.required' => 'Kategori bantuan wajib dipilih',
         'city_id.required' => 'Kota wajib dipilih',
         'city_id.exists' => 'Kota yang dipilih saat ini sedang tidak aktif.',
@@ -792,8 +792,8 @@ class Create extends Component
         $adminFee = 0;
 
         $this->rules['amount'] = 'required|numeric|min:'.$minNominal.'|max:'.$maxNominal;
-        $this->messages['amount.min'] = 'Nominal minimal '.($this->help_type === 'urgent' ? 'untuk bantuan prioritas / urgent adalah ' : '').'Rp '.number_format($minNominal, 0, ',', '.');
-        $this->messages['amount.max'] = 'Nominal maksimal Rp '.number_format($maxNominal, 0, ',', '.');
+        $this->messages['amount.min'] = 'Nominal minimal '.($this->help_type === 'urgent' ? 'untuk bantuan prioritas / urgent adalah ' : '').format_rupiah($minNominal);
+        $this->messages['amount.max'] = 'Nominal maksimal '.format_rupiah($maxNominal);
 
         if ($this->help_type === 'urgent') {
             $this->rules['auto_cancel_minutes'] = 'required|integer|min:30|max:180';
@@ -843,7 +843,7 @@ class Create extends Component
 
         if ($userBalance->balance < $totalPaid) {
             $this->checkPendingTopup();
-            $this->insufficientMessage = 'Saldo Anda tidak cukup. Total yang harus dibayar: Rp '.number_format($totalPaid, 0, ',', '.');
+            $this->insufficientMessage = 'Saldo Anda tidak cukup. Total yang harus dibayar: '.format_rupiah($totalPaid);
             $this->showInsufficientModal = true;
 
             return;
@@ -997,8 +997,8 @@ class Create extends Component
         }
 
         $this->rules['amount'] = 'required|numeric|min:'.$minNominal.'|max:'.$maxNominal;
-        $this->messages['amount.min'] = 'Nominal minimal '.($this->help_type === 'urgent' ? 'untuk bantuan prioritas / urgent adalah ' : '').'Rp '.number_format($minNominal, 0, ',', '.');
-        $this->messages['amount.max'] = 'Nominal maksimal Rp '.number_format($maxNominal, 0, ',', '.');
+        $this->messages['amount.min'] = 'Nominal minimal '.($this->help_type === 'urgent' ? 'untuk bantuan prioritas / urgent adalah ' : '').format_rupiah($minNominal);
+        $this->messages['amount.max'] = 'Nominal maksimal '.format_rupiah($maxNominal);
 
         if ($this->help_type === 'urgent') {
             $this->rules['auto_cancel_minutes'] = 'required|integer|min:30|max:180';
@@ -1039,7 +1039,7 @@ class Create extends Component
             $this->confirmCustomerFee = $custFeeAmount;
             $this->confirmCustomerFeePercent = $custPercent;
             $this->confirmTotal = $totalPaid;
-            $this->insufficientMessage = 'Saldo Anda saat ini Rp '.number_format($userBalance->balance, 0, ',', '.').', sedangkan total yang harus dibayar adalah Rp '.number_format($totalPaid, 0, ',', '.').' (Kurang Rp '.number_format($deficit, 0, ',', '.').').';
+            $this->insufficientMessage = 'Saldo Anda saat ini '.format_rupiah($userBalance->balance).', sedangkan total yang harus dibayar adalah '.format_rupiah($totalPaid).' (Kurang '.format_rupiah($deficit).').';
             $this->loadPaymentSettings();
             $this->calculateTopupFee();
             $this->showInsufficientModal = true;
@@ -1295,10 +1295,10 @@ class Create extends Component
         $total = $baseAmount + $custFeeAmount;
 
         if ($newBalance >= $total) {
-            session()->flash('topup_success', '🎉 Top up berhasil! Saldo Anda sekarang: Rp '.number_format($newBalance, 0, ',', '.').'. Silakan konfirmasi permintaan bantuan.');
+            session()->flash('topup_success', '🎉 Top up berhasil! Saldo Anda sekarang: '.format_rupiah($newBalance).'. Silakan konfirmasi permintaan bantuan.');
             $this->prepareConfirm();
         } else {
-            session()->flash('topup_success', 'Top up berhasil! Saldo saat ini: Rp '.number_format($newBalance, 0, ',', '.'));
+            session()->flash('topup_success', 'Top up berhasil! Saldo saat ini: '.format_rupiah($newBalance));
         }
     }
 

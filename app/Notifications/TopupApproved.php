@@ -41,14 +41,16 @@ class TopupApproved extends Notification
      */
     public function toMail(object $notifiable): MailMessage
     {
+        $dashRoute = ($notifiable->role ?? null) === 'mitra' ? 'mitra.dashboard' : 'customer.dashboard';
+
         return (new MailMessage)
             ->subject('✅ Request Top-Up Saldo Disetujui')
             ->greeting('Kabar Baik, '.$notifiable->name.'!')
             ->line('Request top-up saldo Anda telah disetujui oleh admin.')
             ->line('Kode Request: '.$this->transaction->request_code)
-            ->line('Nominal: Rp '.number_format($this->transaction->amount, 0, ',', '.'))
+            ->line('Nominal: '.format_rupiah($this->transaction->amount))
             ->line('Saldo Anda telah bertambah dan siap digunakan.')
-            ->action('Lihat Saldo', route('customer.dashboard'))
+            ->action('Lihat Saldo', route($dashRoute))
             ->line('Terima kasih telah menggunakan layanan kami!');
     }
 
@@ -59,14 +61,16 @@ class TopupApproved extends Notification
      */
     public function toArray(object $notifiable): array
     {
+        $historyRoute = ($notifiable->role ?? null) === 'mitra' ? 'mitra.topup.history' : 'customer.topup.history';
+
         return [
             'type' => 'topup_approved',
             'title' => '✅ Request Top-Up Disetujui',
             'transaction_id' => $this->transaction->id,
             'request_code' => $this->transaction->request_code,
             'amount' => $this->transaction->amount,
-            'message' => 'Request top-up saldo Anda telah disetujui! Saldo Rp '.number_format($this->transaction->amount, 0, ',', '.').' telah ditambahkan.',
-            'url' => route('customer.topup.history'),
+            'message' => 'Request top-up saldo Anda telah disetujui! Saldo '.format_rupiah($this->transaction->amount).' telah ditambahkan.',
+            'url' => route($historyRoute),
         ];
     }
 }

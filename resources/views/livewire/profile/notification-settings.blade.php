@@ -1,8 +1,82 @@
 <div class="space-y-4" x-data="{
     playNotif() { window.playNotifChime(); },
     playRing() { window.playRingChime(); },
-    vibrate() { window.triggerVibrate(); }
+    vibrate() { window.triggerVibrate(); },
+    pushSupported: false,
+    pushPermission: 'default',
+    pushSubscribed: false,
+    loadingPush: false,
+
+    async checkPushStatus() {
+        if (!window.SayaBantuPush) return;
+        this.pushSupported = window.SayaBantuPush.isSupported();
+        this.pushPermission = window.SayaBantuPush.getPermissionState();
+        const sub = await window.SayaBantuPush.getSubscription();
+        this.pushSubscribed = !!sub;
+    },
+
+    async enablePush() {
+        this.loadingPush = true;
+        try {
+            await window.SayaBantuPush.subscribe();
+            await this.checkPushStatus();
+            await window.SayaBantuPush.sendTest().catch(() => {});
+            if (window.sbToast) {
+                window.sbToast('Push notifikasi berhasil diaktifkan di perangkat ini!', 'success');
+            }
+        } catch (e) {
+            if (window.sbToast) {
+                window.sbToast(e.message, 'error');
+            } else {
+                alert(e.message);
+            }
+        } finally {
+            this.loadingPush = false;
+        }
+    },
+
+    async disablePush() {
+        this.loadingPush = true;
+        try {
+            await window.SayaBantuPush.unsubscribe();
+            await this.checkPushStatus();
+            if (window.sbToast) {
+                window.sbToast('Push notifikasi dinonaktifkan.', 'info');
+            }
+        } catch (e) {
+            if (window.sbToast) {
+                window.sbToast(e.message, 'error');
+            }
+        } finally {
+            this.loadingPush = false;
+        }
+    },
+
+    async testPush() {
+        this.loadingPush = true;
+        const sentAt = Date.now();
+        try {
+            const res = await window.SayaBantuPush.sendTest();
+            // Tunggu sebentar jika Service Worker menampilkan kartu push foreground;
+            // hanya tampilkan toast teks bila belum ada kartu push yang muncul.
+            setTimeout(() => {
+                const recentPushShown = window._sbLastPushToast && window._sbLastPushToast.time >= sentAt;
+                if (!recentPushShown && window.sbToast) {
+                    window.sbToast(res.message || 'Notifikasi tes berhasil dikirim!', 'success');
+                }
+            }, 1200);
+        } catch (e) {
+            if (window.sbToast) {
+                window.sbToast(e.message, 'error');
+            } else {
+                alert(e.message);
+            }
+        } finally {
+            this.loadingPush = false;
+        }
+    }
 }"
+x-init="checkPushStatus()"
 @play-preview.window="
     if ($event.detail.setting === 'sound') playNotif();
     if ($event.detail.setting === 'soundCall') playRing();
@@ -16,6 +90,84 @@
             <span>{{ session('message') }}</span>
         </div>
     @endif
+
+    <!-- Card Push Notifikasi Perangkat (HP & Browser) -->
+    <div class="bg-gradient-to-br from-blue-50/70 to-indigo-50/40 border border-blue-200/80 rounded-2xl p-4 transition-all shadow-xs">
+        <div class="flex items-start gap-3">
+            <div class="w-10 h-10 rounded-xl bg-[#0066FF] text-white flex items-center justify-center shrink-0 shadow-sm shadow-blue-500/20">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                </svg>
+            </div>
+            <div class="flex-1 min-w-0">
+                <div class="flex items-center justify-between gap-2 flex-wrap">
+                    <h3 class="font-bold text-sm text-slate-900 leading-tight">Push Notifikasi HP & Web</h3>
+                    <!-- Status Badge -->
+                    <template x-if="pushPermission === 'granted' && pushSubscribed">
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                            Aktif
+                        </span>
+                    </template>
+                    <template x-if="pushPermission === 'denied'">
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 text-rose-800 border border-rose-200">
+                            Diblokir Browser
+                        </span>
+                    </template>
+                    <template x-if="pushPermission !== 'denied' && !(pushPermission === 'granted' && pushSubscribed)">
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-200">
+                            Belum Aktif
+                        </span>
+                    </template>
+                </div>
+                <p class="text-xs text-slate-600 mt-1 leading-relaxed">
+                    Terima info pesanan, chat, dan penarikan saldo secara langsung di layar HP Anda meskipun web sedang ditutup.
+                </p>
+
+                <!-- Action Buttons -->
+                <div class="mt-3 flex items-center gap-2 flex-wrap">
+                    <template x-if="pushPermission !== 'granted' || !pushSubscribed">
+                        <button type="button"
+                            @click="enablePush()"
+                            :disabled="loadingPush || !pushSupported || pushPermission === 'denied'"
+                            class="px-3.5 py-1.5 rounded-xl bg-[#0066FF] hover:bg-blue-700 text-white text-xs font-bold shadow-xs active:scale-95 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5">
+                            <template x-if="loadingPush">
+                                <svg class="animate-spin w-3.5 h-3.5" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
+                            </template>
+                            <span>Aktifkan di Perangkat Ini</span>
+                        </button>
+                    </template>
+
+                    <template x-if="pushPermission === 'granted' && pushSubscribed">
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <button type="button"
+                                @click="testPush()"
+                                :disabled="loadingPush"
+                                class="px-3 py-1.5 rounded-xl bg-white hover:bg-slate-50 text-[#0066FF] border border-blue-200 text-xs font-bold shadow-2xs active:scale-95 transition disabled:opacity-50 flex items-center gap-1.5">
+                                <template x-if="loadingPush">
+                                    <svg class="animate-spin w-3 h-3 text-[#0066FF]" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
+                                </template>
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                                <span>Kirim Tes Notifikasi</span>
+                            </button>
+                            <button type="button"
+                                @click="disablePush()"
+                                :disabled="loadingPush"
+                                class="px-2.5 py-1.5 text-xs text-slate-500 hover:text-rose-600 font-medium transition">
+                                Nonaktifkan
+                            </button>
+                        </div>
+                    </template>
+                </div>
+
+                <template x-if="pushPermission === 'denied'">
+                    <p class="text-[11px] text-rose-600 mt-2 bg-rose-50/80 p-2 rounded-lg border border-rose-100">
+                        ⚠️ Izin notifikasi diblokir oleh browser. Silakan klik ikon gembok / info di bilah alamat browser, lalu ubah <strong>Notifikasi</strong> menjadi <strong>Izinkan</strong>.
+                    </p>
+                </template>
+            </div>
+        </div>
+    </div>
 
     <!-- Notifikasi Umum -->
     <div class="flex items-center justify-between py-3 border-b border-gray-100">

@@ -58,8 +58,8 @@
                         </div>
                         <div class="min-w-0 flex-1">
                             <div class="text-xs font-medium text-gray-500 truncate" title="Total Pendapatan Admin Top-Up">Total Admin Top-Up</div>
-                            <div class="text-lg sm:text-xl font-medium text-gray-900 leading-tight my-0.5 truncate" title="Rp {{ number_format($totalTopupAdmin ?? 0, 0, ',', '.') }}">
-                                Rp {{ number_format($totalTopupAdmin ?? 0, 0, ',', '.') }}
+                            <div class="text-lg sm:text-xl font-medium text-gray-900 leading-tight my-0.5 truncate" title="{{ format_rupiah($totalTopupAdmin ?? 0) }}">
+                                {{ format_rupiah($totalTopupAdmin ?? 0) }}
                             </div>
                             <div class="text-xs text-emerald-600 font-medium truncate">Sepanjang waktu</div>
                         </div>
@@ -75,8 +75,8 @@
                         </div>
                         <div class="min-w-0 flex-1">
                             <div class="text-xs font-medium text-gray-500 truncate" title="Admin Top-Up Bulan Ini">Admin Bulan Ini</div>
-                            <div class="text-lg sm:text-xl font-medium text-gray-900 leading-tight my-0.5 truncate" title="Rp {{ number_format($monthTopupAdmin ?? 0, 0, ',', '.') }}">
-                                Rp {{ number_format($monthTopupAdmin ?? 0, 0, ',', '.') }}
+                            <div class="text-lg sm:text-xl font-medium text-gray-900 leading-tight my-0.5 truncate" title="{{ format_rupiah($monthTopupAdmin ?? 0) }}">
+                                {{ format_rupiah($monthTopupAdmin ?? 0) }}
                             </div>
                             <div class="text-xs text-blue-600 font-medium truncate">{{ now()->translatedFormat('F Y') }}</div>
                         </div>
@@ -109,8 +109,8 @@
                         </div>
                         <div class="min-w-0 flex-1">
                             <div class="text-xs font-medium text-gray-500 truncate" title="Rata-rata Biaya Admin per Top-Up">Rata-rata / Top-Up</div>
-                            <div class="text-lg sm:text-xl font-medium text-gray-900 leading-tight my-0.5 truncate" title="Rp {{ number_format($avgTopupAdmin ?? 0, 0, ',', '.') }}">
-                                Rp {{ number_format($avgTopupAdmin ?? 0, 0, ',', '.') }}
+                            <div class="text-lg sm:text-xl font-medium text-gray-900 leading-tight my-0.5 truncate" title="{{ format_rupiah($avgTopupAdmin ?? 0) }}">
+                                {{ format_rupiah($avgTopupAdmin ?? 0) }}
                             </div>
                             <div class="text-xs text-amber-600 font-medium truncate">Per transaksi</div>
                         </div>
@@ -174,7 +174,7 @@
                                 <div class="flex justify-between items-center text-xs">
                                     <span class="text-gray-600 font-medium">Total Perolehan:</span>
                                     <span class="text-base font-medium text-blue-700">
-                                         Rp {{ number_format($topupBreakdown['bank']['total'] ?? 0, 0, ',', '.') }}
+                                         {{ format_rupiah($topupBreakdown['bank']['total'] ?? 0) }}
                                     </span>
                                 </div>
                                 <div class="flex justify-between items-center text-xs pt-2 border-t border-blue-200/80">
@@ -186,7 +186,7 @@
                                 <div class="flex justify-between items-center text-xs pt-2 border-t border-blue-200/80">
                                     <span class="text-gray-600 font-medium">Rata-rata Admin Fee:</span>
                                     <span class="font-medium text-gray-700">
-                                        Rp {{ number_format($topupBreakdown['bank']['avg'] ?? 0, 0, ',', '.') }} / top-up
+                                        {{ format_rupiah($topupBreakdown['bank']['avg'] ?? 0) }} / top-up
                                     </span>
                                 </div>
                             </div>
@@ -214,7 +214,7 @@
                                 <div class="flex justify-between items-center text-xs">
                                     <span class="text-gray-600 font-medium">Total Perolehan:</span>
                                     <span class="text-base font-medium text-emerald-700">
-                                         Rp {{ number_format($topupBreakdown['qris']['total'] ?? 0, 0, ',', '.') }}
+                                         {{ format_rupiah($topupBreakdown['qris']['total'] ?? 0) }}
                                     </span>
                                 </div>
                                 <div class="flex justify-between items-center text-xs pt-2 border-t border-emerald-200/80">
@@ -226,7 +226,7 @@
                                 <div class="flex justify-between items-center text-xs pt-2 border-t border-emerald-200/80">
                                     <span class="text-gray-600 font-medium">Rata-rata Admin Fee:</span>
                                     <span class="font-medium text-gray-700">
-                                        Rp {{ number_format($topupBreakdown['qris']['avg'] ?? 0, 0, ',', '.') }} / top-up
+                                        {{ format_rupiah($topupBreakdown['qris']['avg'] ?? 0) }} / top-up
                                     </span>
                                 </div>
                             </div>
@@ -254,13 +254,13 @@
                                 <div class="flex justify-between items-center text-xs">
                                     <span class="text-gray-600 font-medium">Total Saldo Masuk:</span>
                                     <span class="text-base font-medium text-purple-700">
-                                         Rp {{ number_format($topupBreakdown['volume']['total_amount'] ?? 0, 0, ',', '.') }}
+                                         {{ format_rupiah($topupBreakdown['volume']['total_amount'] ?? 0) }}
                                     </span>
                                 </div>
                                 <div class="flex justify-between items-center text-xs pt-2 border-t border-purple-200/80">
                                     <span class="text-gray-600 font-medium">Rata-rata Nominal Top-Up:</span>
                                     <span class="font-medium text-gray-700">
-                                        Rp {{ number_format($topupBreakdown['volume']['avg_amount'] ?? 0, 0, ',', '.') }}
+                                        {{ format_rupiah($topupBreakdown['volume']['avg_amount'] ?? 0) }}
                                     </span>
                                 </div>
                                 <div class="flex justify-between items-center text-xs pt-2 border-t border-purple-200/80">
@@ -359,7 +359,7 @@
                                     {{ $message }}
                                 </div>
                             @enderror
-                            <p class="text-[11px] text-gray-400 mt-1.5">Biaya tetap untuk nominal di bawah Rp {{ number_format($tier1_limit ?? 50000, 0, ',', '.') }}</p>
+                            <p class="text-[11px] text-gray-400 mt-1.5">Biaya tetap untuk nominal di bawah {{ format_rupiah($tier1_limit ?? 50000) }}</p>
                         </div>
                     </div>
                 </div>
@@ -423,7 +423,7 @@
                                     {{ $message }}
                                 </div>
                             @enderror
-                            <p class="text-[11px] text-gray-400 mt-1.5">Biaya tetap untuk nominal Rp {{ number_format($tier1_limit ?? 50000, 0, ',', '.') }} - Rp {{ number_format($tier2_limit ?? 100000, 0, ',', '.') }}</p>
+                            <p class="text-[11px] text-gray-400 mt-1.5">Biaya tetap untuk nominal {{ format_rupiah($tier1_limit ?? 50000) }} - {{ format_rupiah($tier2_limit ?? 100000) }}</p>
                         </div>
                     </div>
                 </div>
@@ -450,7 +450,7 @@
                                     {{ $message }}
                                 </div>
                             @enderror
-                            <p class="text-[11px] text-gray-400 mt-1.5">Persentase dari nominal top-up (untuk nominal ≥ Rp {{ number_format($tier2_limit ?? 100000, 0, ',', '.') }})</p>
+                            <p class="text-[11px] text-gray-400 mt-1.5">Persentase dari nominal top-up (untuk nominal ≥ {{ format_rupiah($tier2_limit ?? 100000) }})</p>
                         </div>
 
                         <div>
@@ -516,6 +516,7 @@
                         <!-- Toggle Status QRIS -->
                         <div class="flex items-center gap-2 self-start sm:self-auto">
                             <button type="button" wire:click="toggleQrisStatus"
+                                wire:confirm="{{ $qris_enabled ? 'Apakah Anda yakin ingin menonaktifkan metode pembayaran QRIS?' : 'Apakah Anda yakin ingin mengaktifkan metode pembayaran QRIS?' }}"
                                 class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold border transition cursor-pointer {{ $qris_enabled ? 'bg-emerald-50 text-emerald-700 border-emerald-300 hover:bg-emerald-100' : 'bg-gray-100 text-gray-600 border-gray-300 hover:bg-gray-200' }}">
                                 <span class="w-2 h-2 rounded-full {{ $qris_enabled ? 'bg-emerald-500 animate-pulse' : 'bg-gray-400' }}"></span>
                                 <span>{{ $qris_enabled ? 'QRIS Aktif' : 'QRIS Dinonaktifkan' }}</span>
@@ -607,6 +608,7 @@
                             <!-- Tombol Simpan -->
                             <div class="pt-2">
                                 <button type="button" wire:click="saveQrisSettings"
+                                    wire:confirm="Apakah Anda yakin ingin menyimpan dan menerapkan pengaturan QRIS ini?"
                                     class="inline-flex items-center gap-2 px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-sm hover:shadow transition cursor-pointer">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
@@ -704,6 +706,7 @@
                                             <!-- Status Toggle -->
                                             <td class="py-3.5 px-5 text-center">
                                                 <button type="button" wire:click="toggleBankStatus({{ $i }})"
+                                                    wire:confirm="{{ !empty($bank['enabled']) ? 'Apakah Anda yakin ingin menonaktifkan status rekening ' . ($bank['name'] ?? 'bank ini') . '?' : 'Apakah Anda yakin ingin mengaktifkan status rekening ' . ($bank['name'] ?? 'bank ini') . '?' }}"
                                                     class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-medium border transition cursor-pointer {{ !empty($bank['enabled']) ? 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100' : 'bg-gray-100 text-gray-600 border-gray-200 hover:bg-gray-200' }}"
                                                     title="Klik untuk mengubah status aktif/nonaktif">
                                                     <span class="w-1.5 h-1.5 rounded-full {{ !empty($bank['enabled']) ? 'bg-emerald-500' : 'bg-gray-400' }}"></span>
@@ -970,7 +973,7 @@
                                 callbacks: {
                                     label: function (context) {
                                         const v = context.raw ?? context.parsed?.y ?? 0;
-                                        return 'Admin Top-Up: Rp ' + Number(v).toLocaleString('id-ID');
+                                        return 'Admin Top-Up: ' + (window.formatRupiah ? window.formatRupiah(v) : 'Rp ' + Number(v).toLocaleString('id-ID'));
                                     }
                                 }
                             }
@@ -989,7 +992,7 @@
                                 beginAtZero: true,
                                 ticks: {
                                     callback: function (v) { 
-                                        if (v >= 1000000) return 'Rp ' + (v / 1000000).toFixed(1) + 'M';
+                                        if (v >= 1000000) return window.formatRupiah ? window.formatRupiah(v) : (Number.isInteger(v) && v % 10000 === 0 ? ('Rp ' + (v / 1000000).toFixed(2).replace(/\.?0+$/, '').replace('.', ',') + ' jt') : ('Rp ' + Number(v).toLocaleString('id-ID')));
                                         if (v >= 1000) return 'Rp ' + (v / 1000).toFixed(0) + 'k';
                                         return 'Rp ' + Number(v).toLocaleString('id-ID'); 
                                     },

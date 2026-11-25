@@ -47,7 +47,7 @@
                     <div>
                         <p class="text-xs font-semibold text-blue-100 mb-1">Saldo Tersedia</p>
                         <h2 class="text-2xl font-black text-white tracking-tight">
-                            Rp {{ number_format($user->balance ?? 250000, 0, ',', '.') }}
+                            {{ format_rupiah($user->balance ?? 250000) }}
                         </h2>
                     </div>
                     <div class="text-white/95 mt-1">
@@ -131,11 +131,11 @@
                         <div class="text-right flex-shrink-0">
                             @if($tx->type === 'income')
                                 <span class="text-xs font-bold text-emerald-500">
-                                    + Rp {{ number_format($tx->amount, 0, ',', '.') }}
+                                    + {{ format_rupiah($tx->amount) }}
                                 </span>
                             @else
                                 <span class="text-xs font-bold text-red-500">
-                                    - Rp {{ number_format($tx->amount, 0, ',', '.') }}
+                                    - {{ format_rupiah($tx->amount) }}
                                 </span>
                             @endif
                         </div>

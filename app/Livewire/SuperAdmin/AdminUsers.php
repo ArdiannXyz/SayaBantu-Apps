@@ -606,6 +606,50 @@ class AdminUsers extends Component
         $this->confirmingDeactivateName = '';
     }
 
+    /**
+     * Ambil daftar kota yang belum dikelola admin lain (kecuali admin yang sedang diedit).
+     */
+    protected function availableManagedCitiesQuery()
+    {
+        $assignedToOthers = DB::table('admin_city')
+            ->when($this->selectedUser, function ($q) {
+                // when editing, exclude cities assigned to this user so they remain selectable
+                $q->where('user_id', '!=', $this->selectedUser->id);
+            })
+            ->pluck('city_id')
+            ->toArray();
+
+        return City::whereNotIn('id', $assignedToOthers)->orderBy('name');
+    }
+
+    /**
+     * Pilih semua atau batalkan pilihan kota wewenang yang tersedia/tampil.
+     */
+    public function toggleSelectAllManagedCities(array $visibleIds = []): void
+    {
+        $allowedIds = $this->availableManagedCitiesQuery()
+            ->pluck('id')
+            ->map(fn ($id) => (int) $id)
+            ->all();
+
+        $targetIds = ! empty($visibleIds)
+            ? array_values(array_intersect($allowedIds, array_map('intval', $visibleIds)))
+            : $allowedIds;
+
+        if (empty($targetIds)) {
+            return;
+        }
+
+        $currentIds = array_values(array_unique(array_map('intval', $this->managed_city_ids ?? [])));
+        $allTargetSelected = count(array_diff($targetIds, $currentIds)) === 0;
+
+        if ($allTargetSelected) {
+            $this->managed_city_ids = array_values(array_diff($currentIds, $targetIds));
+        } else {
+            $this->managed_city_ids = array_values(array_unique(array_merge($currentIds, $targetIds)));
+        }
+    }
+
     public function render()
     {
         $users = User::with(['city', 'managedCities'])
@@ -625,17 +669,7 @@ class AdminUsers extends Component
             ->paginate($this->perPage);
 
         $cities = City::orderBy('name')->get();
-
-        // compute available cities for create modal: exclude cities already assigned to other admins
-        $assignedToOthers = DB::table('admin_city')
-            ->when($this->selectedUser, function ($q) {
-                // when editing, exclude cities assigned to this user so they remain selectable
-                $q->where('user_id', '!=', $this->selectedUser->id);
-            })
-            ->pluck('city_id')
-            ->toArray();
-
-        $availableCities = City::whereNotIn('id', $assignedToOthers)->orderBy('name')->get();
+        $availableCities = $this->availableManagedCitiesQuery()->get();
 
         $totalAdminsCount = User::whereIn('role', ['admin', 'super_admin'])->count();
         $superAdminsCount = User::where('role', 'super_admin')->count();

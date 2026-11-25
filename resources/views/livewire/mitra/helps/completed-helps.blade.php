@@ -103,19 +103,19 @@
 
                 {{-- Stats Cards --}}
                 <div class="grid grid-cols-3 gap-2">
-                    <div class="bg-white/10 backdrop-blur-sm rounded-xl p-3 text-center">
-                        <div class="text-2xl font-bold text-white">{{ $completedCount ?? 0 }}</div>
-                        <div class="text-xs text-white/80 mt-1">Selesai</div>
+                    <div class="bg-white/10 backdrop-blur-sm rounded-xl p-2.5 sm:p-3 text-center min-w-0">
+                        <div class="text-xl sm:text-2xl font-bold text-white">{{ $completedCount ?? 0 }}</div>
+                        <div class="text-[11px] sm:text-xs text-white/80 mt-1">Selesai</div>
                     </div>
 
-                    <div class="bg-white/10 backdrop-blur-sm rounded-xl p-3 text-center">
-                        <div class="text-xs text-white/80 mb-1">Total Nilai</div>
-                        <div class="text-sm font-bold text-white">Rp {{ number_format($helps->sum('amount') ?? 0, 0, ',', '.') }}</div>
+                    <div class="bg-white/10 backdrop-blur-sm rounded-xl p-2.5 sm:p-3 text-center min-w-0">
+                        <div class="text-[11px] sm:text-xs text-white/80 mb-1">Total Nilai</div>
+                        <div class="text-xs sm:text-sm font-bold text-white truncate">{{ format_rupiah($helps->sum('amount') ?? 0) }}</div>
                     </div>
 
-                    <div class="bg-white/10 backdrop-blur-sm rounded-xl p-3 text-center">
-                        <div class="text-2xl font-bold text-white">{{ $rejectedCount ?? 0 }}</div>
-                        <div class="text-xs text-white/80 mt-1">Ditolak</div>
+                    <div class="bg-white/10 backdrop-blur-sm rounded-xl p-2.5 sm:p-3 text-center min-w-0">
+                        <div class="text-xl sm:text-2xl font-bold text-white">{{ $rejectedCount ?? 0 }}</div>
+                        <div class="text-[11px] sm:text-xs text-white/80 mt-1">Ditolak</div>
                     </div>
                 </div>
             </div>
@@ -179,7 +179,7 @@
                                         </div>
 
                                         <div class="text-right flex-shrink-0">
-                                            <div class="text-sm font-bold text-emerald-600">Rp {{ number_format($netMitra, 0, ',', '.') }}</div>
+                                            <div class="text-sm font-bold text-emerald-600">{{ format_rupiah($netMitra) }}</div>
                                             <span class="text-[10px] text-gray-400 font-medium block">Netto (-{{ $mitraFeePercent }}%)</span>
                                             <div class="flex flex-col items-end mt-1">
                                                 @if($help->status === 'rejected')
@@ -232,15 +232,15 @@
                                             <div class="space-y-1.5 text-xs">
                                                 <div class="flex justify-between text-gray-600">
                                                     <span>Upah Pokok dari Customer:</span>
-                                                    <span class="font-semibold text-gray-900">Rp {{ number_format($baseWage, 0, ',', '.') }}</span>
+                                                    <span class="font-semibold text-gray-900">{{ format_rupiah($baseWage) }}</span>
                                                 </div>
                                                 <div class="flex justify-between text-red-600 font-medium">
                                                     <span>Biaya Operasional Platform ({{ $mitraFeePercent }}%):</span>
-                                                    <span class="font-semibold">- Rp {{ number_format($platformFee, 0, ',', '.') }}</span>
+                                                    <span class="font-semibold">- {{ format_rupiah($platformFee) }}</span>
                                                 </div>
                                                 <div class="flex justify-between text-emerald-700 font-bold border-t border-emerald-200/80 pt-1.5">
                                                     <span>Pendapatan Bersih Masuk Saldo:</span>
-                                                    <span class="text-sm font-extrabold text-emerald-600">Rp {{ number_format($netMitra, 0, ',', '.') }}</span>
+                                                    <span class="text-sm font-extrabold text-emerald-600">{{ format_rupiah($netMitra) }}</span>
                                                 </div>
                                             </div>
 
@@ -249,7 +249,7 @@
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                                 </svg>
                                                 <span>
-                                                    Upah dipotong <strong>{{ $mitraFeePercent }}%</strong> untuk biaya operasional platform. Saldo bersih sebesar <strong>Rp {{ number_format($netMitra, 0, ',', '.') }}</strong> telah masuk ke dompet akun Anda.
+                                                    Upah dipotong <strong>{{ $mitraFeePercent }}%</strong> untuk biaya operasional platform. Saldo bersih sebesar <strong>{{ format_rupiah($netMitra) }}</strong> telah masuk ke dompet akun Anda.
                                                 </span>
                                             </div>
                                         </div>

@@ -165,10 +165,16 @@ body.swal2-toast-shown .swal2-container {
 }
 
 body.swal2-toast-shown .swal2-container.swal2-top {
-    inset: 0.75rem auto auto 50% !important;
+    inset: calc(0.75rem + env(safe-area-inset-top, 0px)) auto auto 50% !important;
     transform: translateX(-50%) !important;
     width: auto !important;
     max-width: min(94vw, 440px) !important;
+}
+
+body.swal2-toast-shown .swal2-container.swal2-bottom-end {
+    inset: auto 1.25rem 1.25rem auto !important;
+    width: auto !important;
+    max-width: min(94vw, 420px) !important;
 }
 
 body.swal2-toast-shown .swal2-container.swal2-top-end {
@@ -274,4 +280,62 @@ body.swal2-toast-shown .swal2-container.swal2-top-end {
 
 .swal2-popup.swal2-toast .swal2-timer-progress-bar {
     background: #0066FF !important;
+}
+
+/* =========================================================================
+   Adaptive App-Style Push Notification Dock
+   Mobile (< 768px): Atas layar | Laptop / Desktop (>= 768px): Pojok kanan bawah
+   ========================================================================= */
+.sb-push-dock {
+    position: fixed;
+    top: calc(0.75rem + env(safe-area-inset-top, 0px));
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(92vw, 24rem);
+    z-index: 999999;
+    pointer-events: none;
+}
+
+@media (min-width: 768px) {
+    .sb-push-dock {
+        top: auto;
+        bottom: 1.25rem;
+        right: 1.25rem;
+        left: auto;
+        transform: none;
+        width: 24rem;
+        max-width: calc(100vw - 2.5rem);
+    }
+}
+
+@keyframes sbPushEnterTop {
+    from {
+        opacity: 0;
+        transform: translate3d(0, -18px, 0) scale(0.96);
+    }
+    to {
+        opacity: 1;
+        transform: translate3d(0, 0, 0) scale(1);
+    }
+}
+
+@keyframes sbPushEnterBottomRight {
+    from {
+        opacity: 0;
+        transform: translate3d(20px, 14px, 0) scale(0.96);
+    }
+    to {
+        opacity: 1;
+        transform: translate3d(0, 0, 0) scale(1);
+    }
+}
+
+.sb-push-card {
+    animation: sbPushEnterTop 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@media (min-width: 768px) {
+    .sb-push-card {
+        animation: sbPushEnterBottomRight 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
 }

@@ -248,6 +248,16 @@ require __DIR__.'/admin.php';
 // Smart Address Autocomplete API (OpenStreetMap & Photon)
 Route::get('/api/address/autocomplete', [\App\Http\Controllers\Api\AddressController::class, 'search'])->name('api.address.autocomplete');
 
+// =========================================================================
+// Web Push Notifications API (VAPID / RFC 8292)
+// =========================================================================
+Route::get('/api/push/key', [\App\Http\Controllers\Api\PushSubscriptionController::class, 'getPublicKey'])->name('api.push.key');
+Route::middleware('auth')->group(function () {
+    Route::post('/api/push/subscribe', [\App\Http\Controllers\Api\PushSubscriptionController::class, 'subscribe'])->name('api.push.subscribe');
+    Route::post('/api/push/unsubscribe', [\App\Http\Controllers\Api\PushSubscriptionController::class, 'unsubscribe'])->name('api.push.unsubscribe');
+    Route::post('/api/push/test', [\App\Http\Controllers\Api\PushSubscriptionController::class, 'testNotification'])->name('api.push.test');
+});
+
 // Public callback endpoint for withdraw disbursements
 Route::post('/gateway/callback', [\App\Http\Controllers\WithdrawController::class, 'gatewayCallback'])->name('gateway.callback');
 

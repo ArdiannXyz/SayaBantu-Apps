@@ -174,7 +174,7 @@
                     <label class="block text-xs font-bold text-slate-700 mb-1.5">
                         Pilih Label Alamat
                     </label>
-                    <div class="grid grid-cols-4 gap-2 mb-2">
+                    <div class="grid grid-cols-2 min-[380px]:grid-cols-4 gap-2 mb-2">
                         @foreach(['Rumah' => '🏠 Rumah', 'Kantor' => '🏢 Kantor', 'Kos' => '🛏️ Kos', 'Lainnya' => '📍 Lainnya'] as $key => $title)
                             <button type="button" wire:click="setQuickLabel('{{ $key }}')"
                                     class="py-2.5 px-2 text-xs font-bold rounded-xl border text-center transition cursor-pointer {{ ($label === $key || ($key === 'Lainnya' && !in_array($label, ['Rumah', 'Kantor', 'Kos']))) ? 'bg-blue-50 border-[#0066FF] text-[#0066FF] shadow-2xs ring-1 ring-[#0066FF]/20' : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100' }}">

@@ -170,7 +170,7 @@ class HelpObserver
 
                         // Credit the mitra with a descriptive transaction
                         $feeText = ($help->mitra_fee_amount > 0)
-                            ? " (Potongan Platform {$help->mitra_fee_percent}%: Rp ".number_format($help->mitra_fee_amount, 0, ',', '.').')'
+                            ? " (Potongan Platform {$help->mitra_fee_percent}%: ".format_rupiah($help->mitra_fee_amount).')'
                             : '';
 
                         $isAuto = ($help->admin_notes && str_contains(strtolower($help->admin_notes), 'auto-confirm'));

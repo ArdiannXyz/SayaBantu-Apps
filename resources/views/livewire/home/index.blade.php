@@ -232,8 +232,8 @@
 
             <!-- 3. SALDO DOMPET CARD (Saldo Dompet + Nominal Rp... + Tombol Top up) -->
             <div class="bg-white rounded-2xl p-4 shadow-xs border border-slate-200/90 transition hover:shadow-sm">
-                <div class="flex items-center justify-between">
-                    <div>
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                    <div class="min-w-0 flex-1">
                         <div class="flex items-center gap-1.5 text-xs text-slate-500 font-medium">
                             <div class="w-5 h-5 rounded-md bg-blue-50 text-[#0066FF] flex items-center justify-center shrink-0">
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -242,14 +242,14 @@
                             </div>
                             <span class="font-semibold text-slate-600">Saldo Dompet</span>
                         </div>
-                        <h2 class="text-2xl font-black text-slate-900 tracking-tight mt-1">
-                            Rp{{ number_format($balance, 0, ',', '.') }}
+                        <h2 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight mt-1 break-words">
+                            {{ format_rupiah($balance, false) }}
                         </h2>
                     </div>
 
                     <a href="{{ auth()->check() ? route('customer.topup') : route('login') }}" wire:navigate
-                       class="px-4 py-2 rounded-full text-xs font-bold text-white bg-[#0066FF] hover:bg-blue-700 shadow-sm shadow-blue-500/25 active:scale-95 transition flex items-center gap-1.5 cursor-pointer">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                       class="px-4 py-2 rounded-full text-xs font-bold text-white bg-[#0066FF] hover:bg-blue-700 shadow-sm shadow-blue-500/25 active:scale-95 transition flex items-center gap-1.5 shrink-0 whitespace-nowrap cursor-pointer">
+                        <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
                         </svg>
                         <span>Top up</span>
@@ -268,7 +268,7 @@
 
                 <!-- Card Container dengan Grid 4 Kolom -->
                 <div class="bg-white rounded-2xl p-3 sm:p-4 shadow-xs border border-slate-200/90">
-                    <div class="grid grid-cols-4 gap-2 sm:gap-2.5">
+                    <div class="grid grid-cols-3 min-[380px]:grid-cols-4 gap-2 min-[380px]:gap-2.5">
                         @forelse($categories as $category)
                             @php
                                 $style = $category->badge_style;
@@ -293,7 +293,7 @@
                                 </span>
                             </a>
                         @empty
-                            <div class="col-span-4 py-6 text-center">
+                            <div class="col-span-3 min-[380px]:col-span-4 py-6 text-center">
                                 <span class="text-2xl">🔍</span>
                                 <p class="text-xs font-bold text-slate-700 mt-1">Kategori belum tersedia</p>
                             </div>
@@ -335,7 +335,7 @@
                                 </div>
                                 <div class="text-right shrink-0">
                                     <div class="text-xs font-extrabold text-[#0066FF]">
-                                        Rp{{ number_format($order->final_cost ?? $order->budget, 0, ',', '.') }}
+                                        {{ format_rupiah($order->final_cost ?? $order->budget, false) }}
                                     </div>
                                     <a href="{{ auth()->check() ? route('customer.helps.detail', $order->id) : route('login') }}" wire:navigate
                                        class="text-[10px] font-bold text-slate-500 hover:text-[#0066FF] transition block mt-0.5">

@@ -118,4 +118,78 @@ class TopupApprovalTest extends TestCase
 
         $this->assertSame('waiting_approval', $topup->fresh()->status);
     }
+
+    public function test_mitra_topup_muncul_di_halaman_approval_admin_dan_riwayat_mitra(): void
+    {
+        $admin = $this->admin();
+        $superAdmin = User::factory()->create([
+            'role' => 'super_admin',
+            'status' => 'active',
+            'verified' => true,
+            'is_completed' => true,
+            'email_verified_at' => now(),
+        ]);
+        $mitra = User::factory()->create([
+            'role' => 'mitra',
+            'name' => 'Hendra Wijaya',
+            'status' => 'active',
+            'verified' => true,
+            'is_completed' => true,
+            'email_verified_at' => now(),
+        ]);
+
+        // Pendapatan bantuan mitra TIDAK boleh masuk daftar topupRequests
+        BalanceTransaction::create([
+            'user_id' => $mitra->id,
+            'amount' => 75000,
+            'type' => 'topup',
+            'status' => 'completed',
+            'description' => 'Pendapatan Bantuan #99',
+        ]);
+
+        // Request top-up asli dari mitra HARUS muncul
+        $mitraTopup = BalanceTransaction::create([
+            'user_id' => $mitra->id,
+            'amount' => 500000,
+            'admin_fee' => 15000,
+            'total_payment' => 515000,
+            'type' => 'topup',
+            'status' => 'waiting_approval',
+            'description' => 'Top-up saldo via QRIS',
+            'request_code' => 'TPU-20261125-001',
+        ]);
+
+        // 1. Tampil di Admin TopupApproval & bisa di-approve
+        $this->actingAs($admin)
+            ->get(route('admin.topup.approvals'))
+            ->assertSuccessful()
+            ->assertSee('TPU-20261125-001')
+            ->assertSee('Hendra Wijaya')
+            ->assertDontSee('Pendapatan Bantuan #99');
+
+        // 2. Tampil di SuperAdmin TopupApproval
+        $this->actingAs($superAdmin)
+            ->get(route('superadmin.topup.approvals'))
+            ->assertSuccessful()
+            ->assertSee('TPU-20261125-001')
+            ->assertSee('Hendra Wijaya');
+
+        // 3. Tampil di Riwayat Top-Up Mitra
+        $this->actingAs($mitra)
+            ->get(route('mitra.topup.history'))
+            ->assertSuccessful()
+            ->assertSee('TPU-20261125-001')
+            ->assertSee('500.000');
+
+        // 4. Approve oleh Admin menambah saldo mitra dan mengirim notifikasi ber-URL mitra
+        $this->actingAs($admin);
+        Livewire::test(TopupApproval::class)->call('approve', $mitraTopup->id);
+
+        $this->assertSame('completed', $mitraTopup->fresh()->status);
+        $this->assertSame(575000, $mitra->fresh()->balance); // 75000 pendapatan + 500000 topup
+
+        $latestNotif = $mitra->notifications()->latest()->first();
+        $this->assertNotNull($latestNotif);
+        $this->assertSame(route('mitra.topup.history'), $latestNotif->data['url']);
+    }
 }

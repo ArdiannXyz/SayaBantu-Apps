@@ -94,7 +94,13 @@
 
             function formatCurrency(v) {
                 try {
-                    return 'Rp ' + Number(v || 0).toLocaleString('id-ID');
+                    if (window.formatRupiah) return window.formatRupiah(v || 0);
+                    const abs = Math.abs(Number(v || 0));
+                    if (abs >= 1000000 && Number.isInteger(abs) && abs % 10000 === 0) {
+                        const s = (abs / 1000000).toFixed(2).replace(/\.?0+$/, '').replace('.', ',');
+                        return 'Rp ' + s + ' jt';
+                    }
+                    return 'Rp ' + abs.toLocaleString('id-ID');
                 } catch (e) {
                     return v;
                 }

@@ -103,6 +103,8 @@
                             $isSanction = ($type === 'sanction_warning' || str_contains($type, 'sanction'));
                             $helpId = $data['help_id'] ?? null;
                             $detailUrl = \App\Services\NotificationUrlResolver::resolveUrl($notification, auth()->user());
+                            $titleText = $data['title'] ?? 'Notifikasi';
+                            $bodyText = $data['message'] ?? ($data['body'] ?? 'Notifikasi baru');
 
                             if ($isSanction) {
                                 $warningLevel = (int) ($data['warning_level'] ?? 1);
@@ -132,6 +134,21 @@
                                 $bodyText = $data['message'] ?? ($data['body'] ?? 'Notifikasi baru');
                             } elseif ($type === 'withdraw' || str_contains($type, 'withdraw')) {
                                 $titleText = $data['title'] ?? 'Status Penarikan Saldo';
+                                $bodyText = $data['message'] ?? ($data['body'] ?? 'Status penarikan saldo Anda telah diperbarui.');
+                            } elseif ($type === 'topup_approved') {
+                                $titleText = $data['title'] ?? '✅ Top-Up Saldo Disetujui';
+                                $amountFormatted = isset($data['amount']) ? format_rupiah((float) $data['amount']) : '';
+                                $code = $data['request_code'] ?? '';
+                                $bodyText = $data['message'] ?? ("Request top-up saldo Anda ($code) sebesar $amountFormatted telah disetujui! Saldo sudah masuk ke akun Anda.");
+                            } elseif ($type === 'topup_rejected') {
+                                $titleText = $data['title'] ?? '❌ Top-Up Saldo Ditolak';
+                                $reason = $data['rejection_reason'] ?? '';
+                                $code = $data['request_code'] ?? '';
+                                $bodyText = $data['message'] ?? ("Request top-up saldo Anda ($code) ditolak. Alasan: " . ($reason ?: 'Bukti transfer tidak valid.'));
+                            } elseif ($type === 'topup_request_submitted' || str_contains($type, 'topup')) {
+                                $titleText = $data['title'] ?? '⏳ Request Top-Up Terkirim';
+                                $code = $data['request_code'] ?? '';
+                                $bodyText = $data['message'] ?? ("Request top-up saldo Anda ($code) telah diterima dan sedang menunggu verifikasi admin.");
                             } elseif ($type === 'report_status') {
                                 $titleText = $data['title'] ?? 'Update Status Laporan Aduan';
                                 $bodyText = $data['message'] ?? ($data['body'] ?? 'Status laporan aduan Anda telah diperbarui oleh Admin.');
@@ -159,10 +176,22 @@
                                 @endif
 
                                 <div class="flex-shrink-0 mt-0.5">
-                                    <div class="w-10 h-10 rounded-full flex items-center justify-center border {{ $isSanction ? 'border-red-200 bg-red-100/70 text-red-600' : ($type === 'ktp_approved' ? 'border-green-200 bg-green-50' : ($type === 'ktp_rejected' ? 'border-red-200 bg-red-50' : (str_contains($type, 'ktp') ? 'border-amber-200 bg-amber-50' : ($isUnread ? 'border-blue-200 bg-blue-50' : 'border-gray-200 bg-gray-50')))) }}">
+                                    <div class="w-10 h-10 rounded-full flex items-center justify-center border {{ $isSanction ? 'border-red-200 bg-red-100/70 text-red-600' : (in_array($type, ['ktp_approved', 'topup_approved']) ? 'border-green-200 bg-green-50' : (in_array($type, ['ktp_rejected', 'topup_rejected']) ? 'border-red-200 bg-red-50' : (str_contains($type, 'ktp') || str_contains($type, 'topup') ? 'border-amber-200 bg-amber-50' : ($isUnread ? 'border-blue-200 bg-blue-50' : 'border-gray-200 bg-gray-50')))) }}">
                                         @if($isSanction)
                                             <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                                            </svg>
+                                        @elseif($type === 'topup_approved')
+                                            <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                        @elseif($type === 'topup_rejected')
+                                            <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                        @elseif(str_contains($type, 'topup'))
+                                            <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                             </svg>
                                         @elseif($type === 'chat_message')
                                             <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -215,7 +244,7 @@
                                         </div>
                                         @if(isset($data['help_amount']))
                                             <div class="ml-2 text-right">
-                                                <div class="inline-flex items-center px-2.5 py-0.5 rounded-md bg-blue-50 text-blue-700 text-xs font-bold">Rp {{ number_format($data['help_amount'],0,',','.') }}</div>
+                                                <div class="inline-flex items-center px-2.5 py-0.5 rounded-md bg-blue-50 text-blue-700 text-xs font-bold">{{ format_rupiah($data['help_amount']) }}</div>
                                             </div>
                                         @endif
                                     </div>

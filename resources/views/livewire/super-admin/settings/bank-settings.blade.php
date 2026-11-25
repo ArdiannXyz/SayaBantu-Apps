@@ -52,6 +52,7 @@
             </div>
             <div class="flex items-center gap-2">
                 <button type="button" wire:click="toggleQrisStatus"
+                        wire:confirm="{{ $qris_enabled ? 'Apakah Anda yakin ingin menonaktifkan metode pembayaran QRIS?' : 'Apakah Anda yakin ingin mengaktifkan metode pembayaran QRIS?' }}"
                         class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold border transition cursor-pointer {{ $qris_enabled ? 'bg-emerald-50 text-emerald-700 border-emerald-300 hover:bg-emerald-100' : 'bg-slate-100 text-slate-600 border-slate-300 hover:bg-slate-200' }}">
                     <span class="w-2 h-2 rounded-full {{ $qris_enabled ? 'bg-emerald-500 animate-pulse' : 'bg-slate-400' }}"></span>
                     <span>{{ $qris_enabled ? 'QRIS Aktif' : 'QRIS Dinonaktifkan' }}</span>
@@ -119,6 +120,7 @@
 
                 <div class="pt-2 flex items-center justify-end">
                     <button type="button" wire:click="saveQrisSettings"
+                            wire:confirm="Apakah Anda yakin ingin menyimpan dan menerapkan pengaturan QRIS ini?"
                             class="inline-flex items-center gap-2 px-5 py-2.5 bg-[#0066FF] hover:bg-[#0052cc] active:scale-95 text-white rounded-xl text-xs font-bold transition shadow-md shadow-blue-500/20 cursor-pointer">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
@@ -297,6 +299,7 @@
                             <!-- Toggle Status Switch -->
                             <td class="py-3.5 px-4 text-center">
                                 <button type="button" wire:click="toggleStatus({{ $channel->id }})"
+                                        wire:confirm="{{ $channel->is_active ? 'Apakah Anda yakin ingin menonaktifkan status saluran ' . $channel->name . '?' : 'Apakah Anda yakin ingin mengaktifkan status saluran ' . $channel->name . '?' }}"
                                         class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none {{ $channel->is_active ? 'bg-emerald-500' : 'bg-slate-300' }}"
                                         title="{{ $channel->is_active ? 'Klik untuk nonaktifkan' : 'Klik untuk aktifkan' }}">
                                     <span class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-md ring-0 transition duration-200 ease-in-out {{ $channel->is_active ? 'translate-x-5' : 'translate-x-0' }}"></span>

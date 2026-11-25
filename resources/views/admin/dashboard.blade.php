@@ -256,7 +256,7 @@
                                             <td class="py-3"><span
                                                     class="px-2 py-1 text-xs rounded {{ $help->status === 'pending' ? 'bg-yellow-100 text-yellow-700' : ($help->isSelesai() ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700') }}">{{ ucfirst($help->status) }}</span>
                                             </td>
-                                            <td class="py-3 text-gray-800">Rp {{ number_format($help->amount ?? 0, 0, ',', '.') }}
+                                            <td class="py-3 text-gray-800">{{ format_rupiah($help->amount ?? 0) }}
                                             </td>
                                             <td class="py-3 text-gray-500">{{ $help->created_at->diffForHumans() }}</td>
                                         </tr>

@@ -180,7 +180,7 @@
                         <div>
                             <p class="text-[11px] text-blue-100 font-medium">Saldo / Wallet</p>
                             <p class="text-lg font-black text-white tracking-tight leading-tight mt-0.5">
-                                Rp {{ number_format($customerBalance, 0, ',', '.') }}
+                                {{ format_rupiah($customerBalance) }}
                             </p>
                         </div>
                     </div>

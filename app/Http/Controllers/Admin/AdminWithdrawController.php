@@ -360,7 +360,7 @@ class AdminWithdrawController extends Controller
             }
 
             $targetRole = $withdraw->user?->role === 'customer' ? 'customer' : 'mitra';
-            return redirect()->route($this->withdrawIndexRouteName())->with('status', 'Permintaan withdraw ditolak dan saldo Rp ' . number_format($withdraw->amount, 0, ',', '.') . ' telah dikembalikan ke saldo ' . $targetRole . '.');
+            return redirect()->route($this->withdrawIndexRouteName())->with('status', 'Permintaan withdraw ditolak dan saldo ' . format_rupiah($withdraw->amount) . ' telah dikembalikan ke saldo ' . $targetRole . '.');
         } catch (\Throwable $e) {
             Log::error('AdminWithdrawController: reject error', ['error' => $e->getMessage(), 'withdraw_id' => $withdraw->id]);
 

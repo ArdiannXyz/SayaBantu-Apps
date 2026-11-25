@@ -7,6 +7,7 @@
     <meta name="color-scheme" content="only light">
     <meta name="supported-color-schemes" content="only light">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="sb-authenticated" content="{{ auth()->check() ? '1' : '0' }}">
 
     <title>{{ config('app.name', 'sayabantu') }}</title>
 

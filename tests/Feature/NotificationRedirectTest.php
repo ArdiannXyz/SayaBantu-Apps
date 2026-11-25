@@ -163,4 +163,79 @@ class NotificationRedirectTest extends TestCase
         $emptyFallback = NotificationUrlResolver::normalizeUrl('#', '/fallback');
         $this->assertEquals('/fallback', $emptyFallback);
     }
+
+    public function test_mitra_notifications_page_renders_withdraw_and_all_types_without_error(): void
+    {
+        $mitra = User::factory()->create([
+            'role' => 'mitra',
+            'status' => 'active',
+            'verified' => true,
+            'is_completed' => true,
+            'email_verified_at' => now(),
+        ]);
+
+        $mitra->notifications()->create([
+            'id' => (string) Str::uuid(),
+            'type' => 'App\Notifications\WithdrawStatusNotification',
+            'data' => [
+                'type' => 'withdraw_status',
+                'withdraw_id' => 1,
+                'amount' => 100000,
+                'status' => 'success',
+                'message' => 'Penarikan Anda berhasil diproses.',
+                'url' => '/mitra/withdraw/1/success',
+            ],
+            'read_at' => null,
+        ]);
+
+        $mitra->notifications()->create([
+            'id' => (string) Str::uuid(),
+            'type' => 'App\Notifications\WithdrawStatusNotification',
+            'data' => [
+                'type' => 'withdraw_status',
+            ],
+            'read_at' => null,
+        ]);
+
+        $this->actingAs($mitra)
+            ->get(route('mitra.notifications.index'))
+            ->assertSuccessful()
+            ->assertSee('Status Penarikan Saldo')
+            ->assertSee('Penarikan Anda berhasil diproses.')
+            ->assertSee('Status penarikan saldo Anda telah diperbarui.');
+    }
+
+    public function test_mitra_clicking_topup_notification_redirects_to_mitra_topup_history(): void
+    {
+        $mitra = User::factory()->create([
+            'role' => 'mitra',
+            'status' => 'active',
+            'verified' => true,
+            'is_completed' => true,
+            'email_verified_at' => now(),
+        ]);
+
+        // Even if legacy/raw data.url pointed to customer.topup.history, resolver must route mitra cleanly
+        $notifId = (string) Str::uuid();
+        $mitra->notifications()->create([
+            'id' => $notifId,
+            'type' => 'App\Notifications\TopupRequestSubmitted',
+            'data' => [
+                'type' => 'topup_request_submitted',
+                'transaction_id' => 1,
+                'request_code' => 'TPU-20261125-001',
+                'message' => 'Request top-up saldo Anda telah diterima.',
+                'url' => 'http://127.0.0.1:8000/customer/topup/history',
+            ],
+            'read_at' => null,
+        ]);
+
+        $this->actingAs($mitra);
+
+        Livewire::test(\App\Livewire\Mitra\Notifications\Index::class)
+            ->call('readAndRedirect', $notifId)
+            ->assertRedirect(route('mitra.topup.history'));
+
+        $this->assertNotNull($mitra->notifications()->find($notifId)->read_at);
+    }
 }

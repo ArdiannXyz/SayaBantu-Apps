@@ -66,8 +66,8 @@ class BalanceTransactionObserver
                         'user_id' => $transaction->user_id,
                         'activity_type' => 'balance_topup',
                         'description' => sprintf(
-                            'Top up berhasil Rp %s %s',
-                            number_format((float) $transaction->amount, 0, ',', '.'),
+                            'Top up berhasil %s %s',
+                            format_rupiah((float) $transaction->amount),
                             $transaction->order_id ? '(Order #'.$transaction->order_id.')' : ''
                         ),
                         'ip_address' => request()?->ip(),

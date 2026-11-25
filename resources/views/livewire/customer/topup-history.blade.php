@@ -107,15 +107,15 @@
                                 <p class="text-xs text-gray-500">{{ $transaction->created_at->format('d M Y, H:i') }}</p>
                             </div>
                             <div class="text-right">
-                                <p class="text-base font-bold text-gray-900">Rp {{ number_format($transaction->amount, 0, ',', '.') }}</p>
-                                <p class="text-xs text-gray-500">+{{ number_format($transaction->admin_fee, 0, ',', '.') }} admin</p>
+                                <p class="text-base font-bold text-gray-900">{{ format_rupiah($transaction->amount) }}</p>
+                                <p class="text-xs text-gray-500">+{{ format_nominal($transaction->admin_fee) }} admin</p>
                             </div>
                         </div>
 
                         <div class="flex items-center justify-between pt-3 border-t border-gray-100">
                             <div class="text-sm">
                                 <span class="text-gray-600">Total:</span>
-                                <span class="font-bold text-gray-900 ml-1">Rp {{ number_format($transaction->total_payment, 0, ',', '.') }}</span>
+                                <span class="font-bold text-gray-900 ml-1">{{ format_rupiah($transaction->total_payment) }}</span>
                             </div>
                             <button wire:click="viewDetail({{ $transaction->id }})"
                                 class="text-sm font-semibold hover:underline"
@@ -222,7 +222,7 @@
                             Nominal Top-Up
                         </p>
                         <p class="text-2xl font-black mt-0.5 {{ $isRejected ? 'text-gray-400 line-through' : ($isWaiting ? 'text-amber-600' : 'text-emerald-600') }}">
-                            Rp {{ number_format($selectedTransaction->amount, 0, ',', '.') }}
+                            {{ format_rupiah($selectedTransaction->amount) }}
                         </p>
                         @if($isRejected)
                             <span class="inline-block mt-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-rose-50 text-rose-700 border border-rose-200">
@@ -288,17 +288,17 @@
                         </div>
                         <div class="flex justify-between items-center">
                             <span class="text-gray-500">Nominal Pokok</span>
-                            <span class="font-medium text-gray-900">Rp {{ number_format($selectedTransaction->amount, 0, ',', '.') }}</span>
+                            <span class="font-medium text-gray-900">{{ format_rupiah($selectedTransaction->amount) }}</span>
                         </div>
                         @if($selectedTransaction->admin_fee > 0)
                             <div class="flex justify-between items-center">
                                 <span class="text-gray-500">Biaya Admin</span>
-                                <span class="font-medium text-gray-900">Rp {{ number_format($selectedTransaction->admin_fee, 0, ',', '.') }}</span>
+                                <span class="font-medium text-gray-900">{{ format_rupiah($selectedTransaction->admin_fee) }}</span>
                             </div>
                         @endif
                         <div class="border-t border-gray-200/80 pt-2 flex justify-between items-center font-bold">
                             <span class="text-gray-800">Total Ditransfer</span>
-                            <span class="text-blue-600 text-sm">Rp {{ number_format($selectedTransaction->total_payment, 0, ',', '.') }}</span>
+                            <span class="text-blue-600 text-sm">{{ format_rupiah($selectedTransaction->total_payment) }}</span>
                         </div>
 
                         <!-- Disetujui Oleh (Jika Berhasil) -->

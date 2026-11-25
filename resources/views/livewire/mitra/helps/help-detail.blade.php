@@ -134,7 +134,7 @@
                         <span class="text-xs text-gray-500 font-medium">Pendapatan Bersih Mitra:</span>
                         <div class="flex items-center gap-2">
                             <p class="text-lg font-bold text-emerald-600">
-                                Rp {{ number_format($netMitra, 0, ',', '.') }}
+                                {{ format_rupiah($netMitra) }}
                             </p>
                             <span class="text-[10px] font-semibold text-emerald-700 bg-emerald-100 px-1.5 py-0.5 rounded">
                                 Netto (-{{ $mitraFeePercent }}%)
@@ -162,19 +162,19 @@
                     <div class="flex justify-between text-gray-600">
                         <span>Upah Pokok dari Customer:</span>
                         <span class="font-semibold text-gray-900">
-                            Rp {{ number_format($baseWage, 0, ',', '.') }}
+                            {{ format_rupiah($baseWage) }}
                         </span>
                     </div>
                     <div class="flex justify-between text-red-600 font-medium">
                         <span>Biaya Platform ({{ $mitraFeePercent }}%):</span>
                         <span class="font-semibold">
-                            - Rp {{ number_format($platformFee, 0, ',', '.') }}
+                            - {{ format_rupiah($platformFee) }}
                         </span>
                     </div>
                     <div class="flex justify-between text-emerald-700 font-bold border-t border-emerald-200/60 pt-1.5">
                         <span>Pendapatan Bersih Rekan Jasa:</span>
                         <span class="text-sm font-extrabold text-emerald-600">
-                            Rp {{ number_format($netMitra, 0, ',', '.') }}
+                            {{ format_rupiah($netMitra) }}
                         </span>
                     </div>
                 </div>
@@ -184,7 +184,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
                     <span>
-                        <strong>Keterangan:</strong> Upah dipotong <strong>{{ $mitraFeePercent }}%</strong> untuk biaya operasional platform. Saldo bersih sebesar <strong>Rp {{ number_format($netMitra, 0, ',', '.') }}</strong> akan otomatis masuk ke saldo akun Anda begitu pesanan diselesaikan.
+                        <strong>Keterangan:</strong> Upah dipotong <strong>{{ $mitraFeePercent }}%</strong> untuk biaya operasional platform. Saldo bersih sebesar <strong>{{ format_rupiah($netMitra) }}</strong> akan otomatis masuk ke saldo akun Anda begitu pesanan diselesaikan.
                     </span>
                 </div>
             </div>
@@ -617,7 +617,7 @@
                 @if(!empty($help->voucher_code))
                     <div>
                         <div class="text-xs text-gray-500">Voucher</div>
-                        <div class="font-semibold text-red-600">{{ $help->voucher_code }} @if($help->discount_amount) ( -Rp{{ number_format($help->discount_amount,0,',','.') }})@endif</div>
+                        <div class="font-semibold text-red-600">{{ $help->voucher_code }} @if($help->discount_amount) ( -{{ format_rupiah($help->discount_amount, false) }})@endif</div>
                     </div>
                 @endif
             </div>
@@ -903,7 +903,7 @@
                         <div class="mt-2.5 bg-white/80 rounded-lg p-2.5 border border-orange-200/70 text-xs text-gray-700 space-y-1">
                             <div class="flex items-center justify-between text-xs">
                                 <span class="text-gray-500">Estimasi Pencairan:</span>
-                                <span class="font-bold text-green-700">Rp {{ number_format($netPayout, 0, ',', '.') }}</span>
+                                <span class="font-bold text-green-700">{{ format_rupiah($netPayout) }}</span>
                             </div>
                             <div class="text-[11px] text-gray-500 leading-relaxed pt-1 border-t border-gray-100">
                                 💡 <strong>Pencairan Otomatis:</strong> Jika customer tidak merespon dalam 24 jam 

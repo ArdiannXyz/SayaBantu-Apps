@@ -102,6 +102,8 @@
                             $type = $data['type'] ?? 'general';
                             $isSanction = ($type === 'sanction_warning' || str_contains($type, 'sanction'));
                             $detailUrl = \App\Services\NotificationUrlResolver::resolveUrl($notification, auth()->user());
+                            $titleText = $data['title'] ?? 'Notifikasi';
+                            $bodyText = $data['message'] ?? ($data['body'] ?? 'Notifikasi baru');
 
                             if ($isSanction) {
                                 $warningLevel = (int) ($data['warning_level'] ?? 1);
@@ -150,7 +152,7 @@
                                 $bodyText = $data['message'] ?? ($data['body'] ?? 'Notifikasi baru');
                             } elseif ($type === 'topup_approved') {
                                 $titleText = $data['title'] ?? '✅ Top-Up Saldo Disetujui';
-                                $amountFormatted = isset($data['amount']) ? 'Rp ' . number_format((float)$data['amount'], 0, ',', '.') : '';
+                                $amountFormatted = isset($data['amount']) ? format_rupiah((float) $data['amount']) : '';
                                 $code = $data['request_code'] ?? '';
                                 $bodyText = $data['message'] ?? ("Request top-up saldo Anda ($code) sebesar $amountFormatted telah disetujui! Saldo sudah masuk ke akun Anda.");
                             } elseif ($type === 'topup_rejected') {
@@ -263,7 +265,7 @@
                                         </div>
                                         @if(isset($data['help_amount']))
                                             <div class="ml-2 text-right">
-                                                <div class="inline-flex items-center px-2.5 py-0.5 rounded-md bg-blue-50 text-blue-700 text-xs font-bold">Rp {{ number_format($data['help_amount'],0,',','.') }}</div>
+                                                <div class="inline-flex items-center px-2.5 py-0.5 rounded-md bg-blue-50 text-blue-700 text-xs font-bold">{{ format_rupiah($data['help_amount']) }}</div>
                                             </div>
                                         @endif
                                     </div>

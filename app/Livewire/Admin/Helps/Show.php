@@ -160,7 +160,7 @@ class Show extends Component
 
         $this->showDecisionModal = false;
         $this->loadHelp();
-        session()->flash('message', 'Komplain customer disetujui. Dana sebesar Rp '.number_format($this->help->amount + ($this->help->admin_fee ?? 0), 0, ',', '.').' telah dikembalikan ke saldo customer.');
+        session()->flash('message', 'Komplain customer disetujui. Dana sebesar '.format_rupiah($this->help->amount + ($this->help->admin_fee ?? 0)).' telah dikembalikan ke saldo customer.');
     }
 
     public function rejectComplaint()
@@ -195,7 +195,7 @@ class Show extends Component
 
         $this->showDecisionModal = false;
         $this->loadHelp();
-        session()->flash('message', 'Komplain ditolak. Pekerjaan dinyatakan selesai dan dana sebesar Rp '.number_format($this->help->amount, 0, ',', '.').' telah dicairkan ke saldo mitra.');
+        session()->flash('message', 'Komplain ditolak. Pekerjaan dinyatakan selesai dan dana sebesar '.format_rupiah($this->help->amount).' telah dicairkan ke saldo mitra.');
     }
 
     public function render()

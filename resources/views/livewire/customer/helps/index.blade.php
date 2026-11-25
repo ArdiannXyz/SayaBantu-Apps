@@ -248,7 +248,7 @@
                                                 @endif
                                             @endif
                                         </div>
-                                        <span class="text-sm font-extrabold whitespace-nowrap text-[#0066FF]">Rp {{ number_format($help->amount, 0, ',', '.') }}</span>
+                                        <span class="text-sm font-extrabold whitespace-nowrap text-[#0066FF]">{{ format_rupiah($help->amount) }}</span>
                                     </div>
 
                                     <div class="flex items-center gap-1.5 mb-2">
@@ -312,7 +312,7 @@
                                                 <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-extrabold bg-red-100 text-red-700 uppercase tracking-wider flex-shrink-0">⚡ Prioritas / Urgent</span>
                                             @endif
                                         </div>
-                                        <span class="text-xs font-bold whitespace-nowrap" style="color: #0066FF;">Rp {{ number_format($help->amount, 0, ',', '.') }}</span>
+                                        <span class="text-xs font-bold whitespace-nowrap" style="color: #0066FF;">{{ format_rupiah($help->amount) }}</span>
                                     </div>
 
                                     @if($help->status === 'partner_cancel_requested')
@@ -406,7 +406,7 @@
                                                 <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-extrabold bg-red-100 text-red-700 uppercase tracking-wider flex-shrink-0">⚡ Prioritas / Urgent</span>
                                             @endif
                                         </div>
-                                        <span class="text-xs font-bold whitespace-nowrap" style="color: #0066FF;">Rp {{ number_format($help->amount, 0, ',', '.') }}</span>
+                                        <span class="text-xs font-bold whitespace-nowrap" style="color: #0066FF;">{{ format_rupiah($help->amount) }}</span>
                                     </div>
 
                                     <div class="flex items-center gap-2 mb-2 flex-wrap">
@@ -496,7 +496,7 @@
                                     </div>
 
                                     <div class="text-right flex-shrink-0">
-                                        <div class="text-sm font-bold" style="color: #0066FF;">Rp {{ number_format($help->amount ?? 0, 0, ',', '.') }}</div>
+                                        <div class="text-sm font-bold" style="color: #0066FF;">{{ format_rupiah($help->amount ?? 0) }}</div>
                                         <div class="flex flex-col gap-1 mt-1">
                                             <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-green-100 text-green-700 text-xs font-semibold">
                                                 <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
@@ -683,7 +683,7 @@
                                                 <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-extrabold bg-red-100 text-red-700 uppercase tracking-wider flex-shrink-0">⚡ Prioritas / Urgent</span>
                                             @endif
                                         </div>
-                                        <span class="text-xs font-bold whitespace-nowrap text-red-600">Rp {{ number_format($help->amount, 0, ',', '.') }}</span>
+                                        <span class="text-xs font-bold whitespace-nowrap text-red-600">{{ format_rupiah($help->amount) }}</span>
                                     </div>
 
                                     <div class="flex items-center gap-2 mb-2 flex-wrap">
@@ -730,7 +730,7 @@
                                 <div class="flex-1 min-w-0">
                                     <div class="flex items-start justify-between gap-2 mb-1">
                                         <h3 class="font-semibold text-sm text-gray-900 line-clamp-1">{{ $help->title }}</h3>
-                                        <span class="text-xs font-bold whitespace-nowrap text-[#0066FF]">Rp {{ number_format($help->amount, 0, ',', '.') }}</span>
+                                        <span class="text-xs font-bold whitespace-nowrap text-[#0066FF]">{{ format_rupiah($help->amount) }}</span>
                                     </div>
                                     <div class="flex items-center gap-2 mb-2">
                                         <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">
@@ -856,7 +856,7 @@
 
     <!-- FAB: Buat Pesanan Baru -->
     <div class="fixed left-1/2 -translate-x-1/2 z-40 flex justify-end px-5 pointer-events-none"
-        style="bottom: 76px; max-width: 448px; width: 100vw;">
+        style="bottom: calc(5rem + env(safe-area-inset-bottom, 0px)); max-width: 448px; width: 100%;">
         <a href="{{ route('customer.helps.create') }}" wire:navigate
             class="pointer-events-auto inline-flex items-center justify-center w-11 h-11 rounded-full text-white shadow-lg transition active:scale-95 hover:opacity-90"
             style="background: linear-gradient(135deg, #0066FF 0%, #0052cc 100%);"
@@ -1179,7 +1179,7 @@
                         <div>
                             <p class="text-xs text-gray-500 mb-1">Nominal Bantuan</p>
                             <p class="text-2xl font-bold" style="color: var(--brand-600)">
-                                Rp {{ number_format(data_get($selectedHelpData, 'amount', 0), 0, ',', '.') }}
+                                {{ format_rupiah(data_get($selectedHelpData, 'amount', 0)) }}
                             </p>
                         </div>
                         <div class="text-right">
@@ -1285,7 +1285,7 @@
                         <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
-                        <span>Pengembalian dana: <strong>Rp {{ number_format($delHelp->total_customer_paid > 0 ? $delHelp->total_customer_paid : ($delHelp->total_amount ?? ($delHelp->amount + ($delHelp->admin_fee ?? 0))), 0, ',', '.') }}</strong></span>
+                        <span>Pengembalian dana: <strong>{{ format_rupiah($delHelp->total_customer_paid > 0 ? $delHelp->total_customer_paid : ($delHelp->total_amount ?? ($delHelp->amount + ($delHelp->admin_fee ?? 0)))) }}</strong></span>
                     </div>
 
                     {{-- Item Summary Card --}}
@@ -1300,7 +1300,7 @@
                             </div>
                             <div class="flex-1 min-w-0">
                                 <div class="font-bold text-xs text-gray-900 truncate">{{ $delHelp->title }}</div>
-                                <div class="text-[11px] font-semibold text-primary-600 mt-0.5">Rp {{ number_format($delHelp->amount, 0, ',', '.') }}</div>
+                                <div class="text-[11px] font-semibold text-primary-600 mt-0.5">{{ format_rupiah($delHelp->amount) }}</div>
                             </div>
                         </div>
                     </div>

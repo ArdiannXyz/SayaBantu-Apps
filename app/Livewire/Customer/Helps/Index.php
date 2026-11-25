@@ -299,7 +299,7 @@ class Index extends Component
                             );
 
                             $feeText = ($help->mitra_fee_amount > 0)
-                                ? " (Potongan Platform {$help->mitra_fee_percent}%: Rp ".number_format($help->mitra_fee_amount, 0, ',', '.').')'
+                                ? " (Potongan Platform {$help->mitra_fee_percent}%: ".format_rupiah($help->mitra_fee_amount).')'
                                 : '';
 
                             $mitraBalance->addBalance($payoutAmount, "Pendapatan Bantuan #{$help->id}".$feeText, $help->id);

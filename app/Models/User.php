@@ -270,6 +270,11 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->managedCities();
     }
 
+    public function pushSubscriptions()
+    {
+        return $this->hasMany(PushSubscription::class);
+    }
+
     /**
      * Get all city IDs associated with/managed by this admin.
      */

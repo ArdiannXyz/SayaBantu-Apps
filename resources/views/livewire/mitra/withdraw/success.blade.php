@@ -35,7 +35,7 @@
                 <div class="bg-gray-50 border border-gray-200 rounded-2xl p-4 space-y-3">
                     <div class="flex justify-between text-xs">
                         <span class="text-gray-500">Jumlah Penarikan:</span>
-                        <span class="font-bold text-gray-900 text-sm">Rp {{ number_format($withdraw->amount, 0, ',', '.') }}</span>
+                        <span class="font-bold text-gray-900 text-sm">{{ format_rupiah($withdraw->amount) }}</span>
                     </div>
                     <div class="flex justify-between text-xs">
                         <span class="text-gray-500">Bank / E-Wallet Tujuan:</span>

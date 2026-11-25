@@ -679,14 +679,46 @@
                                     </div>
 
                                     <!-- Kota yang Dikelola (Interactive Checklist) -->
-                                    <div>
-                                        <div class="flex items-center justify-between mb-2">
+                                    @php
+                                        $availableCityPayload = $availableCities->map(fn($c) => [
+                                            'id' => (int) $c->id,
+                                            'name' => strtolower($c->name),
+                                            'province' => strtolower($c->province ?? ''),
+                                        ])->values();
+                                        $availableCityIdsInt = $availableCities->pluck('id')->map(fn($id) => (int) $id)->all();
+                                        $selectedManagedCityIdsInt = collect($managed_city_ids)->map(fn($id) => (int) $id)->all();
+                                        $isAllManagedCitiesSelected = count($availableCityIdsInt) > 0 && count(array_diff($availableCityIdsInt, $selectedManagedCityIdsInt)) === 0;
+                                    @endphp
+                                    <div data-available-cities='@json($availableCityPayload)'>
+                                        <div class="flex items-center justify-between flex-wrap gap-2 mb-2">
                                             <label class="text-xs font-semibold text-gray-800 flex items-center gap-2">
                                                 <span>Kota Wewenang yang Dikelola</span>
                                                 <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-700">
                                                     {{ count($managed_city_ids) }} Kota Dipilih
                                                 </span>
                                             </label>
+
+                                            @if($availableCities->isNotEmpty())
+                                                <label class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-xs font-semibold cursor-pointer select-none transition
+                                                    {{ $isAllManagedCitiesSelected ? 'border-primary-500 bg-primary-50 text-primary-700' : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50 hover:border-gray-300' }}">
+                                                    <input type="checkbox"
+                                                        id="select-all-managed-cities"
+                                                        @checked($isAllManagedCitiesSelected)
+                                                        wire:loading.attr="disabled"
+                                                        wire:target="toggleSelectAllManagedCities"
+                                                        @change="
+                                                            const container = $el.closest('[data-available-cities]');
+                                                            const cities = JSON.parse(container?.dataset.availableCities || '[]');
+                                                            const q = (citySearch || '').trim().toLowerCase();
+                                                            const visibleIds = q
+                                                                ? cities.filter(c => c.name.includes(q) || c.province.includes(q)).map(c => c.id)
+                                                                : cities.map(c => c.id);
+                                                            $wire.toggleSelectAllManagedCities(visibleIds);
+                                                        "
+                                                        class="w-3.5 h-3.5 text-primary-600 rounded border-gray-300 focus:ring-primary-500 cursor-pointer">
+                                                    <span>{{ $isAllManagedCitiesSelected ? 'Batal Pilih Semua' : 'Pilih Semua' }}</span>
+                                                </label>
+                                            @endif
                                         </div>
 
                                         <!-- City Filter Bar & Card List -->

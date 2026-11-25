@@ -181,7 +181,7 @@
                                 @endif
                                 @if(isset($data['amount']))
                                     <span class="px-2.5 py-1 bg-emerald-50 text-emerald-700 border border-emerald-100 rounded-lg font-semibold">
-                                        Rp {{ number_format((float) $data['amount'], 0, ',', '.') }}
+                                        {{ format_rupiah((float) $data['amount']) }}
                                     </span>
                                 @endif
                                 @if(isset($data['customer_name']))

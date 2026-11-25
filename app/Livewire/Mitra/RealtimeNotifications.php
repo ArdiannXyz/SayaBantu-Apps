@@ -25,6 +25,7 @@ class RealtimeNotifications extends Component
             $this->checkUnpoppedSanctions();
             $this->checkUnpoppedReportStatus();
             $this->checkUnpoppedHelpStatus();
+            $this->checkUnpoppedTopups();
         }
     }
 
@@ -39,6 +40,7 @@ class RealtimeNotifications extends Component
             $this->checkUnpoppedSanctions();
             $this->checkUnpoppedReportStatus();
             $this->checkUnpoppedHelpStatus();
+            $this->checkUnpoppedTopups();
         }
 
         // Check for new chat messages
@@ -112,10 +114,84 @@ class RealtimeNotifications extends Component
                         }
                     ));
                 }
+
+                if (in_array($data['type'] ?? '', ['topup_approved', 'topup_rejected', 'topup_request_submitted'])
+                    || in_array($notification->type, [
+                        'App\Notifications\TopupApproved',
+                        'App\Notifications\TopupRejected',
+                        'App\Notifications\TopupRequestSubmitted',
+                    ])) {
+                    $this->emitTopupToast($notification);
+                }
             }
         } catch (\Throwable $e) {
             Log::warning('[RealtimeNotifications] failed processing mitra notifications: '.$e->getMessage());
         }
+    }
+
+    public function checkUnpoppedTopups()
+    {
+        if (! auth()->check()) {
+            return;
+        }
+
+        $notif = auth()->user()->notifications()
+            ->whereNull('popped_at')
+            ->where('created_at', '>=', now()->subDays(3))
+            ->latest()
+            ->get()
+            ->first(function ($n) {
+                $type = $n->data['type'] ?? '';
+
+                return in_array($type, ['topup_approved', 'topup_rejected', 'topup_request_submitted'])
+                    || in_array($n->type, [
+                        'App\Notifications\TopupApproved',
+                        'App\Notifications\TopupRejected',
+                        'App\Notifications\TopupRequestSubmitted',
+                    ]);
+            });
+
+        if ($notif) {
+            $this->emitTopupToast($notif, 500);
+        }
+    }
+
+    protected function emitTopupToast($notif, int $delayMs = 0): void
+    {
+        $data = $notif->data ?? [];
+        $notif->update(['popped_at' => now()]);
+
+        $type = $data['type'] ?? '';
+        $isApproved = $type === 'topup_approved' || $notif->type === 'App\Notifications\TopupApproved';
+        $isRejected = $type === 'topup_rejected' || $notif->type === 'App\Notifications\TopupRejected';
+        $resolvedUrl = \App\Services\NotificationUrlResolver::resolveUrl($notif, auth()->user());
+
+        $amount = isset($data['amount']) ? format_rupiah((float) $data['amount']) : '';
+        if ($isApproved) {
+            $title = $data['title'] ?? 'Top-Up Saldo Disetujui!';
+            $message = $data['message'] ?? ("Request top-up saldo Anda sebesar $amount telah disetujui!");
+            $toastType = 'success';
+            $this->dispatch('balance-updated');
+            $this->js("window.dispatchEvent(new CustomEvent('balance-updated'))");
+        } elseif ($isRejected) {
+            $title = $data['title'] ?? 'Top-Up Saldo Ditolak';
+            $reason = $data['rejection_reason'] ?? '';
+            $message = $data['message'] ?? ('Request top-up saldo Anda ditolak.'.($reason ? " Alasan: $reason" : ''));
+            $toastType = 'error';
+        } else {
+            $title = $data['title'] ?? 'Request Top-Up Terkirim';
+            $message = $data['message'] ?? "Request top-up saldo Anda sebesar $amount telah diterima.";
+            $toastType = 'info';
+        }
+
+        $script = sprintf(
+            "if (typeof window.showGlobalFlashToast === 'function') { window.showGlobalFlashToast('%s', '%s', '%s'); } if (typeof window.playNotifChime === 'function') { window.playNotifChime(); }",
+            addslashes($title.': '.$message),
+            $toastType,
+            addslashes($resolvedUrl)
+        );
+
+        $this->js($delayMs > 0 ? "setTimeout(() => { {$script} }, {$delayMs});" : $script);
     }
 
     public function checkUnpoppedReportStatus()

@@ -324,7 +324,7 @@
                         <div class="p-3 bg-green-50 border border-green-200 rounded-xl text-xs text-green-800">
                             <p class="font-bold mb-0.5">Dana Telah Dikembalikan ke Saldo Anda</p>
                             <p class="text-[11px] text-green-700 leading-relaxed">
-                                Pengajuan refund Bantuan #{{ $help->id }} telah disetujui Admin pada {{ $help->complaint_resolved_at?->translatedFormat('d M Y, H:i') }}. Dana sebesar <strong>Rp {{ number_format($help->amount + ($help->admin_fee ?? 0), 0, ',', '.') }}</strong> telah masuk kembali 100% ke saldo akun Anda.
+                                Pengajuan refund Bantuan #{{ $help->id }} telah disetujui Admin pada {{ $help->complaint_resolved_at?->translatedFormat('d M Y, H:i') }}. Dana sebesar <strong>{{ format_rupiah($help->amount + ($help->admin_fee ?? 0)) }}</strong> telah masuk kembali 100% ke saldo akun Anda.
                             </p>
                             @if(!empty($help->complaint_admin_notes))
                                 <div class="mt-2 pt-2 border-t border-green-200/60 text-[11px]">
@@ -1280,20 +1280,20 @@
             <div class="space-y-3">
                 <div class="flex items-center justify-between text-sm">
                     <span class="text-gray-700">Nominal Pokok Bantuan</span>
-                    <span class="font-semibold text-gray-900">Rp{{ number_format($help->base_amount > 0 ? $help->base_amount : $help->amount, 0, ',', '.') }}</span>
+                    <span class="font-semibold text-gray-900">{{ format_rupiah($help->base_amount > 0 ? $help->base_amount : $help->amount, false) }}</span>
                 </div>
 
                 {{-- Perlengkapan ditampilkan di bagian "Deskripsi & Detail" di atas --}}
 
                 <div class="flex items-center justify-between text-sm">
                     <span class="text-gray-700">Biaya Layanan ({{ (float)($help->customer_fee_percent ?? 10) }}%)</span>
-                    <span class="font-semibold text-gray-900">Rp{{ number_format($help->customer_fee_amount > 0 ? $help->customer_fee_amount : 0, 0, ',', '.') }}</span>
+                    <span class="font-semibold text-gray-900">{{ format_rupiah($help->customer_fee_amount > 0 ? $help->customer_fee_amount : 0, false) }}</span>
                 </div>
 
                 @if(($help->admin_fee ?? 0) > 0)
                 <div class="flex items-center justify-between text-sm">
                     <span class="text-gray-700">Biaya Admin</span>
-                    <span class="font-semibold text-gray-900">Rp{{ number_format($help->admin_fee, 0, ',', '.') }}</span>
+                    <span class="font-semibold text-gray-900">{{ format_rupiah($help->admin_fee, false) }}</span>
                 </div>
                 @endif
 
@@ -1305,13 +1305,13 @@
                             </svg>
                             <span class="text-red-500 font-semibold">{{ $help->voucher_code }}</span>
                         </div>
-                        <span class="font-semibold text-red-500">-Rp{{ number_format($help->discount_amount ?? 0, 0, ',', '.') }}</span>
+                        <span class="font-semibold text-red-500">-{{ format_rupiah($help->discount_amount ?? 0, false) }}</span>
                     </div>
                 @endif
 
                 <div class="border-t pt-3 flex items-center justify-between">
                     <span class="font-bold text-gray-900">Total Pembayaran</span>
-                    <span class="font-bold text-gray-900">Rp{{ number_format($help->total_customer_paid > 0 ? $help->total_customer_paid : ($help->total_amount ?? ($help->amount + ($help->admin_fee ?? 0) - ($help->discount_amount ?? 0))), 0, ',', '.') }}</span>
+                    <span class="font-bold text-gray-900">{{ format_rupiah($help->total_customer_paid > 0 ? $help->total_customer_paid : ($help->total_amount ?? ($help->amount + ($help->admin_fee ?? 0) - ($help->discount_amount ?? 0))), false) }}</span>
                 </div>
             </div>
 
@@ -1472,7 +1472,7 @@
                     <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
-                    <span>Pengembalian dana: <strong>Rp{{ number_format($help->total_customer_paid > 0 ? $help->total_customer_paid : ($help->total_amount ?? ($help->amount + ($help->admin_fee ?? 0))), 0, ',', '.') }}</strong></span>
+                    <span>Pengembalian dana: <strong>{{ format_rupiah($help->total_customer_paid > 0 ? $help->total_customer_paid : ($help->total_amount ?? ($help->amount + ($help->admin_fee ?? 0))), false) }}</strong></span>
                 </div>
 
                 @if($help->status === 'partner_on_the_way')

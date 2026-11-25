@@ -155,7 +155,7 @@ class RealtimeNotifications extends Component
                 $this->dispatch('balance-updated');
                 $this->js("window.dispatchEvent(new CustomEvent('balance-updated'))");
 
-                $amount = isset($data['amount']) ? 'Rp '.number_format((float) $data['amount'], 0, ',', '.') : '';
+                $amount = isset($data['amount']) ? format_rupiah((float) $data['amount']) : '';
                 $title = $data['title'] ?? 'Top-Up Saldo Disetujui! ✅';
                 $message = $data['message'] ?? ("Request top-up saldo Anda sebesar $amount telah disetujui! Saldo sudah masuk.");
                 $url = $data['url'] ?? route('customer.transactions.index', ['tab' => 'masuk']);
@@ -206,7 +206,7 @@ class RealtimeNotifications extends Component
                 $notification->update(['popped_at' => now()]);
 
                 $title = $data['title'] ?? '⏳ Request Top-Up Terkirim';
-                $amount = isset($data['amount']) ? 'Rp '.number_format((float) $data['amount'], 0, ',', '.') : '';
+                $amount = isset($data['amount']) ? format_rupiah((float) $data['amount']) : '';
                 $message = $data['message'] ?? "Request top-up saldo Anda sebesar $amount telah diterima dan menunggu verifikasi Admin.";
                 $url = $data['url'] ?? route('customer.topup.history');
 
@@ -351,7 +351,7 @@ class RealtimeNotifications extends Component
             $resolvedUrl = \App\Services\NotificationUrlResolver::resolveUrl($notif, auth()->user());
 
             if ($isApproved) {
-                $amount = isset($data['amount']) ? 'Rp '.number_format((float) $data['amount'], 0, ',', '.') : '';
+                $amount = isset($data['amount']) ? format_rupiah((float) $data['amount']) : '';
                 $title = $data['title'] ?? 'Top-Up Saldo Disetujui! ✅';
                 $message = $data['message'] ?? ("Request top-up saldo Anda sebesar $amount telah disetujui! Saldo sudah masuk.");
                 $url = $resolvedUrl;
@@ -367,7 +367,7 @@ class RealtimeNotifications extends Component
                 $toastType = 'error';
             } else {
                 $title = $data['title'] ?? '⏳ Request Top-Up Terkirim';
-                $amount = isset($data['amount']) ? 'Rp '.number_format((float) $data['amount'], 0, ',', '.') : '';
+                $amount = isset($data['amount']) ? format_rupiah((float) $data['amount']) : '';
                 $message = $data['message'] ?? ("Request top-up saldo Anda sebesar $amount telah diterima dan menunggu verifikasi Admin.");
                 $url = $resolvedUrl;
                 $toastType = 'info';

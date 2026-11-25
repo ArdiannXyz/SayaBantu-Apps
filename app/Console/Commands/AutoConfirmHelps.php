@@ -113,7 +113,7 @@ class AutoConfirmHelps extends Command
                             );
 
                             $feeText = ($help->mitra_fee_amount > 0)
-                                ? " (Potongan Platform {$help->mitra_fee_percent}%: Rp ".number_format($help->mitra_fee_amount, 0, ',', '.').')'
+                                ? " (Potongan Platform {$help->mitra_fee_percent}%: ".format_rupiah($help->mitra_fee_amount).')'
                                 : '';
 
                             $userBalance->addBalance($payoutAmount, "Auto-confirm Bantuan #{$help->id}".$feeText, $help->id);

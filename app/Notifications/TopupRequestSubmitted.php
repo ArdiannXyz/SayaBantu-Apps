@@ -36,15 +36,17 @@ class TopupRequestSubmitted extends Notification
      */
     public function toMail(object $notifiable): MailMessage
     {
+        $historyRoute = ($notifiable->role ?? null) === 'mitra' ? 'mitra.topup.history' : 'customer.topup.history';
+
         return (new MailMessage)
             ->subject('Request Top-Up Saldo Diterima')
             ->greeting('Halo '.$notifiable->name.'!')
             ->line('Request top-up saldo Anda telah berhasil diterima.')
             ->line('Kode Request: '.$this->transaction->request_code)
-            ->line('Nominal: Rp '.number_format($this->transaction->amount, 0, ',', '.'))
-            ->line('Total Pembayaran: Rp '.number_format($this->transaction->total_payment, 0, ',', '.'))
+            ->line('Nominal: '.format_rupiah($this->transaction->amount))
+            ->line('Total Pembayaran: '.format_rupiah($this->transaction->total_payment))
             ->line('Request Anda akan diverifikasi oleh Super Admin maksimal 1x24 jam.')
-            ->action('Lihat Status', route('customer.topup.history'))
+            ->action('Lihat Status', route($historyRoute))
             ->line('Terima kasih telah menggunakan layanan kami!');
     }
 
@@ -55,6 +57,8 @@ class TopupRequestSubmitted extends Notification
      */
     public function toArray(object $notifiable): array
     {
+        $historyRoute = ($notifiable->role ?? null) === 'mitra' ? 'mitra.topup.history' : 'customer.topup.history';
+
         return [
             'type' => 'topup_request_submitted',
             'title' => '⏳ Request Top-Up Terkirim',
@@ -63,7 +67,7 @@ class TopupRequestSubmitted extends Notification
             'amount' => $this->transaction->amount,
             'total_payment' => $this->transaction->total_payment,
             'message' => 'Request top-up saldo Anda telah diterima dan menunggu verifikasi Super Admin.',
-            'url' => route('customer.topup.history'),
+            'url' => route($historyRoute),
         ];
     }
 }

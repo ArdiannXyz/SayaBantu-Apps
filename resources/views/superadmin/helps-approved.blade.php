@@ -111,7 +111,7 @@
                                     </span>
                                 </td>
                                 <td class="px-2.5 py-3 text-xs text-gray-600 whitespace-nowrap">{{ $help->city->name ?? '-' }}</td>
-                                <td class="px-2.5 py-3 text-xs font-bold text-gray-900 whitespace-nowrap">Rp {{ number_format($help->amount ?? 0,0,',','.') }}</td>
+                                <td class="px-2.5 py-3 text-xs font-bold text-gray-900 whitespace-nowrap">{{ format_rupiah($help->amount ?? 0) }}</td>
                                 <td class="px-2.5 py-3 text-xs text-gray-500 whitespace-nowrap">{{ $help->created_at?->format('d M Y') }}</td>
                                 <td class="px-2.5 py-2 text-left whitespace-nowrap">
                                     <button
@@ -197,7 +197,7 @@
     @endif
 
     @if($showDetailModal && $detailHelp)
-    <div class="fixed inset-0 z-40 flex items-center justify-center p-4">
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
         <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" wire:click="closeDetailModal"></div>
 
         <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden max-h-[90vh] flex flex-col">
@@ -363,15 +363,15 @@
                         </div>
                         <div>
                             <span class="text-gray-400 block">Nominal Imbalan</span>
-                            <span class="font-bold text-gray-900">Rp {{ number_format($detailHelp->amount ?? 0, 0, ',', '.') }}</span>
+                            <span class="font-bold text-gray-900">{{ format_rupiah($detailHelp->amount ?? 0) }}</span>
                         </div>
                         <div>
                             <span class="text-gray-400 block">Biaya Admin</span>
-                            <span class="font-semibold text-gray-800">Rp {{ number_format($detailHelp->admin_fee ?? 0, 0, ',', '.') }}</span>
+                            <span class="font-semibold text-gray-800">{{ format_rupiah($detailHelp->admin_fee ?? 0) }}</span>
                         </div>
                         <div>
                             <span class="text-gray-400 block">Total Transaksi</span>
-                            <span class="font-bold text-primary-600">Rp {{ number_format($detailHelp->total_amount ?? ($detailHelp->amount + $detailHelp->admin_fee), 0, ',', '.') }}</span>
+                            <span class="font-bold text-primary-600">{{ format_rupiah($detailHelp->total_amount ?? ($detailHelp->amount + $detailHelp->admin_fee)) }}</span>
                         </div>
                         <div>
                             <span class="text-gray-400 block">Dibuat Pada</span>
@@ -572,9 +572,9 @@
                 <form wire:submit.prevent="processDecision" class="p-5 space-y-4">
                     <div class="p-3 {{ $decisionType === 'refund' ? 'bg-red-50 text-red-800 border-red-200' : 'bg-emerald-50 text-emerald-800 border-emerald-200' }} border rounded-xl text-xs leading-relaxed">
                         @if($decisionType === 'refund')
-                            <strong>Perhatian:</strong> Saldo sebesar <strong>Rp {{ number_format($decisionHelp->amount + ($decisionHelp->admin_fee ?? 0), 0, ',', '.') }}</strong> akan dikembalikan ke dompet customer. Status pesanan akan diubah menjadi <em>Dibatalkan</em>.
+                            <strong>Perhatian:</strong> Saldo sebesar <strong>{{ format_rupiah($decisionHelp->amount + ($decisionHelp->admin_fee ?? 0)) }}</strong> akan dikembalikan ke dompet customer. Status pesanan akan diubah menjadi <em>Dibatalkan</em>.
                         @else
-                            <strong>Perhatian:</strong> Dana sebesar <strong>Rp {{ number_format($decisionHelp->amount, 0, ',', '.') }}</strong> akan langsung dicairkan ke dompet saldo mitra. Status pesanan akan diubah menjadi <em>Selesai</em>.
+                            <strong>Perhatian:</strong> Dana sebesar <strong>{{ format_rupiah($decisionHelp->amount) }}</strong> akan langsung dicairkan ke dompet saldo mitra. Status pesanan akan diubah menjadi <em>Selesai</em>.
                         @endif
                     </div>
 

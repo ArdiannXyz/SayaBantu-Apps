@@ -232,7 +232,7 @@
         <div class="bg-gradient-to-br from-emerald-50/80 via-white to-emerald-50/30 rounded-2xl p-4 sm:p-5 border border-emerald-200/80 shadow-xs hover:shadow-md transition-all duration-200 flex items-center justify-between">
             <div>
                 <p class="text-[11px] font-semibold text-emerald-900/70 uppercase tracking-wide">Total Top Up</p>
-                <h3 class="text-lg sm:text-xl font-black text-emerald-700 mt-0.5">Rp {{ number_format($totalRevenue, 0, ',', '.') }}</h3>
+                <h3 class="text-lg sm:text-xl font-black text-emerald-700 mt-0.5">{{ format_rupiah($totalRevenue) }}</h3>
             </div>
             <div class="w-11 h-11 bg-emerald-100 text-emerald-600 border border-emerald-200/80 rounded-xl flex items-center justify-center flex-shrink-0 shadow-2xs">
                 <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -245,7 +245,7 @@
         <div class="bg-gradient-to-br from-rose-50/80 via-white to-rose-50/30 rounded-2xl p-4 sm:p-5 border border-rose-200/80 shadow-xs hover:shadow-md transition-all duration-200 flex items-center justify-between">
             <div>
                 <p class="text-[11px] font-semibold text-rose-900/70 uppercase tracking-wide">Total Withdraw</p>
-                <h3 class="text-lg sm:text-xl font-black text-rose-700 mt-0.5">Rp {{ number_format($totalWithdraw, 0, ',', '.') }}</h3>
+                <h3 class="text-lg sm:text-xl font-black text-rose-700 mt-0.5">{{ format_rupiah($totalWithdraw) }}</h3>
             </div>
             <div class="w-11 h-11 bg-rose-100 text-rose-600 border border-rose-200/80 rounded-xl flex items-center justify-center flex-shrink-0 shadow-2xs">
                 <svg class="w-5 h-5 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -272,7 +272,7 @@
             <div>
                 <p class="text-[11px] font-semibold text-purple-900/70 uppercase tracking-wide">Arus Kas Bersih</p>
                 <h3 class="text-lg sm:text-xl font-black {{ $netCashflow >= 0 ? 'text-purple-700' : 'text-rose-700' }} mt-0.5">
-                    Rp {{ number_format($netCashflow, 0, ',', '.') }}
+                    {{ format_rupiah($netCashflow) }}
                 </h3>
             </div>
             <div class="w-11 h-11 bg-purple-100 text-purple-600 border border-purple-200/80 rounded-xl flex items-center justify-center flex-shrink-0 shadow-2xs">
@@ -447,7 +447,7 @@
                                 </span>
                             </td>
                             <td class="text-xs text-right font-bold text-gray-900 whitespace-nowrap">
-                                Rp {{ number_format($t->amount, 0, ',', '.') }}
+                                {{ format_rupiah($t->amount) }}
                             </td>
                             @php
                                 $refCode = $t->request_code ?? $t->order_id ?? $t->reference_id ?? $t->reference ?? '-';
@@ -558,7 +558,7 @@
                                 </div>
                                 <span class="text-[10px] px-2.5 py-0.5 rounded-full bg-white/20 text-white font-medium">Realtime</span>
                             </div>
-                            <h4 class="text-3xl font-black mt-2.5 text-white tracking-tight">Rp {{ number_format($selectedUserBalance, 0, ',', '.') }}</h4>
+                            <h4 class="text-3xl font-black mt-2.5 text-white tracking-tight">{{ format_rupiah($selectedUserBalance) }}</h4>
                             <p class="text-xs text-white/80 mt-2">
                                 {{ $selectedUser->role === 'mitra' ? 'Saldo aktif relawan yang siap untuk ditarik (withdraw).' : 'Saldo aktif customer yang siap digunakan untuk pesanan bantuan.' }}
                             </p>
@@ -569,11 +569,11 @@
                             <div class="grid grid-cols-3 gap-3">
                                 <div class="p-3.5 rounded-2xl bg-emerald-50/70 border border-emerald-100 text-center">
                                     <span class="text-[10px] font-bold text-emerald-700 uppercase tracking-wider block">Pendapatan</span>
-                                    <div class="text-xs sm:text-sm font-black text-gray-900 mt-1">Rp {{ number_format($selectedUserStats['total_income'] ?? 0, 0, ',', '.') }}</div>
+                                    <div class="text-xs sm:text-sm font-black text-gray-900 mt-1">{{ format_rupiah($selectedUserStats['total_income'] ?? 0) }}</div>
                                 </div>
                                 <div class="p-3.5 rounded-2xl bg-amber-50/70 border border-amber-100 text-center">
                                     <span class="text-[10px] font-bold text-amber-700 uppercase tracking-wider block">Withdraw</span>
-                                    <div class="text-xs sm:text-sm font-black text-gray-900 mt-1">Rp {{ number_format($selectedUserStats['total_withdraw'] ?? 0, 0, ',', '.') }}</div>
+                                    <div class="text-xs sm:text-sm font-black text-gray-900 mt-1">{{ format_rupiah($selectedUserStats['total_withdraw'] ?? 0) }}</div>
                                 </div>
                                 <div class="p-3.5 rounded-2xl bg-blue-50/70 border border-blue-100 text-center">
                                     <span class="text-[10px] font-bold text-blue-700 uppercase tracking-wider block">Transaksi</span>
@@ -584,11 +584,11 @@
                             <div class="grid grid-cols-3 gap-3">
                                 <div class="p-3.5 rounded-2xl bg-emerald-50/70 border border-emerald-100 text-center">
                                     <span class="text-[10px] font-bold text-emerald-700 uppercase tracking-wider block">Top Up</span>
-                                    <div class="text-xs sm:text-sm font-black text-gray-900 mt-1">Rp {{ number_format($selectedUserStats['total_topup'] ?? 0, 0, ',', '.') }}</div>
+                                    <div class="text-xs sm:text-sm font-black text-gray-900 mt-1">{{ format_rupiah($selectedUserStats['total_topup'] ?? 0) }}</div>
                                 </div>
                                 <div class="p-3.5 rounded-2xl bg-rose-50/70 border border-rose-100 text-center">
                                     <span class="text-[10px] font-bold text-rose-700 uppercase tracking-wider block">Pembayaran</span>
-                                    <div class="text-xs sm:text-sm font-black text-gray-900 mt-1">Rp {{ number_format($selectedUserStats['total_payment'] ?? 0, 0, ',', '.') }}</div>
+                                    <div class="text-xs sm:text-sm font-black text-gray-900 mt-1">{{ format_rupiah($selectedUserStats['total_payment'] ?? 0) }}</div>
                                 </div>
                                 <div class="p-3.5 rounded-2xl bg-blue-50/70 border border-blue-100 text-center">
                                     <span class="text-[10px] font-bold text-blue-700 uppercase tracking-wider block">Transaksi</span>

@@ -87,7 +87,7 @@
                     <div>
                         <p class="text-sm font-medium text-blue-900 mb-1">Jumlah Penarikan</p>
                         <p class="text-3xl font-bold text-blue-900">
-                            Rp {{ number_format($withdraw->amount, 0, ',', '.') }}
+                            {{ format_rupiah($withdraw->amount) }}
                         </p>
                     </div>
                     <div class="flex-shrink-0">

@@ -37,6 +37,58 @@ class AppServiceProvider extends ServiceProvider
         // Register BalanceTransaction observer to update user balances when transactions complete
         \App\Models\BalanceTransaction::observe(\App\Observers\BalanceTransactionObserver::class);
 
+        // Otomatis teruskan setiap notifikasi database ke Web Push Notification pengguna
+        \Illuminate\Support\Facades\Event::listen(
+            \Illuminate\Notifications\Events\NotificationSent::class,
+            function (\Illuminate\Notifications\Events\NotificationSent $event) {
+                if ($event->notifiable instanceof \App\Models\User && $event->channel === 'database') {
+                    try {
+                        $notif = $event->notification;
+                        $user = $event->notifiable;
+                        $data = is_array($event->response)
+                            ? $event->response
+                            : (method_exists($notif, 'toDatabase') ? $notif->toDatabase($user) : (method_exists($notif, 'toArray') ? $notif->toArray($user) : []));
+
+                        $notifId = is_object($event->response) && isset($event->response->id)
+                            ? (string) $event->response->id
+                            : (isset($notif->id) ? (string) $notif->id : ($data['id'] ?? null));
+
+                        $resolvedData = $notifId ? array_merge(['id' => $notifId], $data) : $data;
+                        $title = $data['title'] ?? null;
+                        $body = $data['message'] ?? ($data['description'] ?? ($data['body'] ?? ($data['help_title'] ?? null)));
+                        $url = \App\Services\NotificationUrlResolver::resolveUrl($resolvedData, $user);
+
+                        if (! $title && isset($data['type'])) {
+                            $title = match (true) {
+                                $data['type'] === 'chat_message' => '💬 Pesan Baru dari ' . ($data['from_name'] ?? 'Pengguna'),
+                                $data['type'] === 'help_request' => '📢 Permintaan Bantuan Baru',
+                                str_contains($data['type'], 'topup') => '💰 Update Top-Up Saldo',
+                                str_contains($data['type'], 'withdraw') => '🏧 Update Tarik Saldo',
+                                default => '🔔 Notifikasi SayaBantu',
+                            };
+                        }
+
+                        if (! $title) {
+                            $title = '🔔 Notifikasi SayaBantu';
+                        }
+
+                        if ($body) {
+                            \App\Services\WebPushService::sendToUser(
+                                $user,
+                                $title,
+                                (string) $body,
+                                $url,
+                                null,
+                                'sayabantu-notif-' . ($notifId ?: uniqid('', true))
+                            );
+                        }
+                    } catch (\Throwable $e) {
+                        \Illuminate\Support\Facades\Log::warning('[AppServiceProvider] Gagal mirror notifikasi ke Web Push: ' . $e->getMessage());
+                    }
+                }
+            }
+        );
+
         // Force HTTPS in production or behind secure proxies to prevent Mixed Content warnings on iOS/Safari
         if ($this->app->environment('production') || request()->header('X-Forwarded-Proto') === 'https') {
             \Illuminate\Support\Facades\URL::forceScheme('https');

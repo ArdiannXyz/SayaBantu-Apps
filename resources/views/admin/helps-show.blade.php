@@ -169,15 +169,15 @@
                     </div>
                     <div>
                         <p class="text-xs text-gray-500 mb-0.5">Nominal Jasa</p>
-                        <p class="font-medium text-gray-800">{{ $help->amount ? 'Rp ' . number_format($help->amount, 0, ',', '.') : '-' }}</p>
+                        <p class="font-medium text-gray-800">{{ $help->amount ? format_rupiah($help->amount) : '-' }}</p>
                     </div>
                     <div>
                         <p class="text-xs text-gray-500 mb-0.5">Biaya Admin</p>
-                        <p class="font-medium text-gray-800">{{ $help->admin_fee ? 'Rp ' . number_format($help->admin_fee, 0, ',', '.') : 'Rp 0' }}</p>
+                        <p class="font-medium text-gray-800">{{ $help->admin_fee ? format_rupiah($help->admin_fee) : 'Rp 0' }}</p>
                     </div>
                     <div>
                         <p class="text-xs text-gray-500 mb-0.5">Total Dibayar</p>
-                        <p class="font-bold text-gray-900">{{ 'Rp ' . number_format($help->total_amount ?? ($help->amount + ($help->admin_fee ?? 0)), 0, ',', '.') }}</p>
+                        <p class="font-bold text-gray-900">{{ format_rupiah($help->total_amount ?? ($help->amount + ($help->admin_fee ?? 0))) }}</p>
                     </div>
                     <div>
                         <p class="text-xs text-gray-500 mb-0.5">Dibuat</p>
@@ -469,11 +469,11 @@
                 <form wire:submit.prevent="processDecision" class="p-5 space-y-4">
                     <div class="p-3 {{ $decisionType === 'refund' || $decisionType === 'reject_help' ? 'bg-red-50 text-red-800 border-red-200' : 'bg-emerald-50 text-emerald-800 border-emerald-200' }} border rounded-xl text-xs leading-relaxed">
                         @if($decisionType === 'refund')
-                            <strong>Perhatian:</strong> Saldo sebesar <strong>Rp {{ number_format($help->amount + ($help->admin_fee ?? 0), 0, ',', '.') }}</strong> akan dikembalikan ke dompet customer. Status pesanan akan diubah menjadi <em>Dibatalkan</em>.
+                            <strong>Perhatian:</strong> Saldo sebesar <strong>{{ format_rupiah($help->amount + ($help->admin_fee ?? 0)) }}</strong> akan dikembalikan ke dompet customer. Status pesanan akan diubah menjadi <em>Dibatalkan</em>.
                         @elseif($decisionType === 'reject_help')
-                            <strong>Perhatian:</strong> Permintaan bantuan <strong>"{{ $help->title }}"</strong> akan ditolak. Saldo sebesar <strong>Rp {{ number_format($help->amount + ($help->admin_fee ?? 0), 0, ',', '.') }}</strong> akan otomatis dikembalikan 100% ke dompet customer.
+                            <strong>Perhatian:</strong> Permintaan bantuan <strong>"{{ $help->title }}"</strong> akan ditolak. Saldo sebesar <strong>{{ format_rupiah($help->amount + ($help->admin_fee ?? 0)) }}</strong> akan otomatis dikembalikan 100% ke dompet customer.
                         @else
-                            <strong>Perhatian:</strong> Dana sebesar <strong>Rp {{ number_format($help->amount, 0, ',', '.') }}</strong> akan langsung dicairkan ke dompet saldo mitra. Status pesanan akan diubah menjadi <em>Selesai</em>.
+                            <strong>Perhatian:</strong> Dana sebesar <strong>{{ format_rupiah($help->amount) }}</strong> akan langsung dicairkan ke dompet saldo mitra. Status pesanan akan diubah menjadi <em>Selesai</em>.
                         @endif
                     </div>
 

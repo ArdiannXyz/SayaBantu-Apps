@@ -58,8 +58,8 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-blue-900/70 text-xs font-bold uppercase tracking-wider">Total Nominal Pending</p>
-                        <h3 class="text-2xl font-black text-[#0066FF] mt-1.5">Rp {{ number_format($totalPendingAmount ?? 0, 0, ',', '.') }}</h3>
-                        <p class="text-blue-600/80 text-xs font-medium mt-1">Rp {{ number_format($totalApprovedAmountToday ?? 0, 0, ',', '.') }} (Approved Hari Ini)</p>
+                        <h3 class="text-2xl font-black text-[#0066FF] mt-1.5">{{ format_rupiah($totalPendingAmount ?? 0) }}</h3>
+                        <p class="text-blue-600/80 text-xs font-medium mt-1">{{ format_rupiah($totalApprovedAmountToday ?? 0) }} (Approved Hari Ini)</p>
                     </div>
                     <div class="w-11 h-11 rounded-xl bg-blue-100 text-[#0066FF] border border-blue-200/80 flex items-center justify-center shadow-2xs">
                         <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -133,7 +133,12 @@
                                                 {{ strtoupper(substr($transaction->user->name ?? 'U', 0, 1)) }}
                                             </div>
                                             <div class="min-w-0">
-                                                <div class="text-xs font-semibold text-gray-900 leading-tight truncate max-w-[125px]" title="{{ $transaction->user->name ?? '-' }}">{{ $transaction->user->name ?? '-' }}</div>
+                                                <div class="flex items-center gap-1">
+                                                    <div class="text-xs font-semibold text-gray-900 leading-tight truncate max-w-[115px]" title="{{ $transaction->user->name ?? '-' }}">{{ $transaction->user->name ?? '-' }}</div>
+                                                    @if(($transaction->user->role ?? '') === 'mitra')
+                                                        <span class="px-1 py-0.2 text-[9px] font-bold rounded bg-indigo-50 text-indigo-700 border border-indigo-200">Mitra</span>
+                                                    @endif
+                                                </div>
                                                 <div class="text-[11px] text-gray-500 mt-0.5 truncate max-w-[125px]" title="{{ $transaction->customer_email ?? ($transaction->user->email ?? '-') }}">{{ $transaction->customer_email ?? ($transaction->user->email ?? '-') }}</div>
                                                 @if(!empty($transaction->user->city_name ?? $transaction->user->city))
                                                     <div class="text-[10px] text-gray-400 mt-0.5 flex items-center gap-1">
@@ -153,15 +158,15 @@
                                     </td>
                                     <td class="px-2 py-2.5 whitespace-nowrap">
                                         <div class="text-xs font-bold text-gray-900">
-                                            Rp {{ number_format($transaction->amount, 0, ',', '.') }}
+                                            {{ format_rupiah($transaction->amount) }}
                                         </div>
                                         <div class="text-[10px] text-gray-400">
-                                            +Rp {{ number_format($transaction->admin_fee, 0, ',', '.') }} fee
+                                            +{{ format_rupiah($transaction->admin_fee) }} fee
                                         </div>
                                     </td>
                                     <td class="px-2 py-2.5 whitespace-nowrap">
                                         <div class="text-xs font-bold text-primary-700 px-1.5 py-0.5 bg-primary-50 border border-primary-100 rounded inline-block">
-                                            Rp {{ number_format($transaction->total_payment, 0, ',', '.') }}
+                                            {{ format_rupiah($transaction->total_payment) }}
                                         </div>
                                     </td>
                                     <td class="px-2 py-2.5 whitespace-nowrap text-center">
@@ -200,7 +205,7 @@
                                             <button type="button" wire:loading.attr="disabled"
                                                 data-id="{{ $transaction->id }}"
                                                 data-name="{{ $transaction->user->name ?? 'User' }}"
-                                                data-amount="{{ 'Rp ' . number_format($transaction->amount, 0, ',', '.') }}"
+                                                data-amount="{{ format_rupiah($transaction->amount) }}"
                                                 @click.prevent="openFromEl($event)"
                                                 class="px-2.5 py-1 bg-green-600 hover:bg-green-700 text-white rounded text-[11px] font-semibold transition shadow-xs cursor-pointer"
                                                 title="Approve Request">
@@ -326,7 +331,12 @@
                                                 {{ strtoupper(substr($transaction->user->name ?? 'U', 0, 1)) }}
                                             </div>
                                             <div class="min-w-0">
-                                                <div class="text-xs font-semibold text-gray-900 leading-tight truncate max-w-[125px]" title="{{ $transaction->user->name ?? '-' }}">{{ $transaction->user->name ?? '-' }}</div>
+                                                <div class="flex items-center gap-1">
+                                                    <div class="text-xs font-semibold text-gray-900 leading-tight truncate max-w-[115px]" title="{{ $transaction->user->name ?? '-' }}">{{ $transaction->user->name ?? '-' }}</div>
+                                                    @if(($transaction->user->role ?? '') === 'mitra')
+                                                        <span class="px-1 py-0.2 text-[9px] font-bold rounded bg-indigo-50 text-indigo-700 border border-indigo-200">Mitra</span>
+                                                    @endif
+                                                </div>
                                                 <div class="text-[11px] text-gray-500 mt-0.5 truncate max-w-[125px]" title="{{ $transaction->customer_email ?? ($transaction->user->email ?? '-') }}">{{ $transaction->customer_email ?? ($transaction->user->email ?? '-') }}</div>
                                                 @if(!empty($transaction->user->city_name ?? $transaction->user->city))
                                                     <div class="text-[10px] text-gray-400 mt-0.5 flex items-center gap-1">
@@ -346,15 +356,15 @@
                                     </td>
                                     <td class="px-2 py-2.5 whitespace-nowrap">
                                         <div class="text-xs font-bold text-gray-900">
-                                            Rp {{ number_format($transaction->amount, 0, ',', '.') }}
+                                            {{ format_rupiah($transaction->amount) }}
                                         </div>
                                         <div class="text-[10px] text-gray-400">
-                                            +Rp {{ number_format($transaction->admin_fee, 0, ',', '.') }} fee
+                                            +{{ format_rupiah($transaction->admin_fee) }} fee
                                         </div>
                                     </td>
                                     <td class="px-2 py-2.5 whitespace-nowrap">
                                         <div class="text-xs font-bold text-gray-900">
-                                            Rp {{ number_format($transaction->total_payment, 0, ',', '.') }}
+                                            {{ format_rupiah($transaction->total_payment) }}
                                         </div>
                                     </td>
                                     <td class="px-2 py-2.5 whitespace-nowrap text-center">
@@ -488,11 +498,11 @@
                             </div>
                             <div>
                                 <p class="text-gray-500 text-xs mb-1">Nominal:</p>
-                                <p class="font-semibold text-gray-900">Rp {{ number_format($selectedTransaction->amount, 0, ',', '.') }}</p>
+                                <p class="font-semibold text-gray-900">{{ format_rupiah($selectedTransaction->amount) }}</p>
                             </div>
                             <div>
                                 <p class="text-gray-500 text-xs mb-1">Total Bayar:</p>
-                                <p class="font-semibold text-primary-600">Rp {{ number_format($selectedTransaction->total_payment, 0, ',', '.') }}</p>
+                                <p class="font-semibold text-primary-600">{{ format_rupiah($selectedTransaction->total_payment) }}</p>
                             </div>
                         </div>
                     </div>
@@ -538,7 +548,7 @@
                             <button type="button" wire:loading.attr="disabled"
                                 data-id="{{ $selectedTransaction->id }}"
                                 data-name="{{ $selectedTransaction->user->name ?? 'User' }}"
-                                data-amount="{{ 'Rp ' . number_format($selectedTransaction->amount, 0, ',', '.') }}"
+                                data-amount="{{ format_rupiah($selectedTransaction->amount) }}"
                                 @click.prevent="openFromEl($event)"
                                 class="flex-1 px-6 py-2.5 bg-green-600 text-white rounded-xl font-semibold hover:bg-green-700 disabled:opacity-50 text-sm transition">
                                 <span wire:loading.remove wire:target="approve({{ $selectedTransaction->id }})">Approve Request</span>
@@ -572,7 +582,7 @@
                     <h2 class="text-lg font-bold text-gray-900 mb-2">Tolak Request Top-Up</h2>
                     <p class="text-sm text-gray-600 mb-4">
                         Anda akan menolak request dari <strong>{{ $selectedTransaction->user->name ?? '-' }}</strong>
-                        dengan nominal <strong>Rp {{ number_format($selectedTransaction->amount, 0, ',', '.') }}</strong>
+                        dengan nominal <strong>{{ format_rupiah($selectedTransaction->amount) }}</strong>
                     </p>
 
                     <form wire:submit.prevent="reject">

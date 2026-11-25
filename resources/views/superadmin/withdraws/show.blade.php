@@ -48,12 +48,12 @@
 
                 <div class="bg-gray-50 p-4 rounded">
                     <div class="text-xs text-gray-500">Saldo Saat Ini</div>
-                    <div class="font-semibold">Rp {{ number_format($withdraw->user?->balance ?? 0, 0, ',', '.') }}</div>
+                    <div class="font-semibold">{{ format_rupiah($withdraw->user?->balance ?? 0) }}</div>
                 </div>
 
                 <div class="bg-gray-50 p-4 rounded">
                     <div class="text-xs text-gray-500">Jumlah Permintaan</div>
-                    <div class="font-semibold">Rp {{ number_format($withdraw->amount, 0, ',', '.') }}</div>
+                    <div class="font-semibold">{{ format_rupiah($withdraw->amount) }}</div>
                 </div>
             </div>
 

@@ -331,7 +331,7 @@
                                             @endif
                                         </div>
                                     </div>
-                                    <p class="text-[11px] text-gray-500 leading-tight">Min. komisi Rp {{ number_format(\App\Models\AppSetting::get('default_urgent_nominal', 50000), 0, ',', '.') }}, pelaksanaan hari ini atau besok.</p>
+                                    <p class="text-[11px] text-gray-500 leading-tight">Min. komisi {{ format_rupiah(\App\Models\AppSetting::get('default_urgent_nominal', 50000)) }}, pelaksanaan hari ini atau besok.</p>
                                 </label>
 
                                 <!-- Option 2: Reguler -->
@@ -453,11 +453,13 @@
                                 let val = parseInt(v) || 0;
                                 let min = this.currentMin;
                                 if (val < min) {
+                                    const fMin = (window.formatRupiah || (x => 'Rp ' + Number(x || 0).toLocaleString('id-ID')))(min);
                                     this.clientError = this.helpType === 'urgent'
-                                        ? 'Nominal minimal untuk bantuan prioritas / urgent adalah Rp ' + Number(min).toLocaleString('id-ID')
-                                        : 'Nominal minimal Rp ' + Number(min).toLocaleString('id-ID');
+                                        ? 'Nominal minimal untuk bantuan prioritas / urgent adalah ' + fMin
+                                        : 'Nominal minimal ' + fMin;
                                 } else if (val > this.max) {
-                                    this.clientError = 'Nominal maksimal Rp ' + Number(this.max).toLocaleString('id-ID');
+                                    const fMax = (window.formatRupiah || (x => 'Rp ' + Number(x || 0).toLocaleString('id-ID')))(this.max);
+                                    this.clientError = 'Nominal maksimal ' + fMax;
                                 } else {
                                     this.clientError = '';
                                 }
@@ -513,10 +515,10 @@
                                     <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
                                 </svg>
                                 <span x-show="helpType !== 'urgent'">
-                                    Minimal Rp {{ number_format(\App\Models\AppSetting::get('min_help_nominal', 10000), 0, ',', '.') }} - Maksimal Rp {{ number_format(\App\Models\AppSetting::get('max_help_nominal', 10000000), 0, ',', '.') }}
+                                    Minimal {{ format_rupiah(\App\Models\AppSetting::get('min_help_nominal', 10000)) }} - Maksimal {{ format_rupiah(\App\Models\AppSetting::get('max_help_nominal', 10000000)) }}
                                 </span>
                                 <span x-show="helpType === 'urgent'" style="display: none;">
-                                    Minimal <strong class="text-red-600 font-bold">Rp {{ number_format(\App\Models\AppSetting::get('default_urgent_nominal', 50000), 0, ',', '.') }}</strong> (Bantuan Urgent) - Maksimal Rp {{ number_format(\App\Models\AppSetting::get('max_help_nominal', 10000000), 0, ',', '.') }}
+                                    Minimal <strong class="text-red-600 font-bold">{{ format_rupiah(\App\Models\AppSetting::get('default_urgent_nominal', 50000)) }}</strong> (Bantuan Urgent) - Maksimal {{ format_rupiah(\App\Models\AppSetting::get('max_help_nominal', 10000000)) }}
                                 </span>
                             </p>
 
@@ -526,11 +528,11 @@
                             <div x-show="amount && parseInt(amount) >= currentMin" class="mt-3 p-3.5 bg-blue-50/70 border border-blue-100 rounded-xl space-y-1.5 text-xs">
                                 <div class="flex justify-between items-center text-gray-600">
                                     <span>Biaya Layanan ({{ $feCustFeePercent }}%):</span>
-                                    <span class="font-medium text-gray-800" x-text="'Rp ' + Math.round((parseInt(amount) || 0) * {{ $feCustFeePercent }} / 100).toLocaleString('id-ID')"></span>
+                                    <span class="font-medium text-gray-800" x-text="(window.formatRupiah || (x => 'Rp ' + Number(x || 0).toLocaleString('id-ID')))(Math.round((parseInt(amount) || 0) * {{ $feCustFeePercent }} / 100))"></span>
                                 </div>
                                 <div class="flex justify-between items-center pt-1.5 border-t border-blue-200/80 font-medium text-blue-900">
                                     <span>Estimasi Total yang Dibayar:</span>
-                                    <span class="text-sm font-bold text-blue-700" x-text="'Rp ' + Math.round((parseInt(amount) || 0) * (1 + {{ $feCustFeePercent }} / 100)).toLocaleString('id-ID')"></span>
+                                    <span class="text-sm font-bold text-blue-700" x-text="(window.formatRupiah || (x => 'Rp ' + Number(x || 0).toLocaleString('id-ID')))(Math.round((parseInt(amount) || 0) * (1 + {{ $feCustFeePercent }} / 100)))"></span>
                                 </div>
                             </div>
 
@@ -1171,15 +1173,15 @@
                     <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 14px; padding: 12px; display: flex; flex-direction: column; gap: 6px;">
                         <div style="display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: #475569;">
                             <span>Saldo Tersedia:</span>
-                            <span style="font-weight: 700; color: #0f172a;">Rp {{ number_format($currentBalance ?? 0, 0, ',', '.') }}</span>
+                            <span style="font-weight: 700; color: #0f172a;">{{ format_rupiah($currentBalance ?? 0) }}</span>
                         </div>
                         <div style="display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: #475569;">
                             <span>Total Biaya Bantuan:</span>
-                            <span style="font-weight: 700; color: #0f172a;">Rp {{ number_format($confirmTotal ?? 0, 0, ',', '.') }}</span>
+                            <span style="font-weight: 700; color: #0f172a;">{{ format_rupiah($confirmTotal ?? 0) }}</span>
                         </div>
                         <div style="border-top: 1px solid #e2e8f0; padding-top: 6px; display: flex; justify-content: space-between; align-items: center;">
                             <span style="font-weight: 800; color: #dc2626; font-size: 12px;">Kekurangan Saldo:</span>
-                            <span style="font-weight: 900; color: #dc2626; font-size: 14px;">Rp {{ number_format($topupDeficit ?? 0, 0, ',', '.') }}</span>
+                            <span style="font-weight: 900; color: #dc2626; font-size: 14px;">{{ format_rupiah($topupDeficit ?? 0) }}</span>
                         </div>
                     </div>
 
@@ -1203,7 +1205,7 @@
                                 </div>
                                 <div style="display: flex; justify-content: space-between;">
                                     <span style="color: #64748b;">Nominal Transfer:</span>
-                                    <span style="font-weight: 800; color: #d97706;">Rp {{ number_format($activePendingTopup->total_payment ?: $activePendingTopup->amount, 0, ',', '.') }}</span>
+                                    <span style="font-weight: 800; color: #d97706;">{{ format_rupiah($activePendingTopup->total_payment ?: $activePendingTopup->amount) }}</span>
                                 </div>
                                 <div style="display: flex; justify-content: space-between;">
                                     <span style="color: #64748b;">Waktu Pengajuan:</span>
@@ -1223,7 +1225,7 @@
                                 @if($topupDeficit > 0)
                                     <button type="button" wire:click="setTopupQuickAmount({{ (int)(ceil($topupDeficit / 1000) * 1000) }})"
                                         style="font-size: 10px; font-weight: 700; color: #0284c7; background: #f0f9ff; border: 1px solid #bae6fd; padding: 2px 7px; border-radius: 6px; cursor: pointer;">
-                                        ⚡ Pas Kurangnya (Rp {{ number_format(ceil($topupDeficit / 1000) * 1000, 0, ',', '.') }})
+                                        ⚡ Pas Kurangnya ({{ format_rupiah(ceil($topupDeficit / 1000) * 1000) }})
                                     </button>
                                 @endif
                             </div>
@@ -1268,15 +1270,15 @@
                             <div style="margin-top: 8px; background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 10px; padding: 10px 12px; display: flex; flex-direction: column; gap: 5px;">
                                 <div style="display: flex; justify-content: space-between; font-size: 12px; color: #475569;">
                                     <span>Nominal Top-Up</span>
-                                    <span style="font-weight: 600;">Rp {{ number_format($topupAmount, 0, ',', '.') }}</span>
+                                    <span style="font-weight: 600;">{{ format_rupiah($topupAmount) }}</span>
                                 </div>
                                 <div style="display: flex; justify-content: space-between; font-size: 12px; color: #475569;">
                                     <span>Biaya Admin</span>
-                                    <span style="font-weight: 600; color: #dc2626;">+ Rp {{ number_format($topupAdminFee, 0, ',', '.') }}</span>
+                                    <span style="font-weight: 600; color: #dc2626;">+ {{ format_rupiah($topupAdminFee) }}</span>
                                 </div>
                                 <div style="border-top: 1px dashed #93c5fd; padding-top: 5px; display: flex; justify-content: space-between; align-items: center;">
                                     <span style="font-size: 12px; font-weight: 800; color: #0369a1;">Total Transfer</span>
-                                    <span style="font-size: 14px; font-weight: 900; color: #0369a1;">Rp {{ number_format($topupTotalTransfer, 0, ',', '.') }}</span>
+                                    <span style="font-size: 14px; font-weight: 900; color: #0369a1;">{{ format_rupiah($topupTotalTransfer) }}</span>
                                 </div>
                             </div>
                             @endif
@@ -1470,7 +1472,7 @@
                     <div class="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-2xl p-4 mb-4 border border-blue-100">
                         <div class="flex items-center justify-between mb-3 pb-3 border-b border-blue-100">
                             <span class="text-xs font-semibold text-gray-600">Saldo Tersedia</span>
-                            <span class="text-lg font-bold text-gray-900">Rp {{ number_format($currentBalance ?? 0, 0, ',', '.') }}</span>
+                            <span class="text-lg font-bold text-gray-900">{{ format_rupiah($currentBalance ?? 0) }}</span>
                         </div>
                         <div class="space-y-2.5">
                             <div class="flex justify-between items-center">
@@ -1481,11 +1483,11 @@
                             </div>
                             <div class="flex justify-between items-center">
                                 <span class="text-sm text-gray-600">Nominal Pokok Bantuan</span>
-                                <span class="text-sm font-semibold text-gray-900">Rp {{ number_format($confirmAmount ?? 0, 0, ',', '.') }}</span>
+                                <span class="text-sm font-semibold text-gray-900">{{ format_rupiah($confirmAmount ?? 0) }}</span>
                             </div>
                             <div class="flex justify-between items-center">
                                 <span class="text-sm text-gray-600">Biaya Layanan ({{ $confirmCustomerFeePercent }}%)</span>
-                                <span class="text-sm font-semibold text-gray-900">Rp {{ number_format($confirmCustomerFee ?? 0, 0, ',', '.') }}</span>
+                                <span class="text-sm font-semibold text-gray-900">{{ format_rupiah($confirmCustomerFee ?? 0) }}</span>
                             </div>
                             @if (($confirmHelpType ?? $help_type) === 'urgent')
                                 <div class="flex justify-between items-center pt-2 border-t border-blue-100">
@@ -1503,7 +1505,7 @@
                         <div class="flex items-center justify-between">
                             <div class="flex-1">
                                 <span class="text-xs font-semibold text-gray-600">Total Pembayaran</span>
-                                <div class="text-2xl font-bold text-blue-600 mt-1">Rp {{ number_format($confirmTotal ?? 0, 0, ',', '.') }}</div>
+                                <div class="text-2xl font-bold text-blue-600 mt-1">{{ format_rupiah($confirmTotal ?? 0) }}</div>
                             </div>
                             <div class="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
                                 <svg class="w-7 h-7 text-blue-600" fill="currentColor" viewBox="0 0 20 20">

@@ -90,29 +90,29 @@
 
     <!-- Saldo Mitra Card (Mengambang di Atas Wave) -->
     <div class="px-5 -mt-12 relative z-10 mb-2">
-        <div class="bg-gradient-to-r from-[#0052CC] to-[#0044AA] rounded-2xl p-5 text-white shadow-xl relative overflow-hidden border border-white/10 flex items-center justify-between">
+        <div class="bg-gradient-to-r from-[#0052CC] to-[#0044AA] rounded-2xl p-4 sm:p-5 text-white shadow-xl relative overflow-hidden border border-white/10 flex flex-wrap items-center justify-between gap-3">
             <!-- Decorative circle overlay -->
             <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-white/10 rounded-full pointer-events-none"></div>
 
-            <div class="min-w-0">
+            <div class="min-w-0 flex-1">
                 <div class="flex items-center gap-1.5 text-blue-100 text-xs font-semibold mb-1.5">
-                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-4 h-4 text-white shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
                     </svg>
                     <span>Saldo Mitra</span>
                 </div>
-                <h2 class="text-2xl font-black tracking-tight text-white">
-                    Rp {{ number_format($balance ?? 0, 0, ',', '.') }}
+                <h2 class="text-xl sm:text-2xl font-black tracking-tight text-white break-words">
+                    {{ format_rupiah($balance ?? 0) }}
                 </h2>
             </div>
 
-            <div class="flex-shrink-0 ml-3 flex items-center gap-1.5">
+            <div class="flex-shrink-0 flex flex-wrap items-center gap-1.5">
                 <a href="{{ route('mitra.topup') }}" wire:navigate
-                   class="bg-white/20 hover:bg-white/30 text-white border border-white/25 active:scale-95 font-bold text-xs px-3 py-2.5 rounded-xl transition block whitespace-nowrap cursor-pointer">
+                   class="bg-white/20 hover:bg-white/30 text-white border border-white/25 active:scale-95 font-bold text-xs px-3 py-2 sm:py-2.5 rounded-xl transition block whitespace-nowrap cursor-pointer">
                     + Top Up
                 </a>
                 <a href="{{ route('mitra.withdraw.form') }}" wire:navigate
-                   class="bg-white hover:bg-slate-50 text-[#0066FF] active:scale-95 font-bold text-xs px-3.5 py-2.5 rounded-xl transition shadow-md block whitespace-nowrap cursor-pointer">
+                   class="bg-white hover:bg-slate-50 text-[#0066FF] active:scale-95 font-bold text-xs px-3 sm:px-3.5 py-2 sm:py-2.5 rounded-xl transition shadow-md block whitespace-nowrap cursor-pointer">
                     Tarik Saldo
                 </a>
             </div>
@@ -158,7 +158,7 @@
                 </div>
                 <span class="text-[11px] min-[380px]:text-xs font-black text-gray-900 leading-none whitespace-nowrap">
                     @if($totalEarnings >= 1000000)
-                        Rp {{ number_format($totalEarnings / 1000000, 1) }}jt
+                        {{ format_rupiah($totalEarnings) }}
                     @else
                         Rp {{ number_format($totalEarnings / 1000, 0) }}rb
                     @endif
@@ -350,7 +350,7 @@
                                     <span>📍</span>
                                     <span class="truncate">{{ $activeHelp->location ?? $activeHelp->full_address ?? 'Lokasi customer' }}</span>
                                 </div>
-                                <span class="font-extrabold text-gray-900 flex-shrink-0 ml-2">Rp {{ number_format($activeHelp->amount, 0, ',', '.') }}</span>
+                                <span class="font-extrabold text-gray-900 flex-shrink-0 ml-2">{{ format_rupiah($activeHelp->amount) }}</span>
                             </div>
 
                             <div class="grid grid-cols-2 gap-2">
@@ -417,7 +417,7 @@
                                 <span>{{ Str::limit($addressStr, 35) }}</span>
                             </p>
                             <div class="flex items-center gap-2 mt-1">
-                                <span class="text-xs font-black text-gray-900">Rp {{ number_format($help->amount, 0, ',', '.') }}</span>
+                                <span class="text-xs font-black text-gray-900">{{ format_rupiah($help->amount) }}</span>
                                 <span class="text-gray-300">•</span>
                                 <span class="text-[10px] text-gray-500 font-medium">⭐ 4.8 | Hari ini, {{ $timeStr }}</span>
                             </div>
@@ -779,7 +779,7 @@
             document.getElementById('previewTitle').textContent = title;
             const cleanCategory = (category || 'Lainnya').replace(/^[\p{Extended_Pictographic}\uFE0F\u200D\s]+/u, '').trim();
             document.getElementById('previewCategory').textContent = cleanCategory || 'Lainnya';
-            document.getElementById('previewAmount').textContent = 'Rp ' + amount.toLocaleString('id-ID');
+            document.getElementById('previewAmount').textContent = (window.formatRupiah || (x => 'Rp ' + Number(x || 0).toLocaleString('id-ID')))(amount);
             const schedEl = document.getElementById('previewScheduled');
             if (schedEl) {
                 if (scheduled && scheduled.length) {

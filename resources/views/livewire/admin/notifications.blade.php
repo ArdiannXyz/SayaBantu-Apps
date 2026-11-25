@@ -165,7 +165,7 @@
         x-transition:leave="transition ease-in duration-100"
         x-transition:leave-start="opacity-100 translate-y-0 scale-100"
         x-transition:leave-end="opacity-0 translate-y-1 scale-95"
-        class="absolute right-0 mt-2 w-80 bg-white rounded-2xl shadow-xl border border-gray-200 z-50 overflow-hidden"
+        class="absolute right-0 mt-2 w-[calc(100vw-2rem)] max-w-xs sm:w-80 bg-white rounded-2xl shadow-xl border border-gray-200 z-50 overflow-hidden"
     >
         <!-- Header -->
         <div class="flex items-center justify-between px-4 py-2.5 border-b border-gray-100 bg-gray-50/70">
@@ -321,26 +321,45 @@
         @endif
     </div>
 
-    <!-- Compact Floating Real-time Notification Pop-up (Like Customer & Mitra) -->
+    <!-- App-Style Push Notification Pop-up (HP: Top | Laptop: Bottom-Right) -->
     <template x-teleport="body">
         <div wire:ignore
              x-show="currentNotif !== null" 
              x-cloak
              @keydown.escape.window="dismissAll()"
-             class="fixed top-4 left-1/2 transform -translate-x-1/2 z-[999999] w-[92vw] max-w-sm pointer-events-none"
+             class="fixed top-3 left-1/2 -translate-x-1/2 w-[92vw] max-w-sm md:top-auto md:bottom-5 md:right-5 md:left-auto md:translate-x-0 md:w-96 z-[999999] pointer-events-none"
              x-transition:enter="transition ease-out duration-250 transform"
-             x-transition:enter-start="opacity-0 -translate-y-3 scale-95"
-             x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+             x-transition:enter-start="opacity-0 -translate-y-3 md:translate-y-3 md:translate-x-4 scale-95"
+             x-transition:enter-end="opacity-100 translate-y-0 md:translate-x-0 scale-100"
              x-transition:leave="transition ease-in duration-200 transform"
-             x-transition:leave-start="opacity-100 translate-y-0 scale-100"
-             x-transition:leave-end="opacity-0 -translate-y-3 scale-95">
+             x-transition:leave-start="opacity-100 translate-y-0 md:translate-x-0 scale-100"
+             x-transition:leave-end="opacity-0 -translate-y-3 md:translate-y-3 md:translate-x-4 scale-95">
             
             <div 
                 @mouseenter="paused = true"
                 @mouseleave="paused = false"
-                class="pointer-events-auto relative w-full bg-white/95 backdrop-blur-md rounded-xl shadow-xl border border-gray-200/90 p-2.5 sm:p-3 overflow-hidden transition-all hover:shadow-2xl"
-                style="box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.12), 0 8px 10px -6px rgba(0, 0, 0, 0.08);"
+                class="pointer-events-auto relative w-full bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl border border-gray-200/90 overflow-hidden transition-all"
+                style="box-shadow: 0 16px 36px -8px rgba(15, 23, 42, 0.22), 0 4px 12px -2px rgba(15, 23, 42, 0.08);"
             >
+                <!-- Mini App Header -->
+                <div class="px-3.5 pt-2 pb-1 flex items-center justify-between gap-2 border-b border-slate-100 bg-slate-50/70">
+                    <div class="flex items-center gap-1.5 min-w-0">
+                        <img src="{{ asset('icons/icon-192x192.png') }}" alt="SayaBantu" class="w-4 h-4 rounded-md object-cover shrink-0">
+                        <span class="text-[11px] font-bold text-slate-700 tracking-tight">SayaBantu</span>
+                        <span class="text-[10px] text-slate-400">• Baru saja</span>
+                    </div>
+                    <button 
+                        @click="dismissCurrent()" 
+                        type="button" 
+                        class="text-gray-400 hover:text-gray-600 p-0.5 rounded-md hover:bg-gray-200/60 transition cursor-pointer"
+                        title="Tutup">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="p-3 sm:p-3.5">
                 <div class="flex items-center gap-2.5">
                     <!-- Compact Icon (w-8 h-8) -->
                     <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 text-white shadow-xs"
@@ -403,16 +422,8 @@
                             title="Buka notifikasi">
                             Lihat
                         </button>
-                        <button 
-                            @click="dismissCurrent()" 
-                            type="button" 
-                            class="text-gray-400 hover:text-gray-600 p-1 rounded-md hover:bg-gray-100 transition cursor-pointer"
-                            title="Tutup">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        </button>
                     </div>
+                </div>
                 </div>
 
                 <!-- Slim Progress Bar -->

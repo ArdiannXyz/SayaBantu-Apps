@@ -31,7 +31,7 @@ class SyncTopupActivities extends Command
         $created = 0;
 
         $formatDescription = function (BalanceTransaction $tx): string {
-            $amount = number_format((float) $tx->amount, 0, ',', '.');
+            $amount = format_nominal((float) $tx->amount);
             $order = $tx->order_id ? ('Order #'.$tx->order_id) : 'Order #?';
 
             return sprintf('Top up berhasil Rp %s (%s)', $amount, $order);

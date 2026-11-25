@@ -158,6 +158,7 @@
     <meta name="supported-color-schemes" content="only light">
     <meta name="theme-color" content="#ffffff">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="sb-authenticated" content="{{ auth()->check() ? '1' : '0' }}">
     <title>{{ $pageTitle }} - sayabantu</title>
     <!-- Favicon & Icons -->
     @php
@@ -758,6 +759,14 @@
             });
         </script>
     @endif
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js').catch(() => {});
+            });
+        }
+    </script>
+    @include('partials.push-optin-banner')
 </body>
 
 </html>

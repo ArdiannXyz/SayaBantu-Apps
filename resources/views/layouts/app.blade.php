@@ -7,6 +7,7 @@
     <meta name="color-scheme" content="only light">
     <meta name="supported-color-schemes" content="only light">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="sb-authenticated" content="{{ auth()->check() ? '1' : '0' }}">
 
     <title>{{ config('app.name', 'sayabantu') }}</title>
 
@@ -187,60 +188,15 @@
 </head>
 
 <body class="font-sans antialiased bg-slate-100 flex flex-col items-center sm:justify-start sm:pt-2 sm:pb-6 sm:px-4 min-h-screen min-h-[100dvh]">
+    @include('partials.flash-push-toast')
+
+    <!-- Global notification (app push style: top on mobile, bottom-right on laptop) -->
+    <div id="customer-global-notification" class="sb-push-dock">
+        <div id="customer-global-notification-inner" class="w-full"></div>
+    </div>
+
     <!-- Centered Mobile Frame container matching login page -->
     <div class="w-full max-w-md h-screen h-[100dvh] sm:h-[840px] sm:max-h-[calc(100dvh-1rem)] bg-gray-50 sm:rounded-[36px] sm:shadow-2xl sm:border sm:border-slate-200/80 flex flex-col relative overflow-hidden">
-            <!-- Global notification (toast) for customer actions -->
-            <div id="customer-global-notification" class="fixed left-1/2 -translate-x-1/2 pointer-events-none w-full max-w-md px-3 z-[99999]" style="top: calc(0.75rem + env(safe-area-inset-top, 0px));">
-                <div id="customer-global-notification-inner" class="w-full"></div>
-            </div>
-
-            <!-- Floating Top Flash Notification Pop-Up (Instant Render) -->
-            @if (session()->has('message') || session()->has('success') || session()->has('error') || session()->has('status'))
-                <div id="flash-toast"
-                    x-data="{ show: true }"
-                    x-show="show"
-                    x-init="setTimeout(() => { show = false; }, 3000)"
-                    class="fixed left-1/2 -translate-x-1/2 z-[999999] max-w-sm w-[92%] pointer-events-auto transition-all duration-300 transform"
-                    style="top: calc(1rem + env(safe-area-inset-top, 0px));">
-                    @if (session()->has('error'))
-                        <div class="bg-white border border-red-200 text-gray-900 px-4 py-3 rounded-2xl shadow-2xl flex items-center gap-3">
-                            <div class="w-8 h-8 rounded-full bg-red-100 text-red-600 flex items-center justify-center flex-shrink-0 shadow-xs">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
-                                </svg>
-                            </div>
-                            <div class="flex-1 min-w-0">
-                                <div class="text-xs font-bold text-red-900">Perhatian</div>
-                                <div class="text-[11px] text-gray-600 leading-snug">{{ session('error') }}</div>
-                            </div>
-                            <button @click="show = false; document.getElementById('flash-toast')?.remove();" class="text-gray-400 hover:text-gray-600 p-1 text-xs">✕</button>
-                        </div>
-                    @else
-                        <div class="bg-white border border-emerald-200 text-gray-900 px-4 py-3 rounded-2xl shadow-2xl flex items-center gap-3">
-                            <div class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center flex-shrink-0 shadow-xs">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
-                                </svg>
-                            </div>
-                            <div class="flex-1 min-w-0">
-                                <div class="text-xs font-bold text-emerald-900">Berhasil</div>
-                                <div class="text-[11px] text-gray-600 leading-snug">{{ session('message') ?? session('success') ?? session('status') }}</div>
-                            </div>
-                            <button @click="show = false; document.getElementById('flash-toast')?.remove();" class="text-gray-400 hover:text-gray-600 p-1 text-xs">✕</button>
-                        </div>
-                    @endif
-                </div>
-                <script>
-                    setTimeout(function() {
-                        var toast = document.getElementById('flash-toast');
-                        if (toast) {
-                            toast.style.opacity = '0';
-                            toast.style.transition = 'opacity 0.4s ease';
-                            setTimeout(function() { toast.remove(); }, 400);
-                        }
-                    }, 3000);
-                </script>
-            @endif
             <!-- Content: responsive bottom padding adapting to safe area -->
             <main class="flex-1 overflow-y-auto overflow-x-hidden pb-[calc(4.5rem+env(safe-area-inset-bottom,0px))]">
                 @if($__env->hasSection('content'))
@@ -274,6 +230,10 @@
         window._lastCustomerToast = window._lastCustomerToast || { key: '', time: 0 };
         function showCustomerNotification(argObj) {
             try {
+                if (typeof window.sbShowPushToast === 'function') {
+                    window.sbShowPushToast(argObj);
+                    return;
+                }
                 let options = argObj || {};
                 if (Array.isArray(options)) {
                     options = options[0] || {};
@@ -797,13 +757,24 @@
         });
 
         // Global interactive toast popup
-        window.showGlobalFlashToast = function(message, type = 'success') {
+        window.showGlobalFlashToast = function(message, type = 'success', url = null) {
+            if (typeof window.sbShowPushToast === 'function') {
+                window.sbShowPushToast({
+                    title: type === 'error' ? 'Perhatian' : (type === 'info' ? 'Informasi' : 'Berhasil'),
+                    message: message,
+                    type: type,
+                    url: url || '#',
+                    timeout: 5000,
+                    sound: false,
+                });
+                return;
+            }
             let existing = document.getElementById('flash-toast');
             if (existing) existing.remove();
 
             const toast = document.createElement('div');
             toast.id = 'flash-toast';
-            toast.className = 'fixed top-4 left-1/2 -translate-x-1/2 z-[999999] max-w-sm w-[92%] pointer-events-auto transition-all duration-300 transform';
+            toast.className = 'sb-push-dock transition-all duration-300';
             
             const isError = type === 'error';
             const borderColor = isError ? 'border-red-200' : 'border-emerald-200';
@@ -1022,6 +993,7 @@
         });
     </script>
     <x-camera-modal />
+    @include('partials.push-optin-banner')
 </body>
 
 </html>

@@ -119,6 +119,11 @@ class NotificationUrlResolver
                 return $helpId ? route('mitra.chat', ['help' => $helpId]) : route('mitra.chat');
             }
 
+            // Top-Up Saldo
+            if (in_array($type, ['topup_approved', 'topup_rejected', 'topup_request_submitted']) || str_contains($type, 'topup')) {
+                return route('mitra.topup.history');
+            }
+
             // Withdraw / Penarikan Saldo
             if (str_contains($type, 'withdraw')) {
                 $status = $data['status'] ?? '';
@@ -185,7 +190,7 @@ class NotificationUrlResolver
                 }
             }
 
-            if (in_array($type, ['new_topup_request', 'topup_request_submitted'])) {
+            if (in_array($type, ['new_topup_request', 'topup_request_submitted']) || str_contains($type, 'topup')) {
                 return route('admin.topup.approvals');
             }
             if (in_array($type, ['new_withdraw_request', 'withdraw_status'])) {
@@ -213,7 +218,7 @@ class NotificationUrlResolver
 
         // 5. Super Admin Role Destinations
         if ($role === 'super_admin') {
-            if (in_array($type, ['new_topup_request', 'topup_request_submitted'])) {
+            if (in_array($type, ['new_topup_request', 'topup_request_submitted']) || str_contains($type, 'topup')) {
                 return route('superadmin.topup.approvals');
             }
             if (in_array($type, ['new_withdraw_request', 'withdraw_status'])) {
