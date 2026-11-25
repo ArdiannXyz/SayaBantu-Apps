@@ -88,17 +88,36 @@ export const SayaBantuPush = {
         }
     },
 
+    getEndpoint(metaName, fallbackPath) {
+        const val = document.querySelector(`meta[name="${metaName}"]`)?.getAttribute('content');
+        return val && val.trim() ? val.trim() : fallbackPath;
+    },
+
+    getMetaVapidKey() {
+        const key = document.querySelector('meta[name="sb-vapid-key"]')?.getAttribute('content');
+        return key && key.trim() ? key.trim() : null;
+    },
+
     async getPublicKey() {
+        const endpoint = this.getEndpoint('sb-push-key-url', '/api/push/key');
         try {
-            const res = await fetch('/api/push/key', {
-                headers: { 'Accept': 'application/json' }
+            const res = await fetch(endpoint, {
+                headers: { 'Accept': 'application/json' },
+                credentials: 'same-origin'
             });
-            const data = await res.json();
-            return data.publicKey || null;
+            if (res.ok) {
+                const data = await res.json();
+                if (data && data.publicKey) {
+                    return data.publicKey;
+                }
+            } else {
+                console.warn(`[SayaBantuPush] Endpoint ${endpoint} merespons HTTP ${res.status}`);
+            }
         } catch (e) {
-            console.warn('[SayaBantuPush] Gagal mengambil VAPID Public Key:', e);
-            return null;
+            console.warn('[SayaBantuPush] Gagal mengambil VAPID Public Key dari endpoint:', e);
         }
+
+        return this.getMetaVapidKey();
     },
 
     async subscribe() {
@@ -143,9 +162,11 @@ export const SayaBantuPush = {
     async sendSubscriptionToServer(subscription) {
         const subData = subscription.toJSON();
         const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+        const endpoint = this.getEndpoint('sb-push-subscribe-url', '/api/push/subscribe');
 
-        const response = await fetch('/api/push/subscribe', {
+        const response = await fetch(endpoint, {
             method: 'POST',
+            credentials: 'same-origin',
             headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json',
@@ -167,10 +188,12 @@ export const SayaBantuPush = {
         if (sub) {
             const subData = sub.toJSON();
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+            const endpoint = this.getEndpoint('sb-push-unsubscribe-url', '/api/push/unsubscribe');
 
             try {
-                await fetch('/api/push/unsubscribe', {
+                await fetch(endpoint, {
                     method: 'POST',
+                    credentials: 'same-origin',
                     headers: {
                         'Content-Type': 'application/json',
                         'Accept': 'application/json',
@@ -190,8 +213,10 @@ export const SayaBantuPush = {
 
     async sendTest() {
         const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-        const res = await fetch('/api/push/test', {
+        const endpoint = this.getEndpoint('sb-push-test-url', '/api/push/test');
+        const res = await fetch(endpoint, {
             method: 'POST',
+            credentials: 'same-origin',
             headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json',

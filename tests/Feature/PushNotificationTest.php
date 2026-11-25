@@ -157,6 +157,8 @@ class PushNotificationTest extends TestCase
                 ->get(route($routeName))
                 ->assertOk()
                 ->assertSee('<meta name="sb-authenticated" content="1">', false)
+                ->assertSee('<meta name="sb-vapid-key"', false)
+                ->assertSee('<meta name="sb-push-key-url"', false)
                 ->assertSee('id="sb-push-optin-banner"', false);
         }
     }

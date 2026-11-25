@@ -124,6 +124,11 @@
     <meta name="theme-color" content="#ffffff">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="sb-authenticated" content="{{ auth()->check() ? '1' : '0' }}">
+    <meta name="sb-vapid-key" content="{{ config('webpush.vapid.public_key') }}">
+    <meta name="sb-push-key-url" content="{{ route('api.push.key', [], false) }}">
+    <meta name="sb-push-subscribe-url" content="{{ route('api.push.subscribe', [], false) }}">
+    <meta name="sb-push-unsubscribe-url" content="{{ route('api.push.unsubscribe', [], false) }}">
+    <meta name="sb-push-test-url" content="{{ route('api.push.test', [], false) }}">
     <title>{{ $pageTitle }} - sayabantu</title>
     <!-- Favicon & Icons -->
     @php

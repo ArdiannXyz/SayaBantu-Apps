@@ -14,7 +14,15 @@ class PushSubscriptionController extends Controller
      */
     public function getPublicKey(): JsonResponse
     {
-        $publicKey = config('webpush.vapid.public_key');
+        $publicKey = config('webpush.vapid.public_key') ?: env('VAPID_PUBLIC_KEY');
+
+        if (empty($publicKey)) {
+            return response()->json([
+                'success' => false,
+                'publicKey' => null,
+                'message' => 'VAPID Public Key belum dikonfigurasi di server.',
+            ], 503);
+        }
 
         return response()->json([
             'success' => true,
