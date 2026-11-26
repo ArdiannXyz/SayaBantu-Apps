@@ -43,8 +43,8 @@
             'subtitle' => 'Grafik perolehan pendapatan, breakdown sumber fee, dan pengaturan bagi hasil'
         ],
         'superadmin.pengaturan.bantuan.biaya-topup' => [
-            'title' => 'Biaya Admin Top-Up & Bank',
-            'subtitle' => 'Atur biaya admin top-up bertingkat dan daftar rekening bank penerima'
+            'title' => 'Biaya Admin Top-Up',
+            'subtitle' => 'Atur biaya admin top-up bertingkat dan pantau statistik pendapatan admin top-up'
         ],
         'superadmin.pengaturan.bantuan.tarif-radius' => [
             'title' => 'Tarif & Radius Bantuan',
@@ -125,8 +125,8 @@
             $detectedTitle = 'Pembersihan Storage';
             $detectedSubtitle = 'Pantau kapasitas penyimpanan disk dan bersihkan berkas tumpukan order lama';
         } elseif (request()->routeIs('superadmin.settings.banks*')) {
-            $detectedTitle = 'Pengaturan Bank & E-Wallet';
-            $detectedSubtitle = 'Kelola daftar bank dan e-wallet yang aktif untuk penarikan dana mitra';
+            $detectedTitle = 'Pengaturan Bank, E-Wallet & QRIS';
+            $detectedSubtitle = 'Kelola rekening bank, e-wallet, dan barcode QRIS untuk top-up customer & penarikan dana mitra';
         } elseif (request()->routeIs('superadmin.transactions*')) {
             $detectedTitle = 'Financial Report';
             $detectedSubtitle = 'Laporan daftar transaksi, top up, dan mutasi saldo sistem';
@@ -400,7 +400,7 @@
                         <a href="{{ route('superadmin.pengaturan.bantuan.biaya-topup') }}" wire:navigate
                             class="flex items-center px-2.5 py-2 text-xs font-medium rounded-lg transition {{ request()->routeIs('superadmin.pengaturan.bantuan.biaya-topup') ? 'text-[#0066FF] bg-white border border-blue-100 shadow-2xs font-semibold' : 'text-slate-500 hover:text-[#0066FF] hover:bg-white/80' }}">
                             <span class="w-1.5 h-1.5 rounded-full mr-2.5 {{ request()->routeIs('superadmin.pengaturan.bantuan.biaya-topup') ? 'bg-[#0066FF]' : 'bg-slate-300' }}"></span>
-                            <span class="truncate">Biaya Top-Up & Bank</span>
+                            <span class="truncate">Biaya Admin Top-Up</span>
                         </a>
 
                         <a href="{{ route('superadmin.pengaturan.bantuan.tarif-radius') }}" wire:navigate

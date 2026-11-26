@@ -363,8 +363,12 @@ class BankSettings extends Component
             ];
         }
 
-        // Jika belum ada saluran di bank_channels dengan account_number, pertahankan yang lama
-        if (empty($banksList)) {
+        // Jika belum pernah ada saluran di bank_channels yang diisi account_number, pertahankan konfigurasi lama
+        $hasConfiguredChannel = BankChannel::whereNotNull('account_number')
+            ->where('account_number', '!=', '')
+            ->exists();
+
+        if (empty($banksList) && ! $hasConfiguredChannel) {
             $raw = AppSetting::get('topup_payment_methods', '{}');
             $methods = json_decode((string) $raw, true) ?: [];
             $banksList = $methods['banks'] ?? [];

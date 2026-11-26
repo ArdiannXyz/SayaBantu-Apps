@@ -37,50 +37,59 @@ class PushNotificationTest extends TestCase
 
     public function test_authenticated_user_can_subscribe_and_unsubscribe(): void
     {
-        $user = User::factory()->create();
-
-        $subPayload = [
-            'endpoint' => 'https://fcm.googleapis.com/fcm/send/device-endpoint-xyz',
-            'keys' => [
-                'p256dh' => 'mock-p256dh-public-key',
-                'auth' => 'mock-auth-secret',
-            ],
-            'contentEncoding' => 'aesgcm',
-        ];
-
-        // 1. Subscribe
-        $response = $this->actingAs($user)
-            ->postJson(route('api.push.subscribe'), $subPayload);
-
-        $response->assertSuccessful()
-            ->assertJson(['success' => true]);
-
-        $this->assertDatabaseHas('push_subscriptions', [
-            'user_id' => $user->id,
-            'endpoint' => 'https://fcm.googleapis.com/fcm/send/device-endpoint-xyz',
-            'endpoint_hash' => hash('sha256', 'https://fcm.googleapis.com/fcm/send/device-endpoint-xyz'),
-        ]);
-
-        // 2. Test notification returns true or handles mock delivery
-        $testResponse = $this->actingAs($user)
-            ->postJson(route('api.push.test'));
-
-        $testResponse->assertSuccessful()
-            ->assertJsonStructure(['success', 'message']);
-
-        // 3. Unsubscribe
-        $unsubResponse = $this->actingAs($user)
-            ->postJson(route('api.push.unsubscribe'), [
-                'endpoint' => 'https://fcm.googleapis.com/fcm/send/device-endpoint-xyz',
+        foreach (['customer', 'mitra', 'admin', 'super_admin'] as $role) {
+            $user = User::factory()->create([
+                'role' => $role,
+                'status' => 'active',
+                'verified' => true,
+                'is_completed' => true,
+                'email_verified_at' => now(),
             ]);
 
-        $unsubResponse->assertSuccessful()
-            ->assertJson(['success' => true]);
+            $endpoint = "https://fcm.googleapis.com/fcm/send/device-endpoint-{$role}";
+            $subPayload = [
+                'endpoint' => $endpoint,
+                'keys' => [
+                    'p256dh' => 'mock-p256dh-public-key',
+                    'auth' => 'mock-auth-secret',
+                ],
+                'contentEncoding' => 'aesgcm',
+            ];
 
-        $this->assertDatabaseMissing('push_subscriptions', [
-            'user_id' => $user->id,
-            'endpoint' => 'https://fcm.googleapis.com/fcm/send/device-endpoint-xyz',
-        ]);
+            // 1. Subscribe
+            $response = $this->actingAs($user)
+                ->postJson(route('api.push.subscribe'), $subPayload);
+
+            $response->assertSuccessful()
+                ->assertJson(['success' => true]);
+
+            $this->assertDatabaseHas('push_subscriptions', [
+                'user_id' => $user->id,
+                'endpoint' => $endpoint,
+                'endpoint_hash' => hash('sha256', $endpoint),
+            ]);
+
+            // 2. Test notification returns JSON without role redirect
+            $testResponse = $this->actingAs($user)
+                ->postJson(route('api.push.test'));
+
+            $testResponse->assertSuccessful()
+                ->assertJsonStructure(['success', 'message']);
+
+            // 3. Unsubscribe
+            $unsubResponse = $this->actingAs($user)
+                ->postJson(route('api.push.unsubscribe'), [
+                    'endpoint' => $endpoint,
+                ]);
+
+            $unsubResponse->assertSuccessful()
+                ->assertJson(['success' => true]);
+
+            $this->assertDatabaseMissing('push_subscriptions', [
+                'user_id' => $user->id,
+                'endpoint' => $endpoint,
+            ]);
+        }
     }
 
     public function test_web_push_service_handles_missing_subscriptions_gracefully(): void

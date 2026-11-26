@@ -159,6 +159,23 @@ export const SayaBantuPush = {
         return sub;
     },
 
+    async parseJsonResponse(response, fallbackError) {
+        const rawText = await response.text();
+        let data = null;
+
+        try {
+            data = rawText ? JSON.parse(rawText) : {};
+        } catch (e) {
+            throw new Error(fallbackError || `Respons server tidak valid (HTTP ${response.status}). Silakan muat ulang halaman.`);
+        }
+
+        if (!response.ok || (data && data.success === false && !data.subscription_id && !data.publicKey)) {
+            throw new Error((data && data.message) || fallbackError || `Permintaan gagal (HTTP ${response.status}).`);
+        }
+
+        return data;
+    },
+
     async sendSubscriptionToServer(subscription) {
         const subData = subscription.toJSON();
         const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
@@ -175,12 +192,7 @@ export const SayaBantuPush = {
             body: JSON.stringify(subData)
         });
 
-        if (!response.ok) {
-            const err = await response.json().catch(() => ({}));
-            throw new Error(err.message || 'Gagal menyimpan subscription ke server.');
-        }
-
-        return await response.json();
+        return await this.parseJsonResponse(response, 'Gagal menyimpan subscription ke server.');
     },
 
     async unsubscribe() {
@@ -223,11 +235,7 @@ export const SayaBantuPush = {
                 'X-CSRF-TOKEN': csrfToken || '',
             }
         });
-        const data = await res.json();
-        if (!res.ok) {
-            throw new Error(data.message || 'Gagal mengirim notifikasi tes.');
-        }
-        return data;
+        return await this.parseJsonResponse(res, 'Gagal mengirim notifikasi tes.');
     },
 
     // Inisialisasi otomatis jika izin sudah diberikan sebelumnya

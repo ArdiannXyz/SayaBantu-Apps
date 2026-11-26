@@ -151,10 +151,20 @@ class BankSettingsTest extends TestCase
             ->assertSee('Apakah Anda yakin ingin menonaktifkan metode pembayaran QRIS?', false)
             ->assertSee('Apakah Anda yakin ingin menonaktifkan status saluran Bank BCA?', false);
 
+        // Pastikan halaman Biaya Admin Top-Up tidak lagi menduplikasi QRIS/bank, dan mengarahkan ke Saluran Bank
         Livewire::actingAs($this->superAdmin)
             ->test(\App\Livewire\SuperAdmin\Settings\BiayaTopupBank::class)
-            ->assertSee('wire:confirm="Apakah Anda yakin ingin menyimpan dan menerapkan pengaturan QRIS ini?"', false)
-            ->assertSee('Apakah Anda yakin ingin menonaktifkan metode pembayaran QRIS?', false)
-            ->assertSee('Apakah Anda yakin ingin menonaktifkan status rekening', false);
+            ->assertSee(route('superadmin.settings.banks'), false)
+            ->assertDontSee('wire:click="saveQrisSettings"', false)
+            ->assertDontSee('wire:click="toggleBankStatus(', false);
+
+        // Menonaktifkan bank terakhir yang memiliki account_number di Saluran Bank ikut menyinkronkan topup_payment_methods
+        BankChannel::where('code', '!=', 'BCA')->update(['is_active' => false]);
+        Livewire::actingAs($this->superAdmin)
+            ->test(BankSettings::class)
+            ->call('toggleStatus', $channel->id);
+
+        $methods = json_decode((string) AppSetting::get('topup_payment_methods', '{}'), true);
+        $this->assertSame([], $methods['banks'] ?? null);
     }
 }

@@ -68,7 +68,7 @@ class RedirectBasedOnRole
                 return redirect(route('login', absolute: false))->withErrors(['email' => $errorMessage]);
             }
 
-            // Allow status check, logout, profile, chat, ajax, verification, notifications, password reset, and onboarding endpoints to proceed for any role
+            // Allow status check, logout, profile, chat, ajax, api, verification, notifications, password reset, and onboarding endpoints to proceed for any role
             if ($request->routeIs([
                 'account.status.check',
                 'logout',
@@ -76,6 +76,7 @@ class RedirectBasedOnRole
                 'profile',
                 'chat.*',
                 'ajax.*',
+                'api.*',
                 'notifications.*',
                 'onboarding.*',
                 'verification.*',
@@ -84,7 +85,7 @@ class RedirectBasedOnRole
                 'login',
                 'password.*',
                 'admin.password.*',
-            ]) || $request->is('check-account-status*', 'logout*', 'admin/logout*', 'profile*', 'chat*', 'ajax*', 'notifications*', 'onboarding*', 'email*', 'reset-password*', 'forgot-password*', 'admin/forgot-password*')) {
+            ]) || $request->is('check-account-status*', 'logout*', 'admin/logout*', 'profile*', 'chat*', 'ajax*', 'api/*', 'notifications*', 'onboarding*', 'email*', 'reset-password*', 'forgot-password*', 'admin/forgot-password*')) {
                 return $next($request);
             }
 
@@ -108,12 +109,12 @@ class RedirectBasedOnRole
             }
 
             // Redirect mitra away from admin, superadmin, or customer-only routes
-            if ($user->role === 'mitra' && ! $request->routeIs(['mitra.*', 'profile.*', 'profile', 'chat.*', 'ajax.*', 'notifications.*', 'logout', 'account.status.check'])) {
+            if ($user->role === 'mitra' && ! $request->routeIs(['mitra.*', 'profile.*', 'profile', 'chat.*', 'ajax.*', 'api.*', 'notifications.*', 'logout', 'account.status.check'])) {
                 return redirect(route('mitra.dashboard', absolute: false));
             }
 
             // Redirect admin/super_admin based on their role
-            if (in_array($user->role, ['admin', 'super_admin']) && ! $request->routeIs(['admin.*', 'superadmin.*', 'profile.*', 'profile', 'chat.*', 'ajax.*', 'notifications.*', 'logout', 'account.status.check'])) {
+            if (in_array($user->role, ['admin', 'super_admin']) && ! $request->routeIs(['admin.*', 'superadmin.*', 'profile.*', 'profile', 'chat.*', 'ajax.*', 'api.*', 'notifications.*', 'logout', 'account.status.check'])) {
                 $dashboardRoute = $user->role === 'super_admin' ? 'superadmin.dashboard' : 'admin.dashboard';
 
                 return redirect(route($dashboardRoute, absolute: false));

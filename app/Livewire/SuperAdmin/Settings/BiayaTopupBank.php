@@ -5,18 +5,14 @@ namespace App\Livewire\SuperAdmin\Settings;
 use App\Models\AppSetting;
 use App\Models\BalanceTransaction;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
-use Livewire\WithFileUploads;
 
 #[Layout('layouts.superadmin')]
-#[Title('Biaya Admin Top-Up & Bank - Super Admin')]
+#[Title('Biaya Admin Top-Up - Super Admin')]
 class BiayaTopupBank extends Component
 {
-    use WithFileUploads;
-
     public $tier1_limit;
 
     public $tier1_fee;
@@ -28,32 +24,6 @@ class BiayaTopupBank extends Component
     public $tier3_percentage;
 
     public $tier3_max;
-
-    public $payment_banks = [];
-
-    // QRIS Settings & Upload
-    public bool $qris_enabled = true;
-
-    public string $qris_merchant_name = '';
-
-    public $qris_image_upload = null;
-
-    public ?string $current_qris_image = null;
-
-    // Modal state for Bank Management
-    public bool $showBankModal = false;
-
-    public $editingBankIndex = null;
-
-    public string $bank_code = '';
-
-    public string $bank_name = '';
-
-    public string $bank_account_number = '';
-
-    public string $bank_account_name = '';
-
-    public bool $bank_enabled = true;
 
     protected function rules()
     {
@@ -76,235 +46,6 @@ class BiayaTopupBank extends Component
         $this->tier2_fee = (int) AppSetting::get('topup_tier2_fee', 7500);
         $this->tier3_percentage = (float) AppSetting::get('topup_tier3_percentage', 3);
         $this->tier3_max = (int) AppSetting::get('topup_tier3_max', 15000);
-
-        // Load payment banks config (stored as JSON)
-        $paymentMethods = json_decode((string) AppSetting::get('topup_payment_methods', '{}'), true) ?: [];
-        $this->payment_banks = $paymentMethods['banks'] ?? [
-            ['code' => 'bca', 'name' => 'BCA', 'account_number' => '1234567890', 'account_name' => 'PT sayabantu', 'enabled' => true],
-            ['code' => 'mandiri', 'name' => 'Mandiri', 'account_number' => '0987654321', 'account_name' => 'PT sayabantu', 'enabled' => true],
-            ['code' => 'bni', 'name' => 'BNI', 'account_number' => '5555666677', 'account_name' => 'PT sayabantu', 'enabled' => true],
-            ['code' => 'bri', 'name' => 'BRI', 'account_number' => '8888999900', 'account_name' => 'PT sayabantu', 'enabled' => true],
-        ];
-
-        // Load QRIS config
-        $this->qris_enabled = ! isset($paymentMethods['qris']['enabled']) || ! empty($paymentMethods['qris']['enabled']);
-        $this->qris_merchant_name = (string) AppSetting::get('qris_merchant_name', 'SayaBantu');
-
-        $storedQris = AppSetting::get('qris_image');
-        if ($storedQris && Storage::disk('public')->exists($storedQris)) {
-            $this->current_qris_image = $storedQris;
-        } elseif (file_exists(public_path('images/payment/qris.png'))) {
-            $this->current_qris_image = 'images/payment/qris.png';
-        } else {
-            $this->current_qris_image = null;
-        }
-    }
-
-    public function openAddBankModal()
-    {
-        $this->resetBankForm();
-        $this->editingBankIndex = null;
-        $this->showBankModal = true;
-    }
-
-    public function openEditBankModal($index)
-    {
-        if (! isset($this->payment_banks[$index])) {
-            return;
-        }
-
-        $bank = $this->payment_banks[$index];
-        $this->editingBankIndex = (int) $index;
-        $this->bank_code = (string) ($bank['code'] ?? '');
-        $this->bank_name = (string) ($bank['name'] ?? '');
-        $this->bank_account_number = (string) ($bank['account_number'] ?? '');
-        $this->bank_account_name = (string) ($bank['account_name'] ?? '');
-        $this->bank_enabled = ! empty($bank['enabled']);
-        $this->showBankModal = true;
-    }
-
-    public function closeBankModal()
-    {
-        $this->showBankModal = false;
-        $this->resetBankForm();
-    }
-
-    public function resetBankForm()
-    {
-        $this->bank_code = '';
-        $this->bank_name = '';
-        $this->bank_account_number = '';
-        $this->bank_account_name = '';
-        $this->bank_enabled = true;
-        $this->resetErrorBag(['bank_code', 'bank_name', 'bank_account_number', 'bank_account_name']);
-    }
-
-    public function saveBankModal()
-    {
-        $this->validate([
-            'bank_code' => 'required|string|max:30',
-            'bank_name' => 'required|string|max:100',
-            'bank_account_number' => 'required|string|max:50',
-            'bank_account_name' => 'required|string|max:150',
-        ], [
-            'bank_code.required' => 'Kode bank wajib diisi (contoh: bca, mandiri).',
-            'bank_name.required' => 'Nama bank wajib diisi.',
-            'bank_account_number.required' => 'Nomor rekening wajib diisi.',
-            'bank_account_name.required' => 'Nama pemilik rekening wajib diisi.',
-        ]);
-
-        $bankData = [
-            'code' => strtolower(trim($this->bank_code)),
-            'name' => trim($this->bank_name),
-            'account_number' => trim($this->bank_account_number),
-            'account_name' => trim($this->bank_account_name),
-            'enabled' => (bool) $this->bank_enabled,
-        ];
-
-        if ($this->editingBankIndex !== null && isset($this->payment_banks[$this->editingBankIndex])) {
-            $this->payment_banks[$this->editingBankIndex] = $bankData;
-            $msg = 'Rekening '.$bankData['name'].' berhasil diperbarui.';
-        } else {
-            $this->payment_banks[] = $bankData;
-            $msg = 'Rekening '.$bankData['name'].' berhasil ditambahkan.';
-        }
-
-        $this->persistPaymentBanks();
-
-        $this->showBankModal = false;
-        $this->resetBankForm();
-
-        $this->dispatch('bankSaved', message: $msg);
-        session()->flash('bank_message', $msg);
-    }
-
-    public function toggleBankStatus($index)
-    {
-        if (isset($this->payment_banks[$index])) {
-            $this->payment_banks[$index]['enabled'] = ! $this->payment_banks[$index]['enabled'];
-            $this->persistPaymentBanks();
-            $statusText = $this->payment_banks[$index]['enabled'] ? 'diaktifkan' : 'dinonaktifkan';
-            $msg = 'Rekening '.($this->payment_banks[$index]['name'] ?? 'Bank').' berhasil '.$statusText.'.';
-            $this->dispatch('bankSaved', message: $msg);
-            session()->flash('bank_message', $msg);
-        }
-    }
-
-    public function removeBank($index)
-    {
-        if (isset($this->payment_banks[$index])) {
-            $deletedName = $this->payment_banks[$index]['name'] ?? 'Bank';
-            unset($this->payment_banks[$index]);
-            $this->payment_banks = array_values($this->payment_banks);
-            $this->persistPaymentBanks();
-            $msg = 'Rekening '.$deletedName.' berhasil dihapus.';
-            $this->dispatch('bankSaved', message: $msg);
-            session()->flash('bank_message', $msg);
-        }
-    }
-
-    public function saveQrisSettings()
-    {
-        $this->validate([
-            'qris_merchant_name' => 'nullable|string|max:100',
-            'qris_image_upload' => 'nullable|image|mimes:jpeg,png,jpg,webp,svg|max:5120',
-        ]);
-
-        if ($this->qris_image_upload) {
-            // Store to public disk compressed
-            $path = \App\Services\ImageCompressionService::compressAndStore($this->qris_image_upload, 'payment');
-
-            // Also copy to public/images/payment/qris.png for backwards compatibility
-            $destinationDir = public_path('images/payment');
-            if (! file_exists($destinationDir)) {
-                mkdir($destinationDir, 0755, true);
-            }
-            @copy(storage_path('app/public/'.$path), public_path('images/payment/qris.png'));
-
-            // Delete previous custom image if exists in public disk
-            if ($this->current_qris_image && $this->current_qris_image !== 'images/payment/qris.png' && Storage::disk('public')->exists($this->current_qris_image)) {
-                Storage::disk('public')->delete($this->current_qris_image);
-            }
-
-            $this->current_qris_image = $path;
-            AppSetting::set('qris_image', $path);
-            $this->qris_image_upload = null;
-        }
-
-        AppSetting::set('qris_merchant_name', trim($this->qris_merchant_name));
-
-        $this->persistPaymentMethods();
-
-        $msg = 'Pengaturan QRIS berhasil diperbarui.';
-        session()->flash('qris_message', $msg);
-        $this->dispatch('qrisSaved', message: $msg);
-    }
-
-    public function toggleQrisStatus()
-    {
-        $this->qris_enabled = ! $this->qris_enabled;
-        $this->persistPaymentMethods();
-        $statusText = $this->qris_enabled ? 'diaktifkan' : 'dinonaktifkan';
-        $msg = 'Metode pembayaran QRIS berhasil '.$statusText.'.';
-        session()->flash('qris_message', $msg);
-        $this->dispatch('qrisSaved', message: $msg);
-    }
-
-    public function removeQrisImage()
-    {
-        if ($this->current_qris_image && $this->current_qris_image !== 'images/payment/qris.png' && Storage::disk('public')->exists($this->current_qris_image)) {
-            Storage::disk('public')->delete($this->current_qris_image);
-        }
-
-        if (file_exists(public_path('images/payment/qris.png'))) {
-            @unlink(public_path('images/payment/qris.png'));
-        }
-
-        $this->current_qris_image = null;
-        $this->qris_image_upload = null;
-        AppSetting::set('qris_image', '');
-
-        $msg = 'Gambar QR Code QRIS berhasil dihapus.';
-        session()->flash('qris_message', $msg);
-        $this->dispatch('qrisSaved', message: $msg);
-    }
-
-    private function persistPaymentBanks()
-    {
-        $this->persistPaymentMethods();
-    }
-
-    private function persistPaymentMethods()
-    {
-        $paymentMethods = [
-            'qris' => [
-                'enabled' => (bool) $this->qris_enabled,
-                'merchant_name' => (string) ($this->qris_merchant_name ?: 'SayaBantu'),
-            ],
-            'banks' => array_values(array_map(function ($b) {
-                return [
-                    'code' => (string) ($b['code'] ?? ''),
-                    'name' => (string) ($b['name'] ?? ''),
-                    'account_number' => isset($b['account_number']) ? (string) $b['account_number'] : null,
-                    'account_name' => isset($b['account_name']) ? (string) $b['account_name'] : null,
-                    'enabled' => ! empty($b['enabled']),
-                ];
-            }, $this->payment_banks ?? [])),
-        ];
-
-        AppSetting::set('topup_payment_methods', json_encode($paymentMethods));
-
-        // Sinkronkan ke bank_channels
-        foreach ($this->payment_banks as $b) {
-            $code = strtoupper($b['code'] ?? '');
-            if (! empty($code)) {
-                \App\Models\BankChannel::where('code', $code)->update([
-                    'account_number' => $b['account_number'] ?? null,
-                    'account_name' => $b['account_name'] ?? null,
-                    'is_active' => ! empty($b['enabled']),
-                ]);
-            }
-        }
     }
 
     public function save()
@@ -325,9 +66,6 @@ class BiayaTopupBank extends Component
         AppSetting::set('topup_tier2_fee', (string) $this->tier2_fee);
         AppSetting::set('topup_tier3_percentage', (string) $this->tier3_percentage);
         AppSetting::set('topup_tier3_max', (string) $this->tier3_max);
-
-        // Also ensure banks are persisted
-        $this->persistPaymentBanks();
 
         session()->flash('message', 'Pengaturan biaya admin top-up berhasil disimpan.');
 

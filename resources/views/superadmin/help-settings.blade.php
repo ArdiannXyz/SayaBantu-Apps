@@ -32,7 +32,7 @@
                         </div>
                     </a>
 
-                    <!-- 2. Biaya Top-Up & Bank -->
+                    <!-- 2. Biaya Admin Top-Up -->
                     <a href="{{ route('superadmin.pengaturan.bantuan.biaya-topup') }}" wire:navigate
                        class="group block bg-white rounded-2xl border border-gray-200 p-5 hover:shadow-md hover:border-blue-300 transition-all duration-200">
                         <div class="flex items-start gap-4">
@@ -43,9 +43,9 @@
                                 </svg>
                             </div>
                             <div class="min-w-0 flex-1">
-                                <h3 class="text-sm font-medium text-gray-900 group-hover:text-blue-700">Biaya Admin Top-Up & Bank</h3>
+                                <h3 class="text-sm font-medium text-gray-900 group-hover:text-blue-700">Biaya Admin Top-Up</h3>
                                 <p class="text-xs text-gray-500 mt-1 leading-relaxed">
-                                    Atur biaya admin top-up (3 tier) dan daftar rekening bank untuk transfer customer.
+                                    Atur biaya admin top-up (3 tier) dan pantau statistik transaksi pengisian saldo.
                                 </p>
                             </div>
                         </div>
