@@ -43,9 +43,20 @@ class NotificationSettingsTest extends TestCase
             ->assertSee('Nada Dering Bantuan Urgent')
             ->assertSee('Getar (Vibrate)')
             ->assertSee('Update Transaksi')
+            ->assertDontSee('Kirim Tes Notifikasi')
             ->assertDontSee('Pengingat Bantuan')
             ->assertDontSee('Notifikasi Promosi')
             ->assertDontSee('Peringatan Saldo Rendah');
+
+        $superAdmin = User::factory()->create([
+            'role' => 'super_admin',
+            'status' => 'active',
+            'is_completed' => true,
+        ]);
+
+        Livewire::actingAs($superAdmin)
+            ->test(NotificationSettings::class)
+            ->assertSee('Kirim Tes Notifikasi');
 
         Livewire::actingAs($user)
             ->test(NotificationSettings::class)
