@@ -26,6 +26,11 @@ class ReportStatusUpdatedNotification extends Notification
 
     public function via($notifiable): array
     {
+        $settings = $notifiable->notification_settings ?? [];
+        if (isset($settings['generalNotification']) && ! $settings['generalNotification']) {
+            return [];
+        }
+
         return ['database'];
     }
 

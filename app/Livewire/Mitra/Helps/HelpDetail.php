@@ -99,6 +99,12 @@ class HelpDetail extends Component
         // Verify this help belongs to the authenticated mitra.
         // If not assigned anymore, allow access only when reassigned or cancel_accepted
         if ($this->help->mitra_id !== auth()->id()) {
+            if ($this->help->status === 'menunggu_mitra' && is_null($this->help->mitra_id)) {
+                $this->redirectRoute('mitra.helps.all', ['tab' => 'tersedia'], navigate: true);
+
+                return;
+            }
+
             $allowed = false;
             $isReassigned = in_array(auth()->id(), $this->help->cancelled_mitra_ids ?? []);
 

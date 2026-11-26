@@ -100,17 +100,20 @@ class WebPushService
         array $extraData = []
     ): int {
         // Cek pengaturan notifikasi pengguna
-        if (is_array($user->notification_settings)) {
-            $general = $user->notification_settings['generalNotification'] ?? true;
-            if (! $general) {
-                return 0; // Pengguna menonaktifkan notifikasi umum
-            }
+        $settings = $user->getNotificationSettings();
+        if (! $settings['generalNotification']) {
+            return 0; // Pengguna menonaktifkan notifikasi umum
         }
 
         $subscriptions = $user->pushSubscriptions()->get();
         if ($subscriptions->isEmpty()) {
             return 0;
         }
+
+        $isUrgent = (bool) ($extraData['isUrgent'] ?? false);
+        $vibratePattern = $settings['vibrate']
+            ? ($isUrgent ? [300, 100, 300, 100, 300] : [200, 100, 200])
+            : [];
 
         $payload = [
             'title' => $title,
@@ -119,9 +122,15 @@ class WebPushService
             'badge' => asset('icons/icon-192x192.png'),
             'url' => $url ?: url('/'),
             'tag' => $tag ?: ('sayabantu-' . time()),
+            'vibrate' => $vibratePattern,
+            'requireInteraction' => $isUrgent,
             'data' => array_merge([
                 'url' => $url ?: url('/'),
                 'time' => time(),
+                'isUrgent' => $isUrgent,
+                'sound' => $settings['sound'],
+                'soundCall' => $settings['soundCall'],
+                'vibrate' => $settings['vibrate'],
             ], $extraData),
         ];
 

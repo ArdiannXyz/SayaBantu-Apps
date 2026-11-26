@@ -143,9 +143,18 @@ class NotificationUrlResolver
 
             // Help Order (taken, status, request, completed, cancelled)
             if ($helpId || str_contains($type, 'help')) {
+                if ($type === 'help_request' && $helpId) {
+                    $help = Help::find($helpId);
+                    if ($help && $help->mitra_id === $user?->id) {
+                        return route('mitra.helps.detail', $helpId);
+                    }
+
+                    return route('mitra.helps.all', ['tab' => 'tersedia']);
+                }
                 if ($helpId) {
                     return route('mitra.helps.detail', $helpId);
                 }
+
                 return route('mitra.helps.processing');
             }
 

@@ -25,6 +25,8 @@ class Dashboard extends Component
 
     public $userLng = null;
 
+    public bool $gpsReady = false;
+
     public function mount()
     {
         // Check if tab parameter is in the query string
@@ -35,9 +37,12 @@ class Dashboard extends Component
 
         $user = auth()->user();
         if ($user) {
+            $hasLatCol = Schema::hasColumn('users', 'latitude');
+            $hasLiveGps = $hasLatCol && ! empty($user->latitude) && ! empty($user->longitude);
             $city = $user->city_id ? \App\Models\City::find($user->city_id) : null;
-            $this->userLat = $user->latitude ? (float) $user->latitude : ($city ? (float) $city->latitude : null);
-            $this->userLng = $user->longitude ? (float) $user->longitude : ($city ? (float) $city->longitude : null);
+            $this->userLat = $hasLiveGps ? (float) $user->latitude : ($city ? (float) $city->latitude : null);
+            $this->userLng = $hasLiveGps ? (float) $user->longitude : ($city ? (float) $city->longitude : null);
+            $this->gpsReady = $hasLiveGps;
         }
     }
 
@@ -45,12 +50,24 @@ class Dashboard extends Component
     {
         $this->userLat = (float) $lat;
         $this->userLng = (float) $lng;
+        $this->gpsReady = true;
 
-        if (auth()->check()) {
-            auth()->user()->update([
-                'latitude' => $lat,
-                'longitude' => $lng,
-            ]);
+        try {
+            if (auth()->check()) {
+                $columns = Schema::getColumnListing('users');
+                $updateData = [];
+                if (in_array('latitude', $columns)) {
+                    $updateData['latitude'] = $this->userLat;
+                }
+                if (in_array('longitude', $columns)) {
+                    $updateData['longitude'] = $this->userLng;
+                }
+                if (! empty($updateData)) {
+                    auth()->user()->update($updateData);
+                }
+            }
+        } catch (\Throwable $e) {
+            // Abaikan error penyimpanan kolom jika skema belum siap
         }
     }
 
@@ -136,7 +153,7 @@ class Dashboard extends Component
         $maxRadius = (float) AppSetting::get('mitra_max_distance_km', AppSetting::get('max_help_radius_km', 10));
         $userCity = ($user && $user->city_id) ? \App\Models\City::find($user->city_id) : null;
 
-        // Prioritas lokasi mitra: jika browser GPS tersedia, cek dulu apakah dalam radius
+        // Prioritas lokasi mitra: GPS live parameter -> koordinat tersimpan user -> titik pusat kota profil
         $hasLatCol = \Illuminate\Support\Facades\Schema::hasColumn('users', 'latitude');
         $cityLat = ($hasLatCol && $user && $user->latitude) ? (float) $user->latitude : ($userCity ? (float) $userCity->latitude : null);
         $cityLng = ($hasLatCol && $user && $user->longitude) ? (float) $user->longitude : ($userCity ? (float) $userCity->longitude : null);
@@ -147,19 +164,8 @@ class Dashboard extends Component
         if ($checkLat && $checkLng && $help->latitude && $help->longitude) {
             $dist = 6371 * acos(min(1.0, max(-1.0, cos(deg2rad((float) $checkLat)) * cos(deg2rad((float) $help->latitude)) * cos(deg2rad((float) $help->longitude) - deg2rad((float) $checkLng)) + sin(deg2rad((float) $checkLat)) * sin(deg2rad((float) $help->latitude)))));
 
-            // Jika GPS browser melebihi radius (misal testing di luar kota / browser IP beda lokasi),
-            // lakukan fallback ke koordinat profil kota mitra
-            if ($dist > $maxRadius && $cityLat && $cityLng) {
-                $cityDist = 6371 * acos(min(1.0, max(-1.0, cos(deg2rad((float) $cityLat)) * cos(deg2rad((float) $help->latitude)) * cos(deg2rad((float) $help->longitude) - deg2rad((float) $cityLng)) + sin(deg2rad((float) $cityLat)) * sin(deg2rad((float) $help->latitude)))));
-                if ($cityDist <= $maxRadius || ($user && $user->city_id && $user->city_id == $help->city_id)) {
-                    $dist = $cityDist;
-                    $checkLat = $cityLat;
-                    $checkLng = $cityLng;
-                }
-            }
-
-            // Jika masih melebihi radius, dan bukan di kota yang sama, tolak dengan pesan jelas
-            if ($dist > $maxRadius && (! $user || ! $user->city_id || $user->city_id != $help->city_id)) {
+            // Jika melebihi batas maksimal radius (lintas kota maupun satu kota), tolak dengan pesan jelas
+            if ($dist > $maxRadius) {
                 session()->flash('error', 'Jarak bantuan ini ('.number_format($dist, 1)." km) melebihi batas maksimal radius {$maxRadius} km.");
 
                 return;
@@ -240,7 +246,7 @@ class Dashboard extends Component
 
         $haversine = null;
         if ($effectiveLat && $effectiveLng) {
-            $haversine = "(6371 * acos(least(1.0, greatest(-1.0, cos(radians($effectiveLat)) * cos(radians(latitude)) * cos(radians(longitude) - radians($effectiveLng)) + sin(radians($effectiveLat)) * sin(radians(latitude))))))";
+            $haversine = Help::haversineSql((float) $effectiveLat, (float) $effectiveLng);
         }
 
         // Filter: Tampilkan bantuan dalam radius 10 km (meski beda kota/kabupaten) atau satu kota (jika tanpa koordinat)

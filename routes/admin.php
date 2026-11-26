@@ -57,6 +57,7 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
     Route::post('/partners/{id}/toggle-shadow-ban', [\App\Http\Controllers\Admin\BlockedPartnerController::class, 'toggleShadowBan'])->name('partners.toggle-shadow-ban');
 
     Route::get('/topup/approvals', \App\Livewire\Admin\TopupApproval::class)->name('topup.approvals');
+    Route::get('/transactions/logs', \App\Livewire\Admin\TransactionsLog::class)->name('transactions.logs');
     Route::get('/notifications', \App\Livewire\Admin\NotificationsIndex::class)->name('notifications.index');
     Route::get('/password', \App\Livewire\Admin\ChangePassword::class)->name('password');
 });

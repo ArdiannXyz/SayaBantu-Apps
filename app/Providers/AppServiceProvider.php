@@ -79,7 +79,12 @@ class AppServiceProvider extends ServiceProvider
                                 (string) $body,
                                 $url,
                                 null,
-                                'sayabantu-notif-' . ($notifId ?: uniqid('', true))
+                                'sayabantu-notif-' . ($notifId ?: uniqid('', true)),
+                                [
+                                    'notifType' => $data['type'] ?? 'info',
+                                    'isUrgent' => (($data['help_type'] ?? '') === 'urgent')
+                                        || (($data['type'] ?? '') === 'idle_partner_alert'),
+                                ]
                             );
                         }
                     } catch (\Throwable $e) {

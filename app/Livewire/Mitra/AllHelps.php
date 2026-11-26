@@ -36,6 +36,8 @@ class AllHelps extends Component
 
     public $userLng = null;
 
+    public bool $gpsReady = false;
+
     public function setTab(string $tab): void
     {
         $this->tab = in_array($tab, ['semua', 'tersedia', 'proses', 'selesai']) ? $tab : 'semua';
@@ -46,9 +48,12 @@ class AllHelps extends Component
     {
         $user = auth()->user();
         if ($user) {
+            $hasLatCol = \Illuminate\Support\Facades\Schema::hasColumn('users', 'latitude');
+            $hasLiveGps = $hasLatCol && ! empty($user->latitude) && ! empty($user->longitude);
             $city = $user->city_id ? \App\Models\City::find($user->city_id) : null;
-            $this->userLat = $user->latitude ? (float) $user->latitude : ($city ? (float) $city->latitude : null);
-            $this->userLng = $user->longitude ? (float) $user->longitude : ($city ? (float) $city->longitude : null);
+            $this->userLat = $hasLiveGps ? (float) $user->latitude : ($city ? (float) $city->latitude : null);
+            $this->userLng = $hasLiveGps ? (float) $user->longitude : ($city ? (float) $city->longitude : null);
+            $this->gpsReady = $hasLiveGps;
         }
     }
 
@@ -66,16 +71,17 @@ class AllHelps extends Component
     {
         $this->userLat = (float) $lat;
         $this->userLng = (float) $lng;
+        $this->gpsReady = true;
 
         try {
             if (auth()->check()) {
                 $columns = \Illuminate\Support\Facades\Schema::getColumnListing('users');
                 $updateData = [];
                 if (in_array('latitude', $columns)) {
-                    $updateData['latitude'] = $lat;
+                    $updateData['latitude'] = $this->userLat;
                 }
                 if (in_array('longitude', $columns)) {
-                    $updateData['longitude'] = $lng;
+                    $updateData['longitude'] = $this->userLng;
                 }
                 if (! empty($updateData)) {
                     auth()->user()->update($updateData);
@@ -111,9 +117,7 @@ class AllHelps extends Component
 
         $needsCity = false;
         if ($effectiveLat && $effectiveLng) {
-            $lat = (float) $effectiveLat;
-            $lng = (float) $effectiveLng;
-            $haversine = "(6371 * acos(least(1.0, greatest(-1.0, cos(radians($lat)) * cos(radians(latitude)) * cos(radians(longitude) - radians($lng)) + sin(radians($lat)) * sin(radians(latitude))))))";
+            $haversine = Help::haversineSql((float) $effectiveLat, (float) $effectiveLng);
 
             $query->select('helps.*', \Illuminate\Support\Facades\DB::raw("$haversine AS distance"));
 
@@ -222,9 +226,7 @@ class AllHelps extends Component
         // Sort sekunder
         if ($this->sortBy === 'nearby') {
             if ($effectiveLat && $effectiveLng) {
-                $lat = (float) $effectiveLat;
-                $lng = (float) $effectiveLng;
-                $haversine = "(6371 * acos(least(1.0, greatest(-1.0, cos(radians($lat)) * cos(radians(latitude)) * cos(radians(longitude) - radians($lng)) + sin(radians($lat)) * sin(radians(latitude))))))";
+                $haversine = Help::haversineSql((float) $effectiveLat, (float) $effectiveLng);
                 $query->orderByRaw('CASE WHEN latitude IS NOT NULL AND longitude IS NOT NULL THEN 0 ELSE 1 END')
                     ->orderByRaw("$haversine ASC")
                     ->latest();
@@ -354,15 +356,17 @@ class AllHelps extends Component
         $maxRadius = (float) AppSetting::get('mitra_max_distance_km', AppSetting::get('max_help_radius_km', 10));
         $userCity = ($user && $user->city_id) ? \App\Models\City::find($user->city_id) : null;
 
-        // Gunakan koordinat kota mitra sebagai patokan (bukan GPS browser yang bisa beda kota)
-        // GPS latitude/longitude dari parameter hanya dipakai jika kolom tersedia di tabel users
+        // Prioritas koordinat: parameter GPS live -> koordinat tersimpan profil user -> titik pusat kota profil
         $hasLatCol = \Illuminate\Support\Facades\Schema::hasColumn('users', 'latitude');
-        $checkLat = ($hasLatCol && $user && $user->latitude) ? (float) $user->latitude : ($userCity ? (float) $userCity->latitude : null);
-        $checkLng = ($hasLatCol && $user && $user->longitude) ? (float) $user->longitude : ($userCity ? (float) $userCity->longitude : null);
+        $fallbackLat = ($hasLatCol && $user && $user->latitude) ? (float) $user->latitude : ($userCity ? (float) $userCity->latitude : null);
+        $fallbackLng = ($hasLatCol && $user && $user->longitude) ? (float) $user->longitude : ($userCity ? (float) $userCity->longitude : null);
+
+        $checkLat = $latitude ? (float) $latitude : $fallbackLat;
+        $checkLng = $longitude ? (float) $longitude : $fallbackLng;
 
         if ($checkLat && $checkLng && $help->latitude && $help->longitude) {
             $dist = 6371 * acos(min(1.0, max(-1.0, cos(deg2rad((float) $checkLat)) * cos(deg2rad((float) $help->latitude)) * cos(deg2rad((float) $help->longitude) - deg2rad((float) $checkLng)) + sin(deg2rad((float) $checkLat)) * sin(deg2rad((float) $help->latitude)))));
-            if ($dist > $maxRadius && (! $user || ! $user->city_id || $user->city_id != $help->city_id)) {
+            if ($dist > $maxRadius) {
                 $this->dispatch('livewire-flash-error', 'Jarak bantuan ini ('.number_format($dist, 1).' km) melebihi batas maksimal radius '.$maxRadius.' km.');
 
                 return;

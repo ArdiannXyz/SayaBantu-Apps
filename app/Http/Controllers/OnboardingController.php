@@ -38,6 +38,11 @@ class OnboardingController extends Controller
         return new User($userData);
     }
 
+    protected function isCustomerUser(User $user): bool
+    {
+        return in_array($user->role ?? 'customer', ['customer', 'kustomer'], true);
+    }
+
     // =========================================================================
     // 0. BUAT PASSWORD
     // =========================================================================
@@ -50,7 +55,7 @@ class OnboardingController extends Controller
         $user = Auth::user();
         if (! empty($user->password)) {
             if (! $user->is_completed) {
-                if (empty($user->nik)) {
+                if ($this->isCustomerUser($user) || empty($user->nik)) {
                     return redirect()->route('onboarding.step1');
                 }
                 if (empty($user->ktp_photo) && empty($user->ktp_path)) {
@@ -125,17 +130,10 @@ class OnboardingController extends Controller
 
         $userId = $user->exists ? $user->id : null;
         $userEmail = $user->email;
-
-        $isMitraRoute = $request->routeIs('onboarding.step1.store');
+        $isCustomer = $this->isCustomerUser($user);
+        $isMitraRoute = ! $isCustomer && $request->routeIs('onboarding.step1.store');
 
         $rules = [
-            'nik' => [
-                'required',
-                'string',
-                'size:16',
-                'regex:/^[0-9]+$/',
-                Rule::unique('users', 'nik')->ignore($userId),
-            ],
             'name' => ['required', 'string', 'max:255', 'regex:/^[a-zA-Z\s\.\,\'\-]+$/'],
             'gender' => ['required', 'in:Laki-laki,Perempuan'],
             'phone' => [
@@ -150,11 +148,25 @@ class OnboardingController extends Controller
             'address' => ['required', 'string', 'max:500'],
         ];
 
-        // Field tambahan domisili HANYA untuk alur mitra (step1)
+        if (! $isCustomer) {
+            $rules['nik'] = [
+                'required',
+                'string',
+                'size:16',
+                'regex:/^[0-9]+$/',
+                Rule::unique('users', 'nik')->ignore($userId),
+            ];
+        }
+
+        // Field tambahan domisili wajib untuk alur mitra (step1); opsional untuk customer
         if ($isMitraRoute) {
             $rules['kelurahan'] = ['required', 'string', 'max:100', 'regex:/^[a-zA-Z\s\.\,\'\-]+$/'];
             $rules['kecamatan'] = ['required', 'string', 'max:100', 'regex:/^[a-zA-Z\s\.\,\'\-]+$/'];
             $rules['province'] = ['required', 'string', 'max:100'];
+        } else {
+            $rules['kelurahan'] = ['nullable', 'string', 'max:100'];
+            $rules['kecamatan'] = ['nullable', 'string', 'max:100'];
+            $rules['province'] = ['nullable', 'string', 'max:100'];
         }
 
         $request->validate($rules, [
@@ -179,19 +191,21 @@ class OnboardingController extends Controller
             'province.required' => 'Provinsi domisili wajib diisi.',
         ]);
 
-        // Cek apakah NIK sudah digunakan oleh akun lain di tabel users
-        $existsInUser = User::where('nik', $request->nik)
-            ->when($userId, fn ($q) => $q->where('id', '!=', $userId))
-            ->exists();
+        if (! $isCustomer) {
+            // Cek apakah NIK sudah digunakan oleh akun lain di tabel users
+            $existsInUser = User::where('nik', $request->nik)
+                ->when($userId, fn ($q) => $q->where('id', '!=', $userId))
+                ->exists();
 
-        // Cek juga apakah NIK sudah terdaftar di tabel registrations
-        $existsInReg = Registration::where('nik', $request->nik)
-            ->where('email', '!=', $userEmail)
-            ->where('status', '!=', 'rejected')
-            ->exists();
+            // Cek juga apakah NIK sudah terdaftar di tabel registrations
+            $existsInReg = Registration::where('nik', $request->nik)
+                ->where('email', '!=', $userEmail)
+                ->where('status', '!=', 'rejected')
+                ->exists();
 
-        if ($existsInUser || $existsInReg) {
-            return back()->withErrors(['nik' => 'NIK ini sudah terdaftar pada akun lain. Mohon gunakan NIK Anda sendiri.'])->withInput();
+            if ($existsInUser || $existsInReg) {
+                return back()->withErrors(['nik' => 'NIK ini sudah terdaftar pada akun lain. Mohon gunakan NIK Anda sendiri.'])->withInput();
+            }
         }
 
         // Cek apakah Nomor HP sudah digunakan oleh akun lain di tabel users
@@ -204,6 +218,60 @@ class OnboardingController extends Controller
         }
 
         $city = City::find($request->city_id);
+
+        // CUSTOMER: langsung selesai tanpa NIK/KTP/Selfie (verifikasi KTP opsional lewat Profil untuk promo akun Premium)
+        if ($isCustomer) {
+            $profileFields = [
+                'name' => $request->name,
+                'place_of_birth' => $request->place_of_birth,
+                'date_of_birth' => $request->date_of_birth,
+                'gender' => $request->gender,
+                'phone' => $request->phone,
+                'city_id' => $request->city_id,
+                'city' => $city ? $city->name : null,
+                'address' => $request->address,
+                'rt' => $request->rt,
+                'rw' => $request->rw,
+                'kelurahan' => $request->kelurahan,
+                'kecamatan' => $request->kecamatan,
+                'province' => $request->province ?: ($city?->province),
+                'is_completed' => true,
+                'status' => 'active',
+            ];
+
+            if (Auth::check()) {
+                $request->user()->update($profileFields);
+
+                return redirect()->route('customer.dashboard')->with('status', 'Pendaftaran selesai! Selamat datang di SayaBantu.');
+            }
+
+            $account = session('reg_account');
+            if (! $account) {
+                return redirect()->route('register.choose-role');
+            }
+            if (User::where('email', $account['email'])->exists()) {
+                return redirect()->route('login')->with('error', 'Email ini sudah terdaftar. Silakan login.');
+            }
+
+            $createdUser = User::create(array_merge($account, $profileFields, [
+                'verified' => false,
+            ]));
+
+            event(new Registered($createdUser));
+
+            try {
+                $superAdmins = User::where('role', 'super_admin')->where('status', 'active')->get();
+                foreach ($superAdmins as $admin) {
+                    $admin->notify(new NewRegistrationNotification($createdUser));
+                }
+            } catch (\Throwable $e) {
+            }
+
+            Auth::login($createdUser);
+            session()->forget(['reg_account', 'reg_step1', 'reg_step2', 'reg_step3']);
+
+            return redirect()->route('customer.dashboard')->with('status', 'Pendaftaran selesai! Selamat datang di SayaBantu.');
+        }
 
         if (Auth::check()) {
             $authUser = $request->user();
@@ -282,6 +350,12 @@ class OnboardingController extends Controller
             return redirect()->route('register.choose-role');
         }
 
+        if ($this->isCustomerUser($user)) {
+            return ($user->exists && $user->is_completed)
+                ? redirect()->route('customer.dashboard')
+                : redirect()->route('onboarding.step1');
+        }
+
         if (Auth::check() && empty($user->password)) {
             return redirect()->route('onboarding.password');
         }
@@ -345,6 +419,12 @@ class OnboardingController extends Controller
         $user = $this->getRegistrationUser();
         if (! $user) {
             return redirect()->route('register.choose-role');
+        }
+
+        if ($this->isCustomerUser($user)) {
+            return ($user->exists && $user->is_completed)
+                ? redirect()->route('customer.dashboard')
+                : redirect()->route('onboarding.step1');
         }
 
         if (Auth::check() && empty($user->password)) {
@@ -412,6 +492,12 @@ class OnboardingController extends Controller
         $user = $this->getRegistrationUser();
         if (! $user) {
             return redirect()->route('register.choose-role');
+        }
+
+        if ($this->isCustomerUser($user)) {
+            return ($user->exists && $user->is_completed)
+                ? redirect()->route('customer.dashboard')
+                : redirect()->route('onboarding.step1');
         }
 
         if (Auth::check() && empty($user->password)) {

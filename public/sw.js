@@ -100,7 +100,6 @@ self.addEventListener('push', (event) => {
     body: data.body || 'Anda memiliki pemberitahuan baru di SayaBantu.',
     icon: data.icon || '/icons/icon-192x192.png',
     badge: data.badge || '/icons/icon-192x192.png',
-    vibrate: data.vibrate || [200, 100, 200],
     tag: data.tag || 'sayabantu-notification',
     renotify: true,
     requireInteraction: Boolean(data.requireInteraction),
@@ -108,6 +107,7 @@ self.addEventListener('push', (event) => {
     data: {
       url: data.url || '/',
       type: data.type || 'info',
+      isUrgent: Boolean((data.data && data.data.isUrgent) || data.isUrgent),
       time: Date.now()
     },
     actions: [
@@ -115,6 +115,14 @@ self.addEventListener('push', (event) => {
       { action: 'close', title: 'Tutup' }
     ]
   };
+
+  if (Array.isArray(data.vibrate)) {
+    if (data.vibrate.length > 0) {
+      options.vibrate = data.vibrate;
+    }
+  } else {
+    options.vibrate = [200, 100, 200];
+  }
 
   if (data.image) {
     options.image = data.image;
@@ -137,6 +145,7 @@ self.addEventListener('push', (event) => {
                 icon: options.icon,
                 tag: options.tag,
                 type: options.data.type,
+                isUrgent: options.data.isUrgent,
               }
             });
           }

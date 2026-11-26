@@ -18,10 +18,11 @@ trait HasProfileCompleteness
         // 1. Ambil semua field biodata teks dasar
         $missing = $this->getMissingBiodataFields();
 
-        // 2. Foto KTP & Selfie HANYA ditagih jika akun BELUM diverifikasi.
-        // Jika akun SUDAH berstatus verified == true (sudah diverifikasi oleh Admin/Super Admin),
-        // maka kewajiban upload file foto KTP & Selfie otomatis diabaikan.
-        if (! $this->verified) {
+        // 2. Customer tidak wajib KTP/Selfie (opsional lewat menu Verifikasi KTP Premium di Profil).
+        // Mitra wajib mengunggah Foto KTP & Selfie jika belum berstatus verified.
+        $isCustomer = in_array($this->role ?? 'customer', ['customer', 'kustomer'], true);
+
+        if (! $isCustomer && ! $this->verified) {
             if (empty($this->ktp_photo) && empty($this->ktp_path)) {
                 $missing['ktp_photo'] = 'Foto KTP';
             }
@@ -37,14 +38,17 @@ trait HasProfileCompleteness
     public function getMissingBiodataFields(): array
     {
         $missing = [];
+        $isCustomer = in_array($this->role ?? 'customer', ['customer', 'kustomer'], true);
 
         if (empty(trim((string) $this->name))) {
             $missing['name'] = 'Nama Lengkap';
         }
 
-        $cleanNik = preg_replace('/[^0-9]/', '', (string) $this->nik);
-        if (empty($cleanNik) || strlen($cleanNik) !== 16) {
-            $missing['nik'] = 'NIK (16 Digit Angka)';
+        if (! $isCustomer) {
+            $cleanNik = preg_replace('/[^0-9]/', '', (string) $this->nik);
+            if (empty($cleanNik) || strlen($cleanNik) !== 16) {
+                $missing['nik'] = 'NIK (16 Digit Angka)';
+            }
         }
 
         $cleanPhone = preg_replace('/[^0-9]/', '', (string) $this->phone);

@@ -17,6 +17,8 @@ class FeePendapatan extends Component
 {
     public $customer_service_fee_percent = 10;
 
+    public $customer_verified_service_fee_percent = 0;
+
     public $mitra_platform_fee_percent = 10;
 
     public $admin_fee = 0;
@@ -25,6 +27,7 @@ class FeePendapatan extends Component
     {
         return [
             'customer_service_fee_percent' => 'required|numeric|min:0|max:100',
+            'customer_verified_service_fee_percent' => 'required|numeric|min:0|max:100',
             'mitra_platform_fee_percent' => 'required|numeric|min:0|max:100',
             'admin_fee' => 'nullable|numeric|min:0',
         ];
@@ -33,6 +36,7 @@ class FeePendapatan extends Component
     public function mount()
     {
         $this->customer_service_fee_percent = (float) AppSetting::get('customer_service_fee_percent', 10);
+        $this->customer_verified_service_fee_percent = (float) AppSetting::get('customer_verified_service_fee_percent', 0);
         $this->mitra_platform_fee_percent = (float) AppSetting::get('mitra_platform_fee_percent', 10);
         $this->admin_fee = (int) AppSetting::get('admin_fee', 0);
     }
@@ -43,6 +47,7 @@ class FeePendapatan extends Component
         $this->validate();
 
         AppSetting::set('customer_service_fee_percent', (string) $this->customer_service_fee_percent);
+        AppSetting::set('customer_verified_service_fee_percent', (string) $this->customer_verified_service_fee_percent);
         AppSetting::set('mitra_platform_fee_percent', (string) $this->mitra_platform_fee_percent);
         AppSetting::set('admin_fee', (string) $this->admin_fee);
 

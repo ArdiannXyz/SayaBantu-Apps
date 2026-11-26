@@ -1313,7 +1313,7 @@
     @if ($showCompletionModal)
         <div class="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-fade-in">
             <div class="bg-white w-full max-w-md rounded-2xl shadow-xl overflow-hidden border border-gray-100 flex flex-col max-h-[85vh]"
-                @click.away="$wire.closeCompletionModal()">
+                @click.away="if (document.getElementById('cameraCaptureModal')?.classList.contains('hidden')) $wire.closeCompletionModal()">
                 
                 {{-- Header --}}
                 <div class="bg-gradient-to-r from-blue-600 to-indigo-600 px-5 py-3.5 text-white flex items-center justify-between flex-shrink-0">
@@ -1361,7 +1361,7 @@
                                     $previewBeforeUrl = null;
                                 }
                             @endphp
-                            <div class="relative rounded-lg overflow-hidden border border-amber-200 bg-gray-900 h-36 flex items-center justify-center group mb-1.5">
+                            <div class="relative rounded-lg overflow-hidden border border-amber-200 bg-gray-900 h-36 flex items-center justify-center group mb-2">
                                 @if($previewBeforeUrl)
                                     <img src="{{ $previewBeforeUrl }}" alt="Preview Before" class="h-full w-full object-contain">
                                 @else
@@ -1369,26 +1369,39 @@
                                         <p class="font-bold text-emerald-400">✓ Foto Awal Terpilih</p>
                                     </div>
                                 @endif
-                                <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
-                                    <label for="before_photo_input" class="px-3 py-1 bg-white text-gray-800 text-xs font-semibold rounded-lg cursor-pointer hover:bg-gray-100 transition shadow-xs">
-                                        Ganti Foto
-                                    </label>
-                                </div>
+                            </div>
+                            <div class="flex items-center justify-center gap-2">
+                                <button type="button" onclick="openDirectCamera('before_photo_input', 'before')" class="inline-flex items-center gap-1.5 whitespace-nowrap px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-amber-600 hover:bg-amber-700 transition cursor-pointer">
+                                    <span>Kamera</span>
+                                </button>
+                                <label for="before_photo_gallery" class="inline-flex items-center gap-1.5 whitespace-nowrap px-3 py-1.5 rounded-lg text-xs font-semibold text-gray-700 bg-white border border-gray-300 hover:bg-gray-100 transition cursor-pointer">
+                                    <span>Ganti dari Galeri</span>
+                                </label>
                             </div>
                         @else
-                            <label for="before_photo_input" class="flex flex-col items-center justify-center w-full h-28 border-2 border-dashed border-amber-300 rounded-lg cursor-pointer bg-white hover:bg-amber-100/50 transition">
-                                <div class="flex flex-col items-center justify-center py-3">
-                                    <svg class="w-6 h-6 text-amber-500 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-                                    </svg>
-                                    <p class="text-xs font-semibold text-gray-700">Pilih Foto Kondisi Awal</p>
-                                    <p class="text-[10px] text-gray-400">JPG, PNG, WebP (Maks 5 MB)</p>
+                            <div class="flex flex-col items-center justify-center w-full py-4 px-3 border-2 border-dashed border-amber-300 rounded-lg bg-white text-center space-y-2.5">
+                                <svg class="w-6 h-6 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                                <div class="flex flex-wrap items-center justify-center gap-2">
+                                    <button type="button" onclick="openDirectCamera('before_photo_input', 'before')" class="inline-flex items-center justify-center gap-1.5 whitespace-nowrap bg-amber-600 hover:bg-amber-700 text-white px-3.5 py-2 rounded-xl text-xs font-bold shadow-xs transition active:scale-95 cursor-pointer">
+                                        <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        </svg>
+                                        <span>Buka Kamera</span>
+                                    </button>
+                                    <label for="before_photo_gallery" class="inline-flex items-center justify-center gap-1.5 whitespace-nowrap bg-white hover:bg-gray-100 text-gray-700 border border-gray-300 px-3.5 py-2 rounded-xl text-xs font-semibold transition cursor-pointer">
+                                        <span>Pilih Galeri</span>
+                                    </label>
                                 </div>
-                            </label>
+                                <p class="text-[10px] text-gray-400">JPG, PNG, WebP (Maks 5 MB)</p>
+                            </div>
                         @endif
 
-                        <input type="file" id="before_photo_input" wire:model="before_photo" accept="image/png,image/jpeg,image/jpg,image/webp" class="hidden">
+                        <input type="file" id="before_photo_input" wire:model="before_photo" accept="image/*" capture="environment" class="sr-only">
+                        <input type="file" id="before_photo_gallery" accept="image/png,image/jpeg,image/jpg,image/webp" class="hidden" onchange="transferGalleryFile(this, 'before_photo_input')">
                         
                         <div x-show="uploadingBefore" class="mt-1.5" style="display: none;">
                             <div class="w-full bg-amber-200 rounded-full h-1.5 overflow-hidden">
@@ -1426,7 +1439,7 @@
                                     $previewUrl = null;
                                 }
                             @endphp
-                            <div class="relative rounded-lg overflow-hidden border border-emerald-200 bg-gray-900 h-40 flex items-center justify-center group mb-1.5">
+                            <div class="relative rounded-lg overflow-hidden border border-emerald-200 bg-gray-900 h-40 flex items-center justify-center group mb-2">
                                 @if($previewUrl)
                                     <img src="{{ $previewUrl }}" alt="Preview Bukti" class="h-full w-full object-contain">
                                 @else
@@ -1435,25 +1448,38 @@
                                         <p class="text-[10px] text-gray-300 mt-0.5">{{ is_object($completion_photo) && method_exists($completion_photo, 'getClientOriginalName') ? $completion_photo->getClientOriginalName() : 'Foto bukti' }}</p>
                                     </div>
                                 @endif
-                                <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
-                                    <label for="completion_photo_input" class="px-3 py-1 bg-white text-gray-800 text-xs font-semibold rounded-lg cursor-pointer hover:bg-gray-100 transition shadow-xs">
-                                        Ganti Foto
-                                    </label>
-                                </div>
+                            </div>
+                            <div class="flex items-center justify-center gap-2">
+                                <button type="button" onclick="openDirectCamera('completion_photo_input', 'after')" class="inline-flex items-center gap-1.5 whitespace-nowrap px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 transition cursor-pointer">
+                                    <span>Ambil Ulang (Kamera)</span>
+                                </button>
+                                <label for="completion_photo_gallery" class="inline-flex items-center gap-1.5 whitespace-nowrap px-3 py-1.5 rounded-lg text-xs font-semibold text-gray-700 bg-white border border-gray-300 hover:bg-gray-100 transition cursor-pointer">
+                                    <span>Ganti dari Galeri</span>
+                                </label>
                             </div>
                         @else
-                            <label for="completion_photo_input" class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-emerald-400 rounded-lg cursor-pointer bg-white hover:bg-emerald-100/50 transition">
-                                <div class="flex flex-col items-center justify-center py-3">
-                                    <svg class="w-7 h-7 text-emerald-600 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                    <p class="text-xs font-semibold text-gray-800">Pilih Foto Hasil Selesai</p>
-                                    <p class="text-[10px] text-gray-400">JPG, PNG, WebP (Maks 5 MB)</p>
+                            <div class="flex flex-col items-center justify-center w-full py-4 px-3 border-2 border-dashed border-emerald-400 rounded-lg bg-white text-center space-y-2.5">
+                                <svg class="w-7 h-7 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <div class="flex flex-wrap items-center justify-center gap-2">
+                                    <button type="button" onclick="openDirectCamera('completion_photo_input', 'after')" class="inline-flex items-center justify-center gap-1.5 whitespace-nowrap bg-[#0066FF] hover:bg-[#0052cc] text-white px-4 py-2 rounded-xl text-xs font-bold shadow-xs transition active:scale-95 cursor-pointer">
+                                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        </svg>
+                                        <span>Buka Kamera</span>
+                                    </button>
+                                    <label for="completion_photo_gallery" class="inline-flex items-center justify-center gap-1.5 whitespace-nowrap bg-white hover:bg-gray-100 text-gray-700 border border-gray-300 px-3.5 py-2 rounded-xl text-xs font-semibold transition cursor-pointer">
+                                        <span>Pilih Galeri</span>
+                                    </label>
                                 </div>
-                            </label>
+                                <p class="text-[10px] text-gray-400">JPG, PNG, WebP (Maks 5 MB)</p>
+                            </div>
                         @endif
 
-                        <input type="file" id="completion_photo_input" wire:model="completion_photo" accept="image/png,image/jpeg,image/jpg,image/webp" class="hidden">
+                        <input type="file" id="completion_photo_input" wire:model="completion_photo" accept="image/*" capture="environment" class="sr-only">
+                        <input type="file" id="completion_photo_gallery" accept="image/png,image/jpeg,image/jpg,image/webp" class="hidden" onchange="transferGalleryFile(this, 'completion_photo_input')">
                         
                         {{-- Upload Progress Bar --}}
                         <div x-show="uploading" class="mt-1.5" style="display: none;">

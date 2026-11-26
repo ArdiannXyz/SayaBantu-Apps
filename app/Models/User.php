@@ -150,6 +150,8 @@ class User extends Authenticatable implements MustVerifyEmail
         'kecamatan',
         'city',
         'province',
+        'latitude',
+        'longitude',
         'religion',
         'marital_status',
         'occupation',

@@ -11,8 +11,7 @@
 
     $u = auth()->user();
     $needsProfileAttention = $u && (
-        !$u->verified || 
-        !empty($u->getMissingBiodataFields()) || 
+        !empty($u->getMissingBiodataFields()) ||
         !$u->hasVerifiedEmail()
     );
 

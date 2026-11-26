@@ -1,16 +1,8 @@
 <div class="min-h-screen bg-gray-100"
-    x-data
-    x-init="
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-                p => {
-                    $wire.setCoordinates(p.coords.latitude, p.coords.longitude);
-                },
-                err => {},
-                { enableHighAccuracy: true, timeout: 8000 }
-            );
-        }
-    "
+    x-data="{
+        gpsGranted: (window._sbMitraGpsState === 'granted') || (Boolean(window._sbMitraGps) && (Date.now() - window._sbMitraGps.ts) < 120000)
+    }"
+    @sb-mitra-gps-changed.window="gpsGranted = ($event.detail.state === 'granted')"
 >
     <style>
         :root{
@@ -372,8 +364,11 @@
             </div>
         @endif
 
+        <!-- Guard Wajib Aktifkan Lokasi GPS Mitra -->
+        <x-mitra-location-guard />
+
         <!-- Order Terdekat Section (Gambar 1) -->
-        <div class="mb-5">
+        <div class="mb-5" x-show="gpsGranted" x-cloak>
             <div class="flex items-center justify-between mb-3">
                 <h2 class="text-sm font-extrabold text-gray-900">Order Terdekat</h2>
                 <a href="{{ route('mitra.helps.all') }}" wire:navigate class="text-xs font-bold text-[#0066FF] hover:underline">
@@ -415,6 +410,9 @@
                             <p class="text-[11px] text-gray-500 truncate mt-0.5 flex items-center gap-1">
                                 <span>📍</span>
                                 <span>{{ Str::limit($addressStr, 35) }}</span>
+                                @if($distLabel)
+                                    <span class="text-[#0066FF] font-semibold shrink-0">• {{ $distLabel }}</span>
+                                @endif
                             </p>
                             <div class="flex items-center gap-2 mt-1">
                                 <span class="text-xs font-black text-gray-900">{{ format_rupiah($help->amount) }}</span>
@@ -431,13 +429,9 @@
                                 <span class="text-[10px] font-bold text-amber-700 bg-amber-50 border border-amber-200 px-3 py-1.5 rounded-full">Sedang Bertugas</span>
                             @else
                                 <button type="button"
-                                    onclick="event.stopPropagation()"
-                                    wire:click.stop="takeHelp({{ $help->id }})"
-                                    wire:loading.attr="disabled"
-                                    wire:target="takeHelp({{ $help->id }})"
+                                    onclick="event.stopPropagation(); takeHelpDirect({{ $help->id }});"
                                     class="bg-emerald-500 hover:bg-emerald-600 active:scale-95 text-white font-bold text-xs px-4 py-1.5 rounded-full shadow-xs transition flex items-center gap-1 cursor-pointer">
-                                    <span wire:loading.remove wire:target="takeHelp({{ $help->id }})">Ambil</span>
-                                    <span wire:loading wire:target="takeHelp({{ $help->id }})">...</span>
+                                    <span>Ambil</span>
                                 </button>
                             @endif
                         </div>
@@ -819,6 +813,36 @@
             currentHelpId = null;
         }
 
+        function takeHelpDirect(helpId) {
+            if (!helpId) return;
+
+            const cached = window._sbMitraGps;
+            if (cached && cached.lat && cached.lng && (Date.now() - cached.ts) < 300000) {
+                @this.takeHelp(helpId, cached.lat, cached.lng);
+                return;
+            }
+
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const lat = position.coords.latitude;
+                        const lng = position.coords.longitude;
+                        window._sbMitraGps = { lat, lng, ts: Date.now() };
+                        @this.takeHelp(helpId, lat, lng);
+                    },
+                    () => {
+                        window.dispatchEvent(new CustomEvent('mitra-request-gps'));
+                        if (typeof window.sbToast === 'function') {
+                            window.sbToast('Aktifkan lokasi GPS terlebih dahulu untuk mengambil bantuan.', 'error');
+                        }
+                    },
+                    { enableHighAccuracy: true, timeout: 6000, maximumAge: 60000 }
+                );
+            } else {
+                window.dispatchEvent(new CustomEvent('mitra-request-gps'));
+            }
+        }
+
         function takeHelpFromModal() {
             if (!currentHelpId) return;
 
@@ -830,53 +854,49 @@
                 btn.disabled = true;
             }
 
-            let taken = false;
-            const completeTake = (lat = null, lng = null) => {
-                if (taken) return;
-                taken = true;
-                clearTimeout(fallbackTimer);
-
-                if (lat && lng) {
-                    @this.takeHelp(currentHelpId, lat, lng);
-                } else {
-                    @this.takeHelp(currentHelpId);
-                }
-
-                closePreviewModal();
-
+            const resetBtn = () => {
                 if (btn) {
                     btn.textContent = originalText;
                     btn.disabled = false;
                 }
             };
 
-            // Batas maksimal tunggu deteksi GPS adalah 1.8 detik agar tidak pernah stuck/macet
-            const fallbackTimer = setTimeout(() => {
-                completeTake();
-            }, 1800);
+            const cached = window._sbMitraGps;
+            if (cached && cached.lat && cached.lng && (Date.now() - cached.ts) < 300000) {
+                @this.takeHelp(currentHelpId, cached.lat, cached.lng);
+                closePreviewModal();
+                resetBtn();
+                return;
+            }
 
-            // Coba ambil lokasi secara cepat jika browser mendukung
+            // Wajib cek GPS aktif saat mengambil bantuan
             if (navigator.geolocation) {
-                try {
-                    navigator.geolocation.getCurrentPosition(
-                        (position) => {
-                            completeTake(position.coords.latitude, position.coords.longitude);
-                        },
-                        (error) => {
-                            console.warn('⚠️ Lokasi GPS tidak dapat diakses, mengambil bantuan langsung:', error.message);
-                            completeTake();
-                        },
-                        {
-                            enableHighAccuracy: false,
-                            timeout: 1500,
-                            maximumAge: 300000 // gunakan cache lokasi 5 menit terakhir jika ada
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const lat = position.coords.latitude;
+                        const lng = position.coords.longitude;
+                        window._sbMitraGps = { lat, lng, ts: Date.now() };
+                        @this.takeHelp(currentHelpId, lat, lng);
+                        closePreviewModal();
+                        resetBtn();
+                    },
+                    () => {
+                        resetBtn();
+                        closePreviewModal();
+                        window.dispatchEvent(new CustomEvent('mitra-request-gps'));
+                        if (typeof window.sbToast === 'function') {
+                            window.sbToast('Aktifkan lokasi GPS terlebih dahulu untuk mengambil bantuan.', 'error');
                         }
-                    );
-                } catch (e) {
-                    completeTake();
-                }
+                    },
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 6000,
+                        maximumAge: 60000
+                    }
+                );
             } else {
-                completeTake();
+                resetBtn();
+                window.dispatchEvent(new CustomEvent('mitra-request-gps'));
             }
         }
 

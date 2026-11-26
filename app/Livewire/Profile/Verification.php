@@ -8,12 +8,15 @@ use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
 class Verification extends Component
 {
     use WithFileUploads;
+
+    public string $nik = '';
 
     public $ktp_photo;
 
@@ -23,6 +26,8 @@ class Verification extends Component
 
     public $existing_selfie;
 
+    public bool $isVerified = false;
+
     public $rejection_reason = null;
 
     public $is_rejected = false;
@@ -30,8 +35,10 @@ class Verification extends Component
     public function mount()
     {
         $user = Auth::user();
+        $this->nik = (string) ($user->nik ?? '');
         $this->existing_ktp = $user->ktp_photo;
         $this->existing_selfie = $user->selfie_photo;
+        $this->isVerified = (bool) ($user->verified ?? false);
 
         $reg = Registration::where('email', $user->email)->first();
         if ($reg && $reg->status === 'rejected') {
@@ -42,18 +49,49 @@ class Verification extends Component
 
     public function save()
     {
-        $this->validate([
-            'ktp_photo' => 'nullable|image|max:15360', // 15MB Max
-            'selfie_photo' => 'nullable|image|max:15360', // 15MB Max
-        ], [
+        $user = Auth::user();
+        $this->nik = preg_replace('/\D/', '', $this->nik);
+
+        $rules = [
+            'ktp_photo' => (empty($user->ktp_photo) ? 'required|' : 'nullable|').'image|max:15360', // 15MB Max
+            'selfie_photo' => (empty($user->selfie_photo) ? 'required|' : 'nullable|').'image|max:15360', // 15MB Max
+        ];
+
+        if (! $user->verified) {
+            $rules['nik'] = [
+                'required',
+                'digits:16',
+                Rule::unique('users', 'nik')->ignore($user->id),
+                function (string $attribute, mixed $value, \Closure $fail) use ($user) {
+                    $existsInReg = Registration::where('nik', $value)
+                        ->where('email', '!=', $user->email)
+                        ->where('status', '!=', 'rejected')
+                        ->exists();
+                    if ($existsInReg) {
+                        $fail('NIK ini sudah terdaftar pada pengajuan akun lain.');
+                    }
+                },
+            ];
+        }
+
+        $this->validate($rules, [
+            'nik.required' => 'NIK wajib diisi untuk verifikasi KTP.',
+            'nik.digits' => 'NIK harus terdiri dari tepat 16 digit angka.',
+            'nik.unique' => 'NIK ini sudah digunakan oleh akun lain.',
+            'ktp_photo.required' => 'Foto KTP wajib diunggah.',
             'ktp_photo.image' => 'File KTP harus berupa gambar.',
             'ktp_photo.max' => 'Ukuran gambar KTP maksimal 15MB.',
+            'selfie_photo.required' => 'Foto Selfie dengan KTP wajib diunggah.',
             'selfie_photo.image' => 'File Selfie harus berupa gambar.',
             'selfie_photo.max' => 'Ukuran gambar Selfie maksimal 15MB.',
         ]);
 
-        $user = Auth::user();
         $changes = 0;
+
+        if (! $user->verified && $this->nik !== '' && $this->nik !== (string) $user->nik) {
+            $user->nik = $this->nik;
+            $changes++;
+        }
 
         if ($this->ktp_photo) {
             // Hapus yang lama jika ada
@@ -149,6 +187,7 @@ class Verification extends Component
         if ($existing) {
             $existing->update([
                 'role' => $role,
+                'nik' => $user->nik ?: $existing->nik,
                 'ktp_photo_path' => $user->ktp_photo ?? $existing->ktp_photo_path,
                 'selfie_photo_path' => $user->selfie_photo ?? $existing->selfie_photo_path,
                 'city_id' => $user->city_id ?? $existing->city_id,

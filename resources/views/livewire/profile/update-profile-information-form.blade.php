@@ -37,15 +37,30 @@ x-on:profile-saved.window="
     <form wire:submit.prevent="updateProfileInformation" class="space-y-5">
 
         @if(!optional(auth()->user())->verified && (empty(auth()->user()->ktp_photo) || empty(auth()->user()->selfie_photo)))
-        <div class="bg-amber-50 border border-amber-200 p-4 rounded-xl mb-2">
-            <p class="text-sm text-amber-900 font-bold mb-1">Upload Data Diri (KTP &amp; Selfie)</p>
-            <p class="text-xs text-amber-800 mb-2">
-                Untuk mengajukan atau mengambil bantuan, Anda juga wajib mengunggah Foto KTP dan Foto Selfie (Wajah &amp; KTP).
-            </p>
-            <a href="{{ route('profile.settings.verification') }}" wire:navigate class="inline-block px-3 py-1.5 bg-amber-200 text-amber-900 font-bold rounded-lg text-xs hover:bg-amber-300 transition">
-                Ke Halaman Upload &rarr;
-            </a>
-        </div>
+            @if(optional(auth()->user())->isMitra())
+                <div class="bg-amber-50 border border-amber-200 p-4 rounded-xl mb-2">
+                    <p class="text-sm text-amber-900 font-bold mb-1">Upload Data Diri (KTP &amp; Selfie)</p>
+                    <p class="text-xs text-amber-800 mb-2">
+                        Untuk mengambil bantuan sebagai Mitra, Anda wajib mengunggah Foto KTP dan Foto Selfie (Wajah &amp; KTP).
+                    </p>
+                    <a href="{{ route('profile.settings.verification') }}" wire:navigate class="inline-block px-3 py-1.5 bg-amber-200 text-amber-900 font-bold rounded-lg text-xs hover:bg-amber-300 transition">
+                        Ke Halaman Upload &rarr;
+                    </a>
+                </div>
+            @else
+                <div class="bg-gradient-to-r from-indigo-50 to-blue-50 border border-indigo-200 p-4 rounded-xl mb-2">
+                    <div class="flex items-center justify-between gap-2 mb-1">
+                        <p class="text-sm text-indigo-950 font-bold">✨ Upgrade Akun Premium (Verifikasi KTP)</p>
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-100 text-indigo-700">Opsional</span>
+                    </div>
+                    <p class="text-xs text-indigo-800 mb-2.5">
+                        Verifikasi NIK &amp; KTP sekarang untuk menikmati promo pengurangan biaya layanan aplikasi hingga <strong>Rp 0</strong>!
+                    </p>
+                    <a href="{{ route('profile.settings.verification') }}" wire:navigate class="inline-block px-3.5 py-1.5 bg-indigo-600 text-white font-bold rounded-lg text-xs hover:bg-indigo-700 transition shadow-xs">
+                        Verifikasi KTP Sekarang &rarr;
+                    </a>
+                </div>
+            @endif
         @endif
 
         <!-- Name -->
@@ -73,6 +88,7 @@ x-on:profile-saved.window="
             @enderror
         </div>
 
+        @if(!empty($nik) || optional(auth()->user())->isMitra() || optional(auth()->user())->verified)
         <!-- NIK (Nomor Induk Kependudukan - Terkunci / Dinonaktifkan) -->
         <div>
             <div class="flex items-center justify-between mb-2">
@@ -103,6 +119,7 @@ x-on:profile-saved.window="
             </div>
             <p class="mt-1 text-[11px] text-gray-400">NIK terikat dengan identitas KTP akun dan tidak dapat diubah.</p>
         </div>
+        @endif
 
         <!-- Gender (Jenis Kelamin) -->
         <div>

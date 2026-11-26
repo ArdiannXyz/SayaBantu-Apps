@@ -280,6 +280,12 @@ export const SayaBantuPush = {
             const { type, payload = {} } = event.data;
 
             if (type === 'SAYABANTU_PUSH_SYNC') {
+                if (payload.isUrgent && window.sbNotifSettings?.soundCall && typeof window.playRingChime === 'function') {
+                    window.playRingChime();
+                }
+                if (typeof window.triggerVibrate === 'function') {
+                    window.triggerVibrate();
+                }
                 window.dispatchEvent(new CustomEvent('sb-push-notification-sync', { detail: payload }));
                 if (window.Livewire && typeof window.Livewire.dispatch === 'function') {
                     try {
@@ -296,6 +302,7 @@ export const SayaBantuPush = {
                         message: payload.body || 'Anda memiliki notifikasi baru.',
                         url: payload.url || '#',
                         type: payload.type || 'info',
+                        isUrgent: Boolean(payload.isUrgent),
                         timeout: 6500,
                         sound: true,
                     });

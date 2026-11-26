@@ -227,11 +227,7 @@ class Create extends Component
             return;
         }
 
-        if ($user && ! $user->verified) {
-            $this->isKtpVerified = false;
-
-            return;
-        }
+        $this->isKtpVerified = (bool) ($user?->verified ?? false);
 
         if ($user) {
             $this->activeHelpsCount = $user->getActiveCustomerHelpsCount();
@@ -767,12 +763,6 @@ class Create extends Component
             return;
         }
 
-        if (! $user->verified) {
-            session()->flash('error', 'Akun Anda belum terverifikasi KTP oleh Admin. Silakan tunggu proses verifikasi disetujui sebelum mengajukan bantuan.');
-
-            return;
-        }
-
         if (! $user->canCreateMoreHelps()) {
             if (! $user->hasVerifiedEmail()) {
                 session()->flash('error', 'Akun Anda belum verifikasi email dan telah mencapai batas maksimal 2 permintaan bantuan. Silakan verifikasi email Anda terlebih dahulu untuk membuat bantuan baru.');
@@ -787,7 +777,8 @@ class Create extends Component
             ? (float) AppSetting::get('default_urgent_nominal', 50000)
             : (float) AppSetting::get('min_help_nominal', 10000);
         $maxNominal = (float) AppSetting::get('max_help_nominal', 10000000);
-        $custPercent = (float) AppSetting::get('customer_service_fee_percent', 10);
+        $custPercent = auth()->user()?->getCustomerServiceFeePercent()
+            ?? (float) AppSetting::get('customer_service_fee_percent', 10);
         $mitraPercent = (float) AppSetting::get('mitra_platform_fee_percent', 10);
         $adminFee = 0;
 
@@ -906,12 +897,37 @@ class Create extends Component
 
             $customerUser = auth()->user();
             if ($customerUser && ! $customerUser->isShadowBanned()) {
-                $mitras = \App\Models\User::where('role', 'mitra')
+                $maxRadius = (float) AppSetting::get('mitra_max_distance_km', AppSetting::get('max_help_radius_km', 10));
+                $helpLat = $help->latitude ? (float) $help->latitude : null;
+                $helpLng = $help->longitude ? (float) $help->longitude : null;
+
+                $allMitras = \App\Models\User::where('role', 'mitra')
                     ->where('status', 'active')
                     ->where('verified', true)
                     ->where('is_shadow_banned', false)
-                    ->where('city_id', $this->city_id)
                     ->get();
+
+                $cityCoords = \App\Models\City::whereIn('id', $allMitras->pluck('city_id')->filter()->unique())
+                    ->get(['id', 'latitude', 'longitude'])
+                    ->keyBy('id');
+
+                $mitras = $allMitras->filter(function ($mitra) use ($helpLat, $helpLng, $maxRadius, $cityCoords) {
+                    if ($helpLat && $helpLng) {
+                        $mLat = ! empty($mitra->latitude) ? (float) $mitra->latitude : (! empty($cityCoords[$mitra->city_id]?->latitude) ? (float) $cityCoords[$mitra->city_id]->latitude : null);
+                        $mLng = ! empty($mitra->longitude) ? (float) $mitra->longitude : (! empty($cityCoords[$mitra->city_id]?->longitude) ? (float) $cityCoords[$mitra->city_id]->longitude : null);
+
+                        if ($mLat && $mLng) {
+                            $dist = 6371 * acos(min(1.0, max(-1.0,
+                                cos(deg2rad($mLat)) * cos(deg2rad($helpLat)) * cos(deg2rad($helpLng) - deg2rad($mLng))
+                                + sin(deg2rad($mLat)) * sin(deg2rad($helpLat))
+                            )));
+
+                            return $dist <= $maxRadius;
+                        }
+                    }
+
+                    return $mitra->city_id == $this->city_id;
+                })->values();
 
                 if ($mitras->count() > 0) {
                     \Illuminate\Support\Facades\Notification::send($mitras, new \App\Notifications\NewHelpRequestNotification($help));
@@ -967,18 +983,12 @@ class Create extends Component
             return;
         }
 
-        if (! $user->verified) {
-            session()->flash('error', 'Akun Anda belum terverifikasi KTP oleh Admin. Silakan tunggu proses verifikasi disetujui sebelum mengajukan bantuan.');
-
-            return;
-        }
-
         $minNominal = $this->help_type === 'urgent'
             ? (float) AppSetting::get('default_urgent_nominal', 50000)
             : (float) AppSetting::get('min_help_nominal', 10000);
         $this->minNominal = (int) $minNominal;
         $maxNominal = (float) AppSetting::get('max_help_nominal', 10000000);
-        $custPercent = (float) AppSetting::get('customer_service_fee_percent', 10);
+        $custPercent = $user->getCustomerServiceFeePercent();
         $adminFee = 0;
 
         // Fallback koordinat jika belum dipilih di peta
@@ -1290,7 +1300,8 @@ class Create extends Component
         $this->showInsufficientModal = false;
 
         $baseAmount = (float) $this->amount;
-        $custPercent = (float) AppSetting::get('customer_service_fee_percent', 10);
+        $custPercent = auth()->user()?->getCustomerServiceFeePercent()
+            ?? (float) AppSetting::get('customer_service_fee_percent', 10);
         $custFeeAmount = ($baseAmount * $custPercent) / 100;
         $total = $baseAmount + $custFeeAmount;
 

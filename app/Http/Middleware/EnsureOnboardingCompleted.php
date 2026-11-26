@@ -23,6 +23,12 @@ class EnsureOnboardingCompleted
                 if (empty($user->password)) {
                     return redirect()->route('onboarding.password');
                 }
+
+                $isCustomer = in_array($user->role ?? 'customer', ['customer', 'kustomer'], true);
+                if ($isCustomer) {
+                    return redirect()->route('onboarding.step1');
+                }
+
                 if (empty($user->nik)) {
                     return redirect()->route('onboarding.step1');
                 }

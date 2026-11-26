@@ -315,6 +315,14 @@
                 ktpGuide.classList.add('hidden');
                 selfieGuide.classList.remove('hidden');
                 if (rotateBtn) rotateBtn.classList.add('hidden');
+            } else if (type === 'before' || type === 'after' || type === 'work') {
+                title.textContent = (type === 'before') ? 'Ambil Foto Kondisi Awal' : 'Ambil Foto Hasil Pekerjaan';
+                subtitle.textContent = (type === 'before')
+                    ? 'Arahkan kamera ke kondisi awal area kerja'
+                    : 'Arahkan kamera ke hasil pekerjaan yang telah selesai';
+                ktpGuide.classList.add('hidden');
+                selfieGuide.classList.add('hidden');
+                if (rotateBtn) rotateBtn.classList.add('hidden');
             } else {
                 title.textContent = 'Ambil Foto KTP';
                 subtitle.textContent = 'Posisikan fisik KTP Anda di dalam kotak panduan';
@@ -454,7 +462,10 @@
                 return;
             }
 
-            const fileName = (currentCaptureType === 'ktp' ? 'ktp_camera_' : 'selfie_camera_') + Date.now() + '.jpg';
+            const prefix = currentCaptureType === 'ktp'
+                ? 'ktp_camera_'
+                : (currentCaptureType === 'selfie' ? 'selfie_camera_' : 'work_camera_');
+            const fileName = prefix + Date.now() + '.jpg';
             const file = new File([capturedBlob], fileName, { type: 'image/jpeg', lastModified: Date.now() });
 
             const targetInput = document.getElementById(currentTargetInputId);

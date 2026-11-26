@@ -573,8 +573,15 @@ window.sbShowPushToast = function (argObj) {
 
         dock.appendChild(card);
 
-        if (options.sound !== false && typeof window.playNotifChime === 'function') {
-            window.playNotifChime();
+        if (options.sound !== false) {
+            if (options.isUrgent && window.sbNotifSettings?.soundCall && typeof window.playRingChime === 'function') {
+                window.playRingChime();
+            } else if (typeof window.playNotifChime === 'function') {
+                window.playNotifChime();
+            }
+        }
+        if (typeof window.triggerVibrate === 'function') {
+            window.triggerVibrate();
         }
 
         window._sbActivePushTimer = setInterval(() => {

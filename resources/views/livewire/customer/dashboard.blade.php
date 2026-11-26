@@ -430,13 +430,14 @@
             </div>
         </div>
 
-        <!-- Card Notifikasi Bertahap (If-Else): Biodata -> KTP -> Email (Hilang 1 per 1 jika sudah terpenuhi) -->
+        <!-- Card Notifikasi Bertahap (If-Else): Biodata -> Email -> Upgrade Premium KTP -->
         @php
             $dashUser = auth()->user();
             $needsBiodata = $dashUser && !$dashUser->isProfileComplete();
             $needsKtp = $dashUser && !(bool)$dashUser->verified;
-            $hasKtpUploaded = $dashUser && (!empty($dashUser->ktp_photo) && !empty($dashUser->selfie_photo));
+            $hasKtpUploaded = $dashUser && (!empty($dashUser->ktp_photo) && !empty($dashUser->selfie_photo) && !empty($dashUser->nik));
             $needsEmail = $dashUser && !$dashUser->hasVerifiedEmail();
+            $dashPremiumFee = (float) \App\Models\AppSetting::get('customer_verified_service_fee_percent', 0);
         @endphp
 
         @if($needsBiodata)
@@ -464,43 +465,12 @@
                 </a>
             </div>
 
-        @elseif($needsKtp)
-            {{-- 2. JIKA BIODATA SUDAH LENGKAP, BARU NUNGGU / VERIF KTP --}}
-            <div class="rounded-2xl p-3.5 text-xs mb-5 flex items-center justify-between gap-3 bg-white"
-                 style="border: 1.5px solid {{ $hasKtpUploaded ? '#3b82f6' : '#f59e0b' }}; box-shadow: 0 4px 14px {{ $hasKtpUploaded ? 'rgba(59, 130, 246, 0.15)' : 'rgba(245, 158, 11, 0.15)' }};">
-                <div class="flex items-center gap-3 min-w-0">
-                    <div style="background: linear-gradient(135deg, {{ $hasKtpUploaded ? '#3b82f6 0%, #1d4ed8 100%' : '#0ea5e9 0%, #0284c7 100%' }}); width: 38px; height: 38px; min-width: 38px; border-radius: 12px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(59, 130, 246, 0.35);">
-                        <svg style="width: 18px; height: 18px; color: #ffffff;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2" />
-                        </svg>
-                    </div>
-                    <div class="min-w-0">
-                        <div class="font-bold text-gray-900 text-xs flex items-center gap-1.5 flex-wrap">
-                            <span>{{ $hasKtpUploaded ? 'Verifikasi KTP' : 'Upload Dokumen KTP' }}</span>
-                            @if($hasKtpUploaded)
-                                <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-700 border border-blue-200">Menunggu Konfirmasi</span>
-                            @else
-                                <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-200">Wajib</span>
-                            @endif
-                        </div>
-                        <p class="text-[11px] text-gray-600 truncate mt-0.5">
-                            {{ $hasKtpUploaded ? 'Dokumen KTP Anda sedang ditinjau oleh Admin' : 'Upload KTP & Selfie untuk verifikasi akun' }}
-                        </p>
-                    </div>
-                </div>
-                <a href="{{ route('profile.settings.verification') }}" wire:navigate 
-                   class="flex-shrink-0 font-bold px-3.5 py-1.5 rounded-xl transition text-[11px] hover:opacity-95 active:scale-95 cursor-pointer shadow-xs {{ $hasKtpUploaded ? 'text-blue-700 bg-blue-50 border border-blue-200 hover:bg-blue-100' : 'text-white' }}"
-                   @if(!$hasKtpUploaded) style="background: linear-gradient(135deg, #0066FF 0%, #0052cc 100%); box-shadow: 0 2px 6px rgba(0, 102, 255, 0.35);" @endif>
-                    {{ $hasKtpUploaded ? 'Cek Status' : 'Upload' }}
-                </a>
-            </div>
-
         @elseif($needsEmail)
-            {{-- 3. JIKA KTP SUDAH DIVERIFIKASI, BARU EMAIL --}}
+            {{-- 2. JIKA BIODATA LENGKAP, VERIFIKASI EMAIL --}}
             <div class="rounded-2xl p-3.5 text-xs mb-5 flex items-center justify-between gap-3 bg-white"
                  style="border: 1.5px solid #f59e0b; box-shadow: 0 4px 14px rgba(245, 158, 11, 0.15);">
                 <div class="flex items-center gap-3 min-w-0">
-                    <div style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); width: 38px; height: 38px; min-width: 38px; border-radius: 12px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(245, 158, 11, 0.35);">
+                    <div style="background: linear-gradient(135deg, #f59e0b 0%, #ea580c 100%); width: 38px; height: 38px; min-width: 38px; border-radius: 12px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(234, 88, 12, 0.35);">
                         <svg style="width: 18px; height: 18px; color: #ffffff;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                         </svg>
@@ -520,6 +490,37 @@
                         Verifikasi
                     </button>
                 </form>
+            </div>
+
+        @elseif($needsKtp)
+            {{-- 3. OPSIONAL: UPGRADE AKUN PREMIUM VIA VERIFIKASI KTP --}}
+            <div class="rounded-2xl p-3.5 text-xs mb-5 flex items-center justify-between gap-3 bg-gradient-to-r from-indigo-50/90 via-white to-blue-50/90"
+                 style="border: 1.5px solid {{ $hasKtpUploaded ? '#3b82f6' : '#6366f1' }}; box-shadow: 0 4px 14px rgba(79, 70, 229, 0.14);">
+                <div class="flex items-center gap-3 min-w-0">
+                    <div style="background: linear-gradient(135deg, #4f46e5 0%, #0066FF 100%); width: 38px; height: 38px; min-width: 38px; border-radius: 12px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(79, 70, 229, 0.35);">
+                        <svg style="width: 18px; height: 18px; color: #ffffff;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                        </svg>
+                    </div>
+                    <div class="min-w-0">
+                        <div class="font-bold text-gray-900 text-xs flex items-center gap-1.5 flex-wrap">
+                            <span>{{ $hasKtpUploaded ? 'Verifikasi Akun Premium' : 'Upgrade Akun Premium' }}</span>
+                            @if($hasKtpUploaded)
+                                <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-700 border border-blue-200">Menunggu Admin</span>
+                            @else
+                                <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-indigo-100 text-indigo-800 border border-indigo-200">Promo</span>
+                            @endif
+                        </div>
+                        <p class="text-[11px] text-gray-600 truncate mt-0.5">
+                            {{ $hasKtpUploaded ? 'Dokumen KTP Anda sedang ditinjau oleh Admin' : 'Verifikasi KTP sekarang, biaya layanan hingga '.($dashPremiumFee == 0 ? 'Rp 0' : $dashPremiumFee.'%') }}
+                        </p>
+                    </div>
+                </div>
+                <a href="{{ route('profile.settings.verification') }}" wire:navigate 
+                   class="flex-shrink-0 font-bold px-3.5 py-1.5 rounded-xl transition text-[11px] hover:opacity-95 active:scale-95 cursor-pointer shadow-xs {{ $hasKtpUploaded ? 'text-blue-700 bg-blue-50 border border-blue-200 hover:bg-blue-100' : 'text-white' }}"
+                   @if(!$hasKtpUploaded) style="background: linear-gradient(135deg, #4f46e5 0%, #0066FF 100%); box-shadow: 0 2px 6px rgba(79, 70, 229, 0.35);" @endif>
+                    {{ $hasKtpUploaded ? 'Cek Status' : 'Upgrade' }}
+                </a>
             </div>
         @endif
 

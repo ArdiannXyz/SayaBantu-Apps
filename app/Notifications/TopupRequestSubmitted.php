@@ -28,6 +28,11 @@ class TopupRequestSubmitted extends Notification
      */
     public function via(object $notifiable): array
     {
+        $settings = $notifiable->notification_settings ?? [];
+        if (isset($settings['transactionUpdate']) && ! $settings['transactionUpdate']) {
+            return [];
+        }
+
         return ['database'];
     }
 

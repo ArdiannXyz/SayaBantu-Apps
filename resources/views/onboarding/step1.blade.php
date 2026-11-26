@@ -1,28 +1,42 @@
 <x-guest-layout>
+    @php
+        $isCustomer = in_array($user->role ?? 'customer', ['customer', 'kustomer'], true);
+    @endphp
     <div class="w-full flex-1 flex flex-col justify-between py-2">
         <div>
             <!-- Header Step 1 -->
             <div class="mb-5">
                 <h2 class="text-xl font-bold text-gray-900 text-center mb-3">Data Diri</h2>
 
-                <!-- Step Progress Bar -->
-                <div class="flex items-center gap-1.5 mb-2">
-                    <div class="flex-1 h-1.5 bg-blue-600 rounded-full"></div>
-                    <div class="flex-1 h-1.5 bg-gray-200 rounded-full"></div>
-                    <div class="flex-1 h-1.5 bg-gray-200 rounded-full"></div>
-                    <div class="flex-1 h-1.5 bg-gray-200 rounded-full"></div>
-                </div>
+                @if($isCustomer)
+                    <div class="flex items-center gap-1.5 mb-2">
+                        <div class="flex-1 h-1.5 bg-blue-600 rounded-full"></div>
+                    </div>
+                    <div class="flex items-center justify-between text-xs text-gray-500">
+                        <span>Lengkapi data diri Anda untuk mulai memesan layanan</span>
+                        <span class="font-bold text-blue-600">Langkah Terakhir</span>
+                    </div>
+                @else
+                    <!-- Step Progress Bar -->
+                    <div class="flex items-center gap-1.5 mb-2">
+                        <div class="flex-1 h-1.5 bg-blue-600 rounded-full"></div>
+                        <div class="flex-1 h-1.5 bg-gray-200 rounded-full"></div>
+                        <div class="flex-1 h-1.5 bg-gray-200 rounded-full"></div>
+                        <div class="flex-1 h-1.5 bg-gray-200 rounded-full"></div>
+                    </div>
 
-                <!-- Sub Row: Left hint & Right Step indicator -->
-                <div class="flex items-center justify-between text-xs text-gray-500">
-                    <span>Isi data sesuai KTP asli Anda</span>
-                    <span class="font-bold text-blue-600">Langkah 1 dari 4</span>
-                </div>
+                    <!-- Sub Row: Left hint & Right Step indicator -->
+                    <div class="flex items-center justify-between text-xs text-gray-500">
+                        <span>Isi data sesuai KTP asli Anda</span>
+                        <span class="font-bold text-blue-600">Langkah 1 dari 4</span>
+                    </div>
+                @endif
             </div>
 
             <form action="{{ route('onboarding.step1.store') }}" method="POST" class="space-y-4" id="step1Form">
                 @csrf
 
+                @if(!$isCustomer)
                 <!-- NIK -->
                 <div>
                     <label for="nik" class="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">
@@ -38,13 +52,14 @@
                     </div>
                     @error('nik') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
+                @endif
 
                 <!-- Nama Lengkap -->
                 <div>
                     <label for="name" class="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">
                         Nama Lengkap
                     </label>
-                    <input name="name" id="name" type="text" autocomplete="name" placeholder="Nama lengkap sesuai KTP"
+                    <input name="name" id="name" type="text" autocomplete="name" placeholder="{{ $isCustomer ? 'Nama lengkap Anda' : 'Nama lengkap sesuai KTP' }}"
                         value="{{ old('name', $user->name ?? '') }}" required
                         oninput="this.value = this.value.replace(/[^a-zA-Z\s]/g, '')"
                         class="w-full px-4 py-3 bg-gray-50/70 border border-gray-200 rounded-xl text-gray-900 text-sm placeholder-gray-400 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition shadow-2xs font-medium @error('name') border-red-500 @enderror">
@@ -97,6 +112,7 @@
                     }
                 @endphp
 
+                @if(!$isCustomer)
                 <!-- Info Khusus Wilayah Kerja / Mitra Perantau -->
                 <div class="p-3.5 bg-blue-50/90 border border-blue-200 rounded-2xl flex items-start gap-3 shadow-xs">
                     <div class="w-8 h-8 rounded-xl bg-blue-600/10 text-blue-600 flex items-center justify-center shrink-0 mt-0.5">
@@ -115,6 +131,21 @@
                         </p>
                     </div>
                 </div>
+                @else
+                <div class="p-3.5 bg-gradient-to-r from-blue-50 to-indigo-50/80 border border-blue-200/80 rounded-2xl flex items-start gap-3 shadow-2xs">
+                    <div class="w-8 h-8 rounded-xl bg-blue-600/10 text-[#0066FF] flex items-center justify-center shrink-0 mt-0.5">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                        </svg>
+                    </div>
+                    <div class="text-xs text-blue-900 leading-relaxed">
+                        <p class="font-bold text-blue-950 mb-0.5">Tanpa Upload KTP di Awal</p>
+                        <p class="text-blue-800/90">
+                            Anda bisa langsung masuk aplikasi setelah mengisi alamat domisili. Verifikasi KTP bisa dilakukan kapan saja dari <strong>Profil</strong> untuk upgrade ke <strong>Akun Premium</strong> (promo bebas biaya layanan hingga Rp 0).
+                        </p>
+                    </div>
+                </div>
+                @endif
 
                 <!-- 1. PROVINSI DOMISILI -->
                 <div>
@@ -201,7 +232,7 @@
                 <div class="pt-5 pb-2">
                     <button type="submit"
                         class="w-full text-white font-bold py-3.5 sm:py-4 rounded-full shadow-md shadow-blue-500/25 hover:bg-[#0055D4] active:scale-[0.98] transition text-base tracking-wide bg-[#0066FF] cursor-pointer">
-                        Lanjutkan ke Foto KTP →
+                        {{ $isCustomer ? 'Selesai & Masuk ke Aplikasi →' : 'Lanjutkan ke Foto KTP →' }}
                     </button>
                 </div>
             </form>

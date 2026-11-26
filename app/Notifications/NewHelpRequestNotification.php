@@ -32,7 +32,10 @@ class NewHelpRequestNotification extends Notification
         return [
             'type' => 'help_request',
             'help_id' => $this->help->id,
-            'title' => 'Permintaan Bantuan Baru',
+            'help_type' => $this->help->help_type ?? 'scheduled',
+            'title' => ($this->help->help_type ?? '') === 'urgent'
+                ? '🚨 Permintaan Bantuan Urgent Baru'
+                : 'Permintaan Bantuan Baru',
             'message' => "Ada permintaan bantuan baru di sekitar Anda: '{$this->help->title}'. Segera ambil sebelum keduluan mitra lain!",
             'help_amount' => $this->help->amount,
             'customer_name' => $this->help->user?->name ?? 'Customer',

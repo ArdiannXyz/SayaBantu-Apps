@@ -46,6 +46,14 @@
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
+    <script>
+        window.sbNotifSettings = @json(auth()->check() ? auth()->user()->getNotificationSettings() : \App\Models\User::defaultNotificationSettings());
+        window.addEventListener('notification-settings-updated', function (e) {
+            if (e && e.detail && e.detail.settings) {
+                window.sbNotifSettings = e.detail.settings;
+            }
+        });
+    </script>
     @stack('styles')
     <style>
         [x-cloak] { display: none !important; }
@@ -369,9 +377,12 @@
 
                 container.appendChild(wrap);
 
-                // Play audio chime if available
+                // Play audio chime & vibrate if user settings permit
                 if (typeof window.playNotifChime === 'function') {
                     window.playNotifChime();
+                }
+                if (typeof window.triggerVibrate === 'function') {
+                    window.triggerVibrate();
                 }
 
                 const effectiveTimeout = (isRejected || isWarning) ? Math.max(timeout, 9000) : timeout;
@@ -385,8 +396,9 @@
             } catch (err) { console.error('showCustomerNotification error', err); }
         }
 
-        window.playNotifChime = function () {
+        window.playNotifChime = function (force = false) {
             try {
+                if (!force && window.sbNotifSettings && window.sbNotifSettings.sound === false) return;
                 const AudioCtx = window.AudioContext || window.webkitAudioContext;
                 if (!AudioCtx) return;
                 const ctx = new AudioCtx();
@@ -406,6 +418,37 @@
                     osc.stop(now + (i * 0.08) + 0.3);
                 });
             } catch(e){}
+        };
+
+        window.playRingChime = function (force = false) {
+            try {
+                if (!force && window.sbNotifSettings && !window.sbNotifSettings.soundCall) return;
+                const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                if (!AudioCtx) return;
+                const ctx = new AudioCtx();
+                if (ctx.state === 'suspended') ctx.resume();
+                const now = ctx.currentTime;
+                const notes = [587.33, 880, 587.33, 880];
+                notes.forEach((freq, i) => {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(freq, now + (i * 0.12));
+                    gain.gain.setValueAtTime(0.25, now + (i * 0.12));
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + (i * 0.12) + 0.22);
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start(now + (i * 0.12));
+                    osc.stop(now + (i * 0.12) + 0.22);
+                });
+            } catch(e){}
+        };
+
+        window.triggerVibrate = function (force = false) {
+            if (!force && window.sbNotifSettings && window.sbNotifSettings.vibrate === false) return;
+            if ('vibrate' in navigator) {
+                try { navigator.vibrate([150, 80, 150]); } catch(e){}
+            }
         };
 
         function escapeHtml(unsafe) {

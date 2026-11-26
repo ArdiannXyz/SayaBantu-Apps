@@ -87,7 +87,7 @@
                                                 <svg class="w-3 h-3 text-[#0066FF] fill-current shrink-0" viewBox="0 0 24 24">
                                                     <path fill-rule="evenodd" d="M8.603 3.799A4.49 4.49 0 0112 2.25c1.357 0 2.573.6 3.397 1.549a4.49 4.49 0 013.498 1.307 4.491 4.491 0 011.307 3.497A4.49 4.49 0 0121.75 12a4.49 4.49 0 01-1.549 3.397 4.491 4.491 0 01-1.307 3.497 4.491 4.491 0 01-3.497 1.307A4.49 4.49 0 0112 21.75a4.49 4.49 0 01-3.397-1.549 4.49 4.49 0 01-3.498-1.306 4.491 4.491 0 01-1.307-3.498A4.49 4.49 0 012.25 12c0-1.357.6-2.573 1.549-3.397a4.49 4.49 0 011.307-3.497 4.49 4.49 0 013.497-1.307zm7.007 6.387a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clip-rule="evenodd" />
                                                 </svg>
-                                                Terverifikasi
+                                                {{ (!$isAdminRole && $user->isCustomer()) ? 'Akun Premium' : 'Terverifikasi' }}
                                             </span>
                                         @elseif($hasDocs)
                                             <span class="inline-flex items-center gap-1 bg-amber-400/25 text-amber-200 text-[10px] font-bold px-2 py-0.5 rounded-full border border-amber-300/30">
@@ -96,7 +96,7 @@
                                         @else
                                             <a href="{{ route('profile.settings.verification') }}" wire:navigate 
                                                class="inline-flex items-center gap-1 bg-white/20 hover:bg-white/30 text-white text-[10px] font-bold px-2 py-0.5 rounded-full border border-white/30 transition">
-                                                Belum Verifikasi &rarr;
+                                                {{ (!$isAdminRole && $user->isCustomer()) ? 'Upgrade Premium' : 'Belum Verifikasi' }} &rarr;
                                             </a>
                                         @endif
                                     </div>
@@ -243,23 +243,47 @@
                     </div>
                 @endif
 
-                <!-- Peringatan Verifikasi KTP (Hanya jika belum terverifikasi) -->
-                @if(!$isVerified)
-                    <div class="mb-4 bg-amber-50 border border-amber-200 rounded-2xl p-3.5 text-xs text-amber-900 shadow-2xs flex items-center justify-between gap-3">
-                        <div class="flex items-center gap-2.5 min-w-0">
-                            <span class="text-lg shrink-0">🆔</span>
-                            <div class="min-w-0">
-                                <p class="font-bold text-amber-950 text-xs">Verifikasi Identitas KTP</p>
-                                <p class="text-[11px] text-amber-800 truncate">
-                                    {{ !$hasDocs ? 'Belum upload KTP & selfie' : 'Sedang ditinjau oleh Admin' }}
-                                </p>
+                <!-- Peringatan / Promo Verifikasi KTP (Hanya jika belum terverifikasi) -->
+                @if($user && !$isAdminRole && !$isVerified)
+                    @if($user->isCustomer())
+                        @php
+                            $profilePremiumFee = (float) \App\Models\AppSetting::get('customer_verified_service_fee_percent', 0);
+                            $profilePromoText = $profilePremiumFee == 0 ? 'hingga Rp 0' : 'hingga ' . $profilePremiumFee . '%';
+                        @endphp
+                        <div class="mb-4 bg-gradient-to-r from-indigo-50 via-blue-50 to-indigo-50 border border-indigo-200 rounded-2xl p-3.5 text-xs text-indigo-950 shadow-2xs flex items-center justify-between gap-3">
+                            <div class="flex items-center gap-2.5 min-w-0">
+                                <span class="w-8 h-8 rounded-xl bg-gradient-to-br from-[#0066FF] to-indigo-600 text-white flex items-center justify-center text-sm shrink-0 shadow-xs">✨</span>
+                                <div class="min-w-0">
+                                    <p class="font-bold text-indigo-950 text-xs">
+                                        {{ !$hasDocs ? 'Verifikasi KTP & Upgrade Premium' : 'Verifikasi Akun Premium' }}
+                                    </p>
+                                    <p class="text-[11px] text-indigo-800 leading-snug">
+                                        {{ !$hasDocs ? "Verifikasi KTP sekarang & nikmati promo biaya layanan {$profilePromoText}!" : 'Dokumen KTP & selfie sedang ditinjau Admin' }}
+                                    </p>
+                                </div>
                             </div>
+                            <a href="{{ route('profile.settings.verification') }}" wire:navigate 
+                               class="px-3 py-1.5 rounded-lg text-xs font-bold text-white shrink-0 active:scale-95 transition shadow-xs {{ !$hasDocs ? 'bg-gradient-to-r from-[#0066FF] to-indigo-600 hover:opacity-95' : 'bg-blue-600 hover:bg-blue-700' }}">
+                                {{ !$hasDocs ? 'Upgrade' : 'Status' }}
+                            </a>
                         </div>
-                        <a href="{{ route('profile.settings.verification') }}" wire:navigate 
-                           class="px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-amber-600 hover:bg-amber-700 shrink-0 active:scale-95 transition">
-                            Kelola
-                        </a>
-                    </div>
+                    @else
+                        <div class="mb-4 bg-amber-50 border border-amber-200 rounded-2xl p-3.5 text-xs text-amber-900 shadow-2xs flex items-center justify-between gap-3">
+                            <div class="flex items-center gap-2.5 min-w-0">
+                                <span class="text-lg shrink-0">🆔</span>
+                                <div class="min-w-0">
+                                    <p class="font-bold text-amber-950 text-xs">Verifikasi Identitas KTP</p>
+                                    <p class="text-[11px] text-amber-800 truncate">
+                                        {{ !$hasDocs ? 'Belum upload KTP & selfie' : 'Sedang ditinjau oleh Admin' }}
+                                    </p>
+                                </div>
+                            </div>
+                            <a href="{{ route('profile.settings.verification') }}" wire:navigate 
+                               class="px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-amber-600 hover:bg-amber-700 shrink-0 active:scale-95 transition">
+                                Kelola
+                            </a>
+                        </div>
+                    @endif
                 @endif
 
                 <!-- Menu List (Rounded-3xl container seperti Mitra) -->
@@ -332,6 +356,34 @@
                             <svg class="w-4 h-4 text-gray-400 group-hover:text-[#0066FF] transition shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                             </svg>
+                        </a>
+
+                        <!-- 4. Verifikasi KTP & Upgrade Premium -->
+                        <a href="{{ route('profile.settings.verification') }}" wire:navigate 
+                           class="py-4 px-2 flex items-center justify-between hover:bg-slate-50/80 active:bg-slate-100/70 rounded-2xl transition group cursor-pointer">
+                            <div class="flex items-center gap-4 min-w-0">
+                                <svg class="w-5 h-5 {{ $isVerified ? 'text-emerald-600' : 'text-indigo-600' }} group-hover:text-[#0066FF] transition shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                                </svg>
+                                <div class="min-w-0">
+                                    <span class="text-sm font-semibold text-gray-800 group-hover:text-[#0066FF] transition block">Verifikasi KTP &amp; Akun Premium</span>
+                                    @if(!$isVerified)
+                                        <span class="text-[11px] text-indigo-600 font-medium block">Promo biaya layanan hingga Rp 0</span>
+                                    @endif
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2 shrink-0">
+                                @if($isVerified)
+                                    <span class="text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">Premium Aktif</span>
+                                @elseif($hasDocs)
+                                    <span class="text-[11px] font-bold text-blue-700 bg-blue-50 border border-blue-200 px-2 py-0.5 rounded-full">Menunggu</span>
+                                @else
+                                    <span class="text-[11px] font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 px-2 py-0.5 rounded-full">Upgrade</span>
+                                @endif
+                                <svg class="w-4 h-4 text-gray-400 group-hover:text-[#0066FF] transition shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                </svg>
+                            </div>
                         </a>
                     @else
                         <!-- 2. Alamat & Data Diri -->

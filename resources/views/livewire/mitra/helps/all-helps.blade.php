@@ -1,4 +1,9 @@
-<div class="min-h-screen bg-slate-50 pb-20">
+<div class="min-h-screen bg-slate-50 pb-20"
+    x-data="{
+        gpsGranted: (window._sbMitraGpsState === 'granted') || (Boolean(window._sbMitraGps) && (Date.now() - window._sbMitraGps.ts) < 120000)
+    }"
+    @sb-mitra-gps-changed.window="gpsGranted = ($event.detail.state === 'granted')"
+>
     <style>
         .header-pattern {
             position: relative;
@@ -233,6 +238,12 @@
                     </div>
                 @endif
 
+                {{-- Guard Wajib Lokasi GPS (untuk tab Semua / Tersedia) --}}
+                @if(!in_array($tab, ['proses', 'selesai']))
+                    <x-mitra-location-guard />
+                @endif
+
+                <div x-show="gpsGranted || {{ in_array($tab, ['proses', 'selesai']) ? 'true' : 'false' }}" class="space-y-3.5">
                 {{-- Order Cards List --}}
                 @forelse($helps as $help)
                     @php
@@ -479,6 +490,7 @@
                         {{ $helps->links() }}
                     </div>
                 @endif
+                </div>
             </div>
         </div>
     </div>
@@ -758,15 +770,44 @@
                 btn.disabled = true;
             }
 
-            @this.takeHelp(currentHelpId);
-
-            closePreviewModal();
-
-            if (btn) {
-                setTimeout(() => {
+            const resetBtn = () => {
+                if (btn) {
                     btn.innerHTML = originalText;
                     btn.disabled = false;
-                }, 2000);
+                }
+            };
+
+            const cached = window._sbMitraGps;
+            if (cached && cached.lat && cached.lng && (Date.now() - cached.ts) < 300000) {
+                @this.takeHelp(currentHelpId, cached.lat, cached.lng);
+                closePreviewModal();
+                setTimeout(resetBtn, 1500);
+                return;
+            }
+
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const lat = position.coords.latitude;
+                        const lng = position.coords.longitude;
+                        window._sbMitraGps = { lat, lng, ts: Date.now() };
+                        @this.takeHelp(currentHelpId, lat, lng);
+                        closePreviewModal();
+                        setTimeout(resetBtn, 1500);
+                    },
+                    () => {
+                        resetBtn();
+                        closePreviewModal();
+                        window.dispatchEvent(new CustomEvent('mitra-request-gps'));
+                        if (typeof window.sbToast === 'function') {
+                            window.sbToast('Aktifkan lokasi GPS terlebih dahulu untuk mengambil bantuan.', 'error');
+                        }
+                    },
+                    { enableHighAccuracy: true, timeout: 6000, maximumAge: 60000 }
+                );
+            } else {
+                resetBtn();
+                window.dispatchEvent(new CustomEvent('mitra-request-gps'));
             }
         }
 

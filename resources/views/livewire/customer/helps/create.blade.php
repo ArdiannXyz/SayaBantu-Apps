@@ -151,32 +151,6 @@
                             </a>
                         </div>
                     </div>
-                @elseif(!$isKtpVerified)
-                    <div class="py-6 text-center">
-                        <div class="w-16 h-16 bg-amber-50 border border-amber-100 rounded-2xl flex items-center justify-center mx-auto mb-4 text-amber-500 shadow-2xs">
-                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                        </div>
-                        <h2 class="text-base font-bold text-gray-900 mb-1.5">Verifikasi KTP Sedang Diproses</h2>
-                        <p class="text-xs text-gray-600 mb-5 leading-relaxed max-w-xs mx-auto">
-                            Dokumen dan foto KTP Anda sedang dalam peninjauan oleh Admin. Anda belum dapat membuat permintaan bantuan baru hingga akun diverifikasi.
-                        </p>
-
-                        <div class="flex flex-col gap-2.5">
-                            <a href="{{ route('profile.settings.verification') }}" wire:navigate
-                               class="w-full py-3 px-4 rounded-xl text-amber-800 bg-amber-50 border border-amber-200 font-bold text-xs shadow-xs hover:bg-amber-100 transition flex items-center justify-center gap-2">
-                                <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                </svg>
-                                Cek Status Dokumen KTP
-                            </a>
-                            <a href="{{ route('customer.dashboard') }}" wire:navigate
-                               class="w-full py-3 px-4 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold text-xs transition flex items-center justify-center">
-                                Kembali ke Beranda
-                            </a>
-                        </div>
-                    </div>
                 @elseif($hasReachedHelpLimit)
                     <div class="py-6 text-center">
                         <div class="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 text-amber-600 shadow-sm"
@@ -523,17 +497,32 @@
                             </p>
 
                             @php
-                                $feCustFeePercent = (float) \App\Models\AppSetting::get('customer_service_fee_percent', 10);
+                                $cu = auth()->user();
+                                $feRegularFeePercent = (float) \App\Models\AppSetting::get('customer_service_fee_percent', 10);
+                                $feVerifiedFeePercent = (float) \App\Models\AppSetting::get('customer_verified_service_fee_percent', 0);
+                                $feCustFeePercent = $cu ? $cu->getCustomerServiceFeePercent() : $feRegularFeePercent;
+                                $feIsDiscounted = $isKtpVerified && $feCustFeePercent < $feRegularFeePercent;
                             @endphp
                             <div x-show="amount && parseInt(amount) >= currentMin" class="mt-3 p-3.5 bg-blue-50/70 border border-blue-100 rounded-xl space-y-1.5 text-xs">
                                 <div class="flex justify-between items-center text-gray-600">
-                                    <span>Biaya Layanan ({{ $feCustFeePercent }}%):</span>
-                                    <span class="font-medium text-gray-800" x-text="(window.formatRupiah || (x => 'Rp ' + Number(x || 0).toLocaleString('id-ID')))(Math.round((parseInt(amount) || 0) * {{ $feCustFeePercent }} / 100))"></span>
+                                    <span class="flex items-center gap-1.5">
+                                        Biaya Layanan ({{ $feCustFeePercent }}%):
+                                        @if ($feIsDiscounted)
+                                            <span class="inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700">✨ Premium</span>
+                                        @endif
+                                    </span>
+                                    <span class="font-medium {{ $feIsDiscounted ? 'text-emerald-700 font-bold' : 'text-gray-800' }}" x-text="(window.formatRupiah || (x => 'Rp ' + Number(x || 0).toLocaleString('id-ID')))(Math.round((parseInt(amount) || 0) * {{ $feCustFeePercent }} / 100))"></span>
                                 </div>
                                 <div class="flex justify-between items-center pt-1.5 border-t border-blue-200/80 font-medium text-blue-900">
                                     <span>Estimasi Total yang Dibayar:</span>
                                     <span class="text-sm font-bold text-blue-700" x-text="(window.formatRupiah || (x => 'Rp ' + Number(x || 0).toLocaleString('id-ID')))(Math.round((parseInt(amount) || 0) * (1 + {{ $feCustFeePercent }} / 100)))"></span>
                                 </div>
+                                @if (!$isKtpVerified && $feVerifiedFeePercent < $feCustFeePercent)
+                                    <div class="pt-1.5 border-t border-blue-200/60 flex items-center justify-between gap-2 text-[11px] text-indigo-700">
+                                        <span>✨ Promo Akun Premium: biaya layanan {{ $feVerifiedFeePercent == 0 ? 'Rp 0' : $feVerifiedFeePercent . '%' }}</span>
+                                        <a href="{{ route('profile.settings.verification') }}" wire:navigate class="font-bold text-indigo-800 hover:underline shrink-0">Verifikasi KTP &rarr;</a>
+                                    </div>
+                                @endif
                             </div>
 
                             <!-- Real-time Warning / Error -->
@@ -1486,8 +1475,13 @@
                                 <span class="text-sm font-semibold text-gray-900">{{ format_rupiah($confirmAmount ?? 0) }}</span>
                             </div>
                             <div class="flex justify-between items-center">
-                                <span class="text-sm text-gray-600">Biaya Layanan ({{ $confirmCustomerFeePercent }}%)</span>
-                                <span class="text-sm font-semibold text-gray-900">{{ format_rupiah($confirmCustomerFee ?? 0) }}</span>
+                                <span class="text-sm text-gray-600 flex items-center gap-1.5">
+                                    Biaya Layanan ({{ $confirmCustomerFeePercent }}%)
+                                    @if ($isKtpVerified && (float) $confirmCustomerFeePercent < (float) \App\Models\AppSetting::get('customer_service_fee_percent', 10))
+                                        <span class="inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700">✨ Premium</span>
+                                    @endif
+                                </span>
+                                <span class="text-sm font-semibold {{ ($confirmCustomerFee ?? 0) == 0 ? 'text-emerald-600' : 'text-gray-900' }}">{{ format_rupiah($confirmCustomerFee ?? 0) }}</span>
                             </div>
                             @if (($confirmHelpType ?? $help_type) === 'urgent')
                                 <div class="flex justify-between items-center pt-2 border-t border-blue-100">

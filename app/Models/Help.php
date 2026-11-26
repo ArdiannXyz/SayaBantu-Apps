@@ -316,4 +316,26 @@ class Help extends Model
     {
         return \App\Console\Commands\AutoConfirmHelps::autoConfirmExpired(null, $userId, $mitraId);
     }
+
+    /**
+     * Build a portable Haversine distance expression (in km) for MySQL and SQLite.
+     */
+    public static function haversineSql(float $lat, float $lng, string $latCol = 'helps.latitude', string $lngCol = 'helps.longitude'): string
+    {
+        $expr = "cos(radians({$lat})) * cos(radians({$latCol})) * cos(radians({$lngCol}) - radians({$lng})) + sin(radians({$lat})) * sin(radians({$latCol}))";
+
+        if (\Illuminate\Support\Facades\DB::getDriverName() === 'sqlite') {
+            $pdo = \Illuminate\Support\Facades\DB::connection()->getPdo();
+            if (method_exists($pdo, 'sqliteCreateFunction')) {
+                $pdo->sqliteCreateFunction('acos', 'acos', 1);
+                $pdo->sqliteCreateFunction('cos', 'cos', 1);
+                $pdo->sqliteCreateFunction('sin', 'sin', 1);
+                $pdo->sqliteCreateFunction('radians', 'deg2rad', 1);
+            }
+
+            return "(6371 * acos(min(1.0, max(-1.0, {$expr}))))";
+        }
+
+        return "(6371 * acos(least(1.0, greatest(-1.0, {$expr}))))";
+    }
 }

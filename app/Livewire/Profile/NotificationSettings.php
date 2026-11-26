@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Profile;
 
+use App\Models\User;
 use Livewire\Component;
 
 class NotificationSettings extends Component
@@ -16,54 +17,45 @@ class NotificationSettings extends Component
 
     public $transactionUpdate = true;
 
-    public $expenseReminder = false;
-
-    public $budgetNotifications = false;
-
-    public $lowBalanceAlerts = false;
-
     public function mount()
     {
         $user = auth()->user();
-        if ($user && is_array($user->notification_settings)) {
-            $settings = $user->notification_settings;
-            $this->generalNotification = (bool) ($settings['generalNotification'] ?? true);
-            $this->sound = (bool) ($settings['sound'] ?? true);
-            $this->soundCall = (bool) ($settings['soundCall'] ?? false);
-            $this->vibrate = (bool) ($settings['vibrate'] ?? true);
-            $this->transactionUpdate = (bool) ($settings['transactionUpdate'] ?? true);
-            $this->expenseReminder = (bool) ($settings['expenseReminder'] ?? false);
-            $this->budgetNotifications = (bool) ($settings['budgetNotifications'] ?? false);
-            $this->lowBalanceAlerts = (bool) ($settings['lowBalanceAlerts'] ?? false);
-        }
+        $settings = $user ? $user->getNotificationSettings() : User::defaultNotificationSettings();
+
+        $this->generalNotification = $settings['generalNotification'];
+        $this->sound = $settings['sound'];
+        $this->soundCall = $settings['soundCall'];
+        $this->vibrate = $settings['vibrate'];
+        $this->transactionUpdate = $settings['transactionUpdate'];
     }
 
     public function updateSetting($setting)
     {
-        if (property_exists($this, $setting)) {
-            $this->$setting = ! $this->$setting;
+        $allowed = array_keys(User::defaultNotificationSettings());
+        if (! in_array($setting, $allowed, true) || ! property_exists($this, $setting)) {
+            return;
+        }
 
-            $user = auth()->user();
-            if ($user) {
-                $user->update([
-                    'notification_settings' => [
-                        'generalNotification' => $this->generalNotification,
-                        'sound' => $this->sound,
-                        'soundCall' => $this->soundCall,
-                        'vibrate' => $this->vibrate,
-                        'transactionUpdate' => $this->transactionUpdate,
-                        'expenseReminder' => $this->expenseReminder,
-                        'budgetNotifications' => $this->budgetNotifications,
-                        'lowBalanceAlerts' => $this->lowBalanceAlerts,
-                    ],
-                ]);
-            }
+        $this->$setting = ! $this->$setting;
 
-            session()->flash('message', 'Pengaturan notifikasi berhasil diperbarui.');
+        $payload = [
+            'generalNotification' => (bool) $this->generalNotification,
+            'sound' => (bool) $this->sound,
+            'soundCall' => (bool) $this->soundCall,
+            'vibrate' => (bool) $this->vibrate,
+            'transactionUpdate' => (bool) $this->transactionUpdate,
+        ];
 
-            if ($this->$setting) {
-                $this->dispatch('play-preview', setting: $setting);
-            }
+        $user = auth()->user();
+        if ($user) {
+            $user->forceFill(['notification_settings' => $payload])->save();
+        }
+
+        session()->flash('message', 'Pengaturan notifikasi berhasil diperbarui.');
+        $this->dispatch('notification-settings-updated', settings: $payload);
+
+        if ($this->$setting) {
+            $this->dispatch('play-preview', setting: $setting);
         }
     }
 

@@ -28,28 +28,79 @@
         </div>
     @endif
 
-    <form wire:submit="save" class="space-y-6">
-        <!-- KTP Upload -->
-        <div>
-            <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
-                <label class="block text-sm font-bold text-gray-900">Foto KTP</label>
-                <div class="flex items-center gap-2">
-                    <button type="button" onclick="openDirectCamera('ktp-upload', 'ktp')" class="inline-flex items-center gap-1.5 text-xs font-semibold text-[#0066FF] hover:text-[#0052CC] bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg transition cursor-pointer">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-                        </svg>
-                        <span>Buka Kamera</span>
-                    </button>
-                    <label for="ktp-upload-gallery" class="inline-flex items-center gap-1.5 text-xs font-medium text-gray-600 hover:text-gray-900 bg-gray-100 hover:bg-gray-200 px-3 py-1.5 rounded-lg transition cursor-pointer">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </svg>
-                        <span>Galeri</span>
-                    </label>
+    @php
+        $verifUser = auth()->user();
+        $isVerifCustomer = $verifUser && $verifUser->isCustomer();
+        $regularFee = (float) \App\Models\AppSetting::get('customer_service_fee_percent', 10);
+        $premiumFee = (float) \App\Models\AppSetting::get('customer_verified_service_fee_percent', 0);
+    @endphp
+
+    @if($isVerifCustomer)
+        @if($isVerified)
+            <div class="mb-5 p-4 rounded-2xl border border-emerald-200 bg-gradient-to-r from-emerald-50 to-teal-50 text-emerald-900 shadow-2xs">
+                <div class="flex items-center gap-2.5">
+                    <span class="w-8 h-8 rounded-xl bg-emerald-500 text-white flex items-center justify-center text-sm shrink-0">✓</span>
+                    <div>
+                        <p class="font-bold text-sm text-emerald-950">Akun Premium Aktif</p>
+                        <p class="text-xs text-emerald-800">
+                            KTP Anda telah terverifikasi. Biaya layanan aplikasi Anda saat ini <strong>{{ $premiumFee == 0 ? 'Rp 0 (Gratis)' : $premiumFee.'%' }}</strong>.
+                        </p>
+                    </div>
                 </div>
             </div>
-            <div class="mt-1 flex flex-col justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-xl hover:border-[#0066FF] hover:bg-blue-50/40 transition bg-gray-50 relative overflow-hidden group">
+        @else
+            <div class="mb-5 p-4 rounded-2xl border border-indigo-200 bg-gradient-to-r from-indigo-50 via-blue-50 to-indigo-50 text-indigo-950 shadow-2xs">
+                <div class="flex items-start gap-3">
+                    <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-[#0066FF] to-indigo-600 text-white flex items-center justify-center text-base shrink-0 shadow-xs">
+                        ✨
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <p class="font-extrabold text-sm text-indigo-950">Upgrade Akunmu Menjadi Premium</p>
+                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-600 text-white">Promo KTP</span>
+                        </div>
+                        <p class="text-xs text-indigo-800 mt-1 leading-relaxed">
+                            Lengkapi NIK (16 digit), foto KTP, dan selfie KTP sekarang untuk menikmati promo pengurangan biaya layanan aplikasi dari <strong>{{ $regularFee }}%</strong> menjadi <strong>{{ $premiumFee == 0 ? 'Rp 0 (Gratis)' : $premiumFee.'%' }}</strong>!
+                        </p>
+                    </div>
+                </div>
+            </div>
+        @endif
+    @endif
+
+    <form wire:submit="save" class="space-y-6">
+        <!-- NIK Input -->
+        <div>
+            <div class="flex items-center justify-between mb-1.5">
+                <label for="verification-nik" class="block text-sm font-bold text-gray-900">
+                    NIK (Nomor Induk Kependudukan) <span class="text-red-500">*</span>
+                </label>
+                @if($isVerified)
+                    <span class="text-[11px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-md">Terverifikasi</span>
+                @endif
+            </div>
+            <input
+                id="verification-nik"
+                type="text"
+                inputmode="numeric"
+                maxlength="16"
+                wire:model="nik"
+                @if($isVerified) disabled readonly @endif
+                oninput="this.value = this.value.replace(/\D/g, '').slice(0, 16)"
+                placeholder="Masukkan 16 digit NIK sesuai KTP"
+                class="w-full px-4 py-3 text-sm rounded-xl border border-gray-300 font-mono tracking-wider focus:border-[#0066FF] focus:ring-2 focus:ring-blue-100 transition {{ $isVerified ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : 'bg-white text-gray-900' }}"
+            />
+            <p class="text-[11px] text-gray-500 mt-1">Pastikan 16 digit NIK sama persis dengan yang tertera pada foto KTP Anda.</p>
+            @error('nik') <span class="text-sm text-red-600 mt-1 block">{{ $message }}</span> @enderror
+        </div>
+
+        <!-- KTP Upload -->
+        <div>
+            <div class="flex items-center justify-between gap-2 mb-2">
+                <label class="block text-sm font-bold text-gray-900">Foto KTP <span class="text-red-500">*</span></label>
+                <span class="text-[11px] font-medium text-gray-500">Pastikan teks KTP jelas</span>
+            </div>
+            <div class="mt-1 flex flex-col justify-center px-5 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-xl hover:border-[#0066FF] hover:bg-blue-50/40 transition bg-gray-50 relative overflow-hidden group">
                 <div class="space-y-3 text-center relative z-10">
                     @if ($ktp_photo)
                         <img src="{{ $ktp_photo->temporaryUrl() }}" alt="KTP Preview" class="mx-auto h-36 object-contain rounded-lg shadow-xs mb-2">
@@ -64,19 +115,19 @@
                         </svg>
                     @endif
 
-                    <div class="flex flex-col sm:flex-row items-center justify-center gap-2 max-w-sm mx-auto">
-                        <button type="button" onclick="openDirectCamera('ktp-upload', 'ktp')" class="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 bg-[#0066FF] hover:bg-[#0052CC] text-white px-4 py-2 rounded-xl text-xs font-bold shadow-xs transition active:scale-95 cursor-pointer">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="flex flex-wrap items-center justify-center gap-2.5">
+                        <button type="button" onclick="openDirectCamera('ktp-upload', 'ktp')" class="inline-flex items-center justify-center gap-1.5 whitespace-nowrap bg-[#0066FF] hover:bg-[#0052CC] text-white px-4 py-2.5 rounded-xl text-xs font-bold shadow-xs transition active:scale-95 cursor-pointer">
+                            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
                             </svg>
-                            <span>Ambil dari Kamera KTP</span>
+                            <span>Kamera KTP</span>
                         </button>
-                        <label for="ktp-upload-gallery" class="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 bg-white hover:bg-gray-100 text-gray-700 border border-gray-300 px-3.5 py-2 rounded-xl text-xs font-medium transition cursor-pointer">
-                            <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <label for="ktp-upload-gallery" class="inline-flex items-center justify-center gap-1.5 whitespace-nowrap bg-white hover:bg-gray-100 text-gray-700 border border-gray-300 px-4 py-2.5 rounded-xl text-xs font-semibold transition cursor-pointer">
+                            <svg class="w-4 h-4 text-gray-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                             </svg>
-                            <span>Pilih dari Galeri</span>
+                            <span>Pilih Galeri</span>
                         </label>
                     </div>
 
@@ -97,25 +148,11 @@
 
         <!-- Selfie Upload -->
         <div>
-            <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
-                <label class="block text-sm font-bold text-gray-900">Foto Selfie (Wajah & KTP)</label>
-                <div class="flex items-center gap-2">
-                    <button type="button" onclick="openDirectCamera('selfie-upload', 'selfie')" class="inline-flex items-center gap-1.5 text-xs font-semibold text-[#0066FF] hover:text-[#0052CC] bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg transition cursor-pointer">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-                        </svg>
-                        <span>Buka Kamera</span>
-                    </button>
-                    <label for="selfie-upload-gallery" class="inline-flex items-center gap-1.5 text-xs font-medium text-gray-600 hover:text-gray-900 bg-gray-100 hover:bg-gray-200 px-3 py-1.5 rounded-lg transition cursor-pointer">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </svg>
-                        <span>Galeri</span>
-                    </label>
-                </div>
+            <div class="flex items-center justify-between gap-2 mb-2">
+                <label class="block text-sm font-bold text-gray-900">Foto Selfie (Wajah &amp; KTP) <span class="text-red-500">*</span></label>
+                <span class="text-[11px] font-medium text-gray-500">Wajah &amp; KTP terlihat</span>
             </div>
-            <div class="mt-1 flex flex-col justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-xl hover:border-[#0066FF] hover:bg-blue-50/40 transition bg-gray-50 relative overflow-hidden group">
+            <div class="mt-1 flex flex-col justify-center px-5 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-xl hover:border-[#0066FF] hover:bg-blue-50/40 transition bg-gray-50 relative overflow-hidden group">
                 <div class="space-y-3 text-center relative z-10">
                     @if ($selfie_photo)
                         <img src="{{ $selfie_photo->temporaryUrl() }}" alt="Selfie Preview" class="mx-auto h-36 object-contain rounded-lg shadow-xs mb-2">
@@ -130,19 +167,19 @@
                         </svg>
                     @endif
 
-                    <div class="flex flex-col sm:flex-row items-center justify-center gap-2 max-w-sm mx-auto">
-                        <button type="button" onclick="openDirectCamera('selfie-upload', 'selfie')" class="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 bg-[#0066FF] hover:bg-[#0052CC] text-white px-4 py-2 rounded-xl text-xs font-bold shadow-xs transition active:scale-95 cursor-pointer">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="flex flex-wrap items-center justify-center gap-2.5">
+                        <button type="button" onclick="openDirectCamera('selfie-upload', 'selfie')" class="inline-flex items-center justify-center gap-1.5 whitespace-nowrap bg-[#0066FF] hover:bg-[#0052CC] text-white px-4 py-2.5 rounded-xl text-xs font-bold shadow-xs transition active:scale-95 cursor-pointer">
+                            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
                             </svg>
-                            <span>Ambil dari Kamera Selfie</span>
+                            <span>Kamera Selfie</span>
                         </button>
-                        <label for="selfie-upload-gallery" class="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 bg-white hover:bg-gray-100 text-gray-700 border border-gray-300 px-3.5 py-2 rounded-xl text-xs font-medium transition cursor-pointer">
-                            <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <label for="selfie-upload-gallery" class="inline-flex items-center justify-center gap-1.5 whitespace-nowrap bg-white hover:bg-gray-100 text-gray-700 border border-gray-300 px-4 py-2.5 rounded-xl text-xs font-semibold transition cursor-pointer">
+                            <svg class="w-4 h-4 text-gray-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                             </svg>
-                            <span>Pilih dari Galeri</span>
+                            <span>Pilih Galeri</span>
                         </label>
                     </div>
 

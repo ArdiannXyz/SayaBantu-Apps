@@ -162,8 +162,8 @@
                                 </div>
                                 <div class="flex justify-between items-center text-xs pt-2 border-t border-blue-200/80">
                                     <span class="text-gray-600 font-medium">Keterangan:</span>
-                                    <span class="font-medium text-gray-700">
-                                        Persentase setting saat ini: {{ (float) $customer_service_fee_percent }}%
+                                    <span class="font-medium text-gray-700 text-right">
+                                        Reguler: {{ (float) $customer_service_fee_percent }}% &bull; Premium KTP: {{ (float) $customer_verified_service_fee_percent }}%
                                     </span>
                                 </div>
                             </div>
@@ -242,12 +242,12 @@
             </div>
 
             <div class="p-4 sm:p-8">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- Fee Customer -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Fee Customer Reguler -->
                     <div class="p-5 bg-blue-50/60 rounded-2xl border border-blue-100">
-                        <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center justify-between mb-3 gap-2">
                             <label class="block text-xs font-medium text-blue-950 uppercase tracking-wider">Biaya Layanan Customer (%)</label>
-                            <span class="text-xs font-medium px-2 py-0.5 bg-blue-200 text-blue-800 rounded">Customer</span>
+                            <span class="text-xs font-medium px-2 py-0.5 bg-blue-200 text-blue-800 rounded shrink-0">Customer</span>
                         </div>
                         <div class="flex items-center rounded-xl shadow-xs border border-blue-200 bg-white" style="display: flex; align-items: center; border: 1px solid #bfdbfe; border-radius: 12px; background: #fff; padding-left: 14px; padding-right: 14px;">
                             <input type="number" step="0.1" min="0" max="100" wire:model="customer_service_fee_percent" placeholder="10"
@@ -262,7 +262,29 @@
                                 {{ $message }}
                             </div>
                         @enderror
-                        <p class="text-xs text-blue-700 mt-2.5">Dikenakan sebagai biaya layanan kepada customer di atas nominal bantuan (default 10%).</p>
+                        <p class="text-xs text-blue-700 mt-2.5">Dikenakan kepada customer reguler (belum verifikasi KTP) di atas nominal bantuan (default 10%).</p>
+                    </div>
+
+                    <!-- Fee Customer Verified / Premium -->
+                    <div class="p-5 bg-indigo-50/70 rounded-2xl border border-indigo-200">
+                        <div class="flex items-center justify-between mb-3 gap-2">
+                            <label class="block text-xs font-medium text-indigo-950 uppercase tracking-wider">Fee Customer Premium / KTP (%)</label>
+                            <span class="text-xs font-medium px-2 py-0.5 bg-indigo-200 text-indigo-800 rounded shrink-0">Premium KTP</span>
+                        </div>
+                        <div class="flex items-center rounded-xl shadow-xs border border-indigo-200 bg-white" style="display: flex; align-items: center; border: 1px solid #c7d2fe; border-radius: 12px; background: #fff; padding-left: 14px; padding-right: 14px;">
+                            <input type="number" step="0.1" min="0" max="100" wire:model="customer_verified_service_fee_percent" placeholder="0"
+                                style="border: none; outline: none; padding: 10px 0; width: 100%; font-size: 14px; font-weight: 500; color: #0f172a; background: transparent;" />
+                            <span style="color: #64748b; font-size: 14px; font-weight: 500; margin-left: 8px; user-select: none;">%</span>
+                        </div>
+                        @error('customer_verified_service_fee_percent')
+                            <div class="flex items-center gap-2 mt-2 text-red-600 text-xs font-medium">
+                                <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                                </svg>
+                                {{ $message }}
+                            </div>
+                        @enderror
+                        <p class="text-xs text-indigo-700 mt-2.5">Promo biaya layanan untuk customer yang sudah terverifikasi KTP / Premium (default 0% / gratis).</p>
                     </div>
 
                     <!-- Fee Mitra -->

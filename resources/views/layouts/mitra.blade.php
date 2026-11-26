@@ -40,6 +40,14 @@
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
+    <script>
+        window.sbNotifSettings = @json(auth()->check() ? auth()->user()->getNotificationSettings() : \App\Models\User::defaultNotificationSettings());
+        window.addEventListener('notification-settings-updated', function (e) {
+            if (e && e.detail && e.detail.settings) {
+                window.sbNotifSettings = e.detail.settings;
+            }
+        });
+    </script>
     <style>
         [x-cloak] { display: none !important; }
 
@@ -537,10 +545,16 @@
                 if (typeof window.playNotifChime === 'function') {
                     window.playNotifChime();
                 }
+                if (typeof window.triggerVibrate === 'function') {
+                    window.triggerVibrate();
+                }
             });
             window.addEventListener('mitra-help-status', () => {
                 if (typeof window.playNotifChime === 'function') {
                     window.playNotifChime();
+                }
+                if (typeof window.triggerVibrate === 'function') {
+                    window.triggerVibrate();
                 }
             });
 
@@ -566,8 +580,9 @@
             });
         });
 
-        window.playNotifChime = function () {
+        window.playNotifChime = function (force = false) {
             try {
+                if (!force && window.sbNotifSettings && window.sbNotifSettings.sound === false) return;
                 const AudioCtx = window.AudioContext || window.webkitAudioContext;
                 if (!AudioCtx) return;
                 const ctx = new AudioCtx();
@@ -589,8 +604,9 @@
             } catch(e){}
         };
 
-        window.playRingChime = function () {
+        window.playRingChime = function (force = false) {
             try {
+                if (!force && window.sbNotifSettings && !window.sbNotifSettings.soundCall) return;
                 const AudioCtx = window.AudioContext || window.webkitAudioContext;
                 if (!AudioCtx) return;
                 const ctx = new AudioCtx();
@@ -612,7 +628,8 @@
             } catch(e){}
         };
 
-        window.triggerVibrate = function () {
+        window.triggerVibrate = function (force = false) {
+            if (!force && window.sbNotifSettings && window.sbNotifSettings.vibrate === false) return;
             if ('vibrate' in navigator) {
                 try { navigator.vibrate([150, 80, 150]); } catch(e){}
             }

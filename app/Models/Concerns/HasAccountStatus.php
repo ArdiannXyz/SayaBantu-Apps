@@ -105,4 +105,48 @@ trait HasAccountStatus
     {
         return (bool) ($this->is_completed ?? false);
     }
+
+    /**
+     * Get the applicable customer service fee percentage.
+     * Verified (Premium) customers get the discounted/promo verified fee (default 0%).
+     */
+    public function getCustomerServiceFeePercent(): float
+    {
+        if ($this->isCustomer() && (bool) ($this->verified ?? false)) {
+            return (float) \App\Models\AppSetting::get('customer_verified_service_fee_percent', 0);
+        }
+
+        return (float) \App\Models\AppSetting::get('customer_service_fee_percent', 10);
+    }
+
+    public static function defaultNotificationSettings(): array
+    {
+        return [
+            'generalNotification' => true,
+            'sound' => true,
+            'soundCall' => false,
+            'vibrate' => true,
+            'transactionUpdate' => true,
+        ];
+    }
+
+    public function getNotificationSettings(): array
+    {
+        $defaults = static::defaultNotificationSettings();
+        $stored = is_array($this->notification_settings) ? $this->notification_settings : [];
+
+        $resolved = [];
+        foreach ($defaults as $key => $default) {
+            $resolved[$key] = array_key_exists($key, $stored) ? (bool) $stored[$key] : $default;
+        }
+
+        return $resolved;
+    }
+
+    public function getNotificationSetting(string $key, bool $default = true): bool
+    {
+        $settings = $this->getNotificationSettings();
+
+        return array_key_exists($key, $settings) ? (bool) $settings[$key] : $default;
+    }
 }

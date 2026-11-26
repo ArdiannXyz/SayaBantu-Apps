@@ -49,6 +49,10 @@ class SimpleRegisterController extends Controller
             ],
         ]);
 
-        return redirect()->route('onboarding.step1')->with('message', 'Data akun tersimpan. Silakan lengkapi data diri dan dokumen Anda.');
+        $message = $request->role === 'customer'
+            ? 'Data akun tersimpan. Silakan lengkapi data diri Anda.'
+            : 'Data akun tersimpan. Silakan lengkapi data diri dan dokumen Anda.';
+
+        return redirect()->route('onboarding.step1')->with('message', $message);
     }
 }
