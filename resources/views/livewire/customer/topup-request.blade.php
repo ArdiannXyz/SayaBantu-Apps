@@ -404,17 +404,16 @@
                                         <div class="bg-white rounded-xl p-4 text-center">
                                             <p class="text-sm font-semibold text-gray-900 mb-3">Scan QR Code untuk Bayar</p>
                                             @php
-                                                $qrisImageSetting = \App\Models\AppSetting::get('qris_image');
-                                                $qrisImageUrl = ($qrisImageSetting && \Illuminate\Support\Facades\Storage::disk('public')->exists($qrisImageSetting))
-                                                    ? asset('storage/' . $qrisImageSetting)
-                                                    : (file_exists(public_path('images/payment/qris.png')) ? asset('images/payment/qris.png') : null);
+                                                $qrisImageUrl = \App\Models\AppSetting::qrisImageUrl();
                                                 $qrisMerchantName = \App\Models\AppSetting::get('qris_merchant_name', 'SayaBantu');
                                             @endphp
 
                                             @if($qrisImageUrl)
-                                                <img src="{{ $qrisImageUrl }}" 
-                                                    alt="QRIS QR Code" 
-                                                    class="w-full max-w-[220px] aspect-square mx-auto border-2 border-gray-200 rounded-xl shadow-lg object-contain bg-white p-1">
+                                                <div class="w-full max-w-[260px] mx-auto bg-white border-2 border-gray-200 rounded-xl shadow-lg p-1.5 overflow-hidden">
+                                                    <img src="{{ $qrisImageUrl }}" 
+                                                        alt="QRIS QR Code" 
+                                                        class="w-full h-auto max-h-[340px] mx-auto object-contain rounded-lg block">
+                                                </div>
                                                 @if($qrisMerchantName)
                                                     <p class="text-xs font-semibold text-gray-700 mt-2">NMID / Merchant: <span class="font-bold text-gray-900">{{ $qrisMerchantName }}</span></p>
                                                 @endif
@@ -441,38 +440,44 @@
                     @endif
 
                     <!-- Transfer Bank & E-Wallet -->
-                    <div class="mb-6">
-                        <h3 class="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
-                            <span>💳</span> TRANSFER BANK & E-WALLET
-                        </h3>
-                        <div class="space-y-3">
-                            @foreach($availableBanks as $bank)
-                                <div wire:click="selectPaymentMethod('bank_{{ strtolower($bank['code']) }}')"
-                                    class="border-2 {{ $paymentMethod === 'bank_'.strtolower($bank['code']) ? 'border-primary-500 bg-primary-50' : 'border-gray-200' }} rounded-xl p-4 cursor-pointer hover:border-primary-300 transition">
-                                    <div class="flex items-center gap-3">
-                                        <div class="w-12 h-12 bg-white rounded-lg flex items-center justify-center border border-gray-200">
-                                            <span class="text-xs font-bold text-gray-700">{{ strtoupper($bank['code']) }}</span>
+                    @if(count($availableBanks) > 0)
+                        <div class="mb-6">
+                            <h3 class="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
+                                <span>💳</span> TRANSFER BANK & E-WALLET
+                            </h3>
+                            <div class="space-y-3">
+                                @foreach($availableBanks as $bank)
+                                    <div wire:click="selectPaymentMethod('bank_{{ strtolower($bank['code']) }}')"
+                                        class="border-2 {{ $paymentMethod === 'bank_'.strtolower($bank['code']) ? 'border-primary-500 bg-primary-50' : 'border-gray-200' }} rounded-xl p-4 cursor-pointer hover:border-primary-300 transition">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-12 h-12 bg-white rounded-lg flex items-center justify-center border border-gray-200">
+                                                <span class="text-xs font-bold text-gray-700">{{ strtoupper($bank['code']) }}</span>
+                                            </div>
+                                            <div class="flex-1">
+                                                <p class="font-semibold text-gray-900">{{ $bank['name'] }}</p>
+                                                <p class="text-sm text-gray-600">{{ $bank['account_number'] }}</p>
+                                                <p class="text-xs text-gray-500">a.n. {{ $bank['account_name'] }}</p>
+                                            </div>
+                                            <button type="button" 
+                                                onclick="navigator.clipboard.writeText('{{ $bank['account_number'] }}'); if (window.sbToast) { window.sbToast('Nomor rekening {{ $bank['name'] }} berhasil disalin!', 'success'); }"
+                                                class="px-3 py-1.5 text-xs font-semibold bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition active:scale-95 cursor-pointer">
+                                                📋 Salin
+                                            </button>
+                                            @if($paymentMethod === 'bank_'.strtolower($bank['code']))
+                                                <svg class="w-6 h-6 text-primary-600" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/>
+                                                </svg>
+                                            @endif
                                         </div>
-                                        <div class="flex-1">
-                                            <p class="font-semibold text-gray-900">{{ $bank['name'] }}</p>
-                                            <p class="text-sm text-gray-600">{{ $bank['account_number'] }}</p>
-                                            <p class="text-xs text-gray-500">a.n. {{ $bank['account_name'] }}</p>
-                                        </div>
-                                        <button type="button" 
-                                            onclick="navigator.clipboard.writeText('{{ $bank['account_number'] }}'); if (window.sbToast) { window.sbToast('Nomor rekening {{ $bank['name'] }} berhasil disalin!', 'success'); }"
-                                            class="px-3 py-1.5 text-xs font-semibold bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition active:scale-95 cursor-pointer">
-                                            📋 Salin
-                                        </button>
-                                        @if($paymentMethod === 'bank_'.strtolower($bank['code']))
-                                            <svg class="w-6 h-6 text-primary-600" fill="currentColor" viewBox="0 0 20 20">
-                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/>
-                                            </svg>
-                                        @endif
                                     </div>
-                                </div>
-                            @endforeach
+                                @endforeach
+                            </div>
                         </div>
-                    </div>
+                    @elseif(!$qrisEnabled)
+                        <div class="mb-6 p-4 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-800 font-medium text-center">
+                            Belum ada metode pembayaran top-up yang aktif saat ini. Silakan hubungi Admin.
+                        </div>
+                    @endif
 
                     @error('paymentMethod') <span class="text-xs text-red-600 mb-4 block">{{ $message }}</span> @enderror
 

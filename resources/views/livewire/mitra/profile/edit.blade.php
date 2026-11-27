@@ -38,11 +38,17 @@
 
                         <div class="md:col-span-2 p-3">
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                @php $modalNameLocked = (bool) (auth()->user()?->verified ?? false) && ! empty(trim((string) (auth()->user()?->name ?? ''))); @endphp
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700">Nama</label>
+                                    <label class="block text-sm font-medium text-gray-700">
+                                        Nama
+                                        @if($modalNameLocked)
+                                            <span class="ml-1 text-[10px] font-semibold text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded border border-gray-200">Terkunci</span>
+                                        @endif
+                                    </label>
                                     <input type="text" wire:model.defer="name"
-                                        oninput="this.value = this.value.replace(/[^a-zA-Z\s]/g, '')"
-                                        class="mt-1 block w-full border rounded px-3 py-2" />
+                                        @if($modalNameLocked) disabled readonly @else oninput="this.value = this.value.replace(/[^a-zA-Z\s]/g, '')" @endif
+                                        class="mt-1 block w-full border rounded px-3 py-2 {{ $modalNameLocked ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : '' }}" />
                                     @error('name') <span class="text-red-600 text-sm">{{ $message }}</span> @enderror
                                 </div>
                                 <div>

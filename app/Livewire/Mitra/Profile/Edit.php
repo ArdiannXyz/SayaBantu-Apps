@@ -20,8 +20,13 @@ class Edit extends Component
 
     protected function rules(): array
     {
+        $user = auth()->user();
+        $nameLocked = $user && (bool) ($user->verified ?? false) && ! empty(trim((string) $user->name));
+
         return [
-            'name' => ['required', 'string', 'max:255', 'regex:/^[a-zA-Z\s]+$/'],
+            'name' => $nameLocked
+                ? ['required', 'string', 'max:255']
+                : ['required', 'string', 'max:255', 'regex:/^[a-zA-Z\s]+$/'],
             'phone' => [
                 'nullable',
                 'string',
@@ -64,12 +69,17 @@ class Edit extends Component
 
     public function save(): void
     {
-        $this->name = preg_replace('/[^a-zA-Z\s]/', '', (string) $this->name);
+        $user = auth()->user();
+
+        if ((bool) ($user->verified ?? false) && ! empty(trim((string) $user->name))) {
+            $this->name = $user->name;
+        } else {
+            $this->name = preg_replace('/[^a-zA-Z\s]/', '', (string) $this->name);
+        }
         $this->phone = preg_replace('/[^0-9]/', '', (string) $this->phone);
 
         $this->validate();
 
-        $user = auth()->user();
         $user->update([
             'name' => $this->name,
             'phone' => $this->phone,

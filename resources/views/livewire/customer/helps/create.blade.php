@@ -484,7 +484,32 @@
                                     class="w-full pl-12 pr-4 py-3 text-sm rounded-lg border transition bg-white"
                                     placeholder="0">
                             </div>
-                            <p class="text-xs text-gray-500 mt-1.5 flex items-center">
+
+                            <!-- Pilihan Nominal Cepat (Saran Nominal) -->
+                            <div class="grid grid-cols-3 sm:grid-cols-6 gap-1.5 mt-2">
+                                @foreach ([
+                                    ['val' => 25000, 'label' => '25K'],
+                                    ['val' => 50000, 'label' => '50K'],
+                                    ['val' => 100000, 'label' => '100K'],
+                                    ['val' => 150000, 'label' => '150K'],
+                                    ['val' => 200000, 'label' => '200K'],
+                                    ['val' => 500000, 'label' => '500K'],
+                                ] as $preset)
+                                    <button type="button"
+                                        @click="if ({{ $preset['val'] }} >= currentMin && {{ $preset['val'] }} <= max) { amount = {{ $preset['val'] }}; validate({{ $preset['val'] }}); }"
+                                        :disabled="{{ $preset['val'] }} < currentMin || {{ $preset['val'] }} > max"
+                                        :class="parseInt(amount) === {{ $preset['val'] }}
+                                            ? 'border-[#0066FF] bg-blue-50 text-[#0066FF] ring-1 ring-[#0066FF]/30 shadow-2xs'
+                                            : ({{ $preset['val'] }} < currentMin || {{ $preset['val'] }} > max
+                                                ? 'border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed opacity-60'
+                                                : 'border-gray-200 bg-white text-gray-700 hover:border-blue-300 hover:bg-blue-50/40 cursor-pointer')"
+                                        class="py-2 px-2 text-xs font-bold rounded-lg border transition active:scale-95 text-center">
+                                        {{ $preset['label'] }}
+                                    </button>
+                                @endforeach
+                            </div>
+
+                            <p class="text-xs text-gray-500 mt-2 flex items-center">
                                 <svg class="w-3 h-3 mr-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                                     <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
                                 </svg>
@@ -685,20 +710,21 @@
                                     <svg class="w-3.5 h-3.5 mr-1.5 text-primary-500" fill="currentColor" viewBox="0 0 20 20">
                                         <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
                                     </svg>
-                                    Detail Lokasi Bantuan / Patokan
+                                    Patokan / Catatan Lokasi
+                                    <span class="text-gray-400 text-xs ml-1 font-normal">(Opsional)</span>
                                 </span>
                             </label>
                             <x-smart-location-input 
                                 wire:model="location" 
                                 id="location"
                                 cityRef="#city-select"
-                                placeholder="Ketik patokan / nama tempat / jalan (Contoh: Dekat Toko ELS, Masuk Gang)..."
+                                placeholder="Contoh: Rumah Ibu Ani pagar biru, atau masuk gang sebelah warung..."
                             />
                             <p class="text-xs text-gray-500 mt-1.5 flex items-center">
                                 <svg class="w-3 h-3 mr-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                                     <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
                                 </svg>
-                                Tuliskan patokan spesifik agar mitra dapat dengan mudah menemukan lokasi Anda
+                                Boleh dikosongkan jika alamat lengkap sudah jelas, atau isi patokan/nama penerima saat memesan untuk orang lain.
                             </p>
                             @error('location')
                                 <span class="text-red-500 text-xs mt-1.5 block flex items-center">
@@ -1278,32 +1304,49 @@
                             <label style="display: block; font-weight: 700; color: #334155; font-size: 12px; margin-bottom: 6px;">Metode Pembayaran</label>
                             
                             <!-- Segmented Switcher -->
-                            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 4px; padding: 3px; background: #f1f5f9; border-radius: 10px; margin-bottom: 10px;">
+                            @php $hasBanks = count($availableBanks) > 0; @endphp
+                            <div style="display: grid; grid-template-columns: repeat({{ ($qrisEnabled && $hasBanks) ? 2 : 1 }}, 1fr); gap: 4px; padding: 3px; background: #f1f5f9; border-radius: 10px; margin-bottom: 10px;">
                                 @if($qrisEnabled)
                                     <button type="button" wire:click="selectTopupMethod('qris')"
                                         style="padding: 7px 0; text-align: center; font-size: 12px; font-weight: 700; border-radius: 7px; border: none; cursor: pointer; transition: all 0.2s; background: {{ $topupMethod === 'qris' ? '#ffffff' : 'transparent' }}; color: {{ $topupMethod === 'qris' ? '#0284c7' : '#64748b' }}; box-shadow: {{ $topupMethod === 'qris' ? '0 1px 2px rgba(0,0,0,0.08)' : 'none' }};">
                                         📱 QRIS E-Wallet
                                     </button>
                                 @endif
-                                <button type="button" wire:click="selectTopupMethod('{{ $availableBanks[0]['value'] ?? 'bank_bca' }}')"
-                                    style="padding: 7px 0; text-align: center; font-size: 12px; font-weight: 700; border-radius: 7px; border: none; cursor: pointer; transition: all 0.2s; background: {{ str_starts_with($topupMethod, 'bank_') ? '#ffffff' : 'transparent' }}; color: {{ str_starts_with($topupMethod, 'bank_') ? '#0284c7' : '#64748b' }}; box-shadow: {{ str_starts_with($topupMethod, 'bank_') ? '0 1px 2px rgba(0,0,0,0.08)' : 'none' }};">
-                                    <span class="inline-flex items-center justify-center gap-1.5"><svg class="w-3.5 h-3.5 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg> Transfer Bank / E-Wallet</span>
-                                </button>
+                                @if($hasBanks)
+                                    <button type="button" wire:click="selectTopupMethod('{{ $availableBanks[0]['value'] }}')"
+                                        style="padding: 7px 0; text-align: center; font-size: 12px; font-weight: 700; border-radius: 7px; border: none; cursor: pointer; transition: all 0.2s; background: {{ str_starts_with($topupMethod, 'bank_') ? '#ffffff' : 'transparent' }}; color: {{ str_starts_with($topupMethod, 'bank_') ? '#0284c7' : '#64748b' }}; box-shadow: {{ str_starts_with($topupMethod, 'bank_') ? '0 1px 2px rgba(0,0,0,0.08)' : 'none' }};">
+                                        <span class="inline-flex items-center justify-center gap-1.5"><svg class="w-3.5 h-3.5 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg> Transfer Bank / E-Wallet</span>
+                                    </button>
+                                @endif
                             </div>
 
+                            @if(!$qrisEnabled && !$hasBanks)
+                                <div style="background: #fffbeb; border: 1px solid #fde68a; border-radius: 12px; padding: 12px; text-align: center; font-size: 11px; color: #92400e; font-weight: 600;">
+                                    Belum ada metode pembayaran top-up yang aktif saat ini. Silakan hubungi Admin.
+                                </div>
+                            @endif
+
                             <!-- Konten QRIS -->
-                            @if($topupMethod === 'qris')
+                            @if($qrisEnabled && $topupMethod === 'qris')
+                                @php
+                                    $modalQrisImageUrl = \App\Models\AppSetting::qrisImageUrl();
+                                    $modalQrisMerchant = \App\Models\AppSetting::get('qris_merchant_name', 'SayaBantu');
+                                @endphp
                                 <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 14px; padding: 12px; text-align: center;">
                                     <p style="font-size: 11px; font-weight: 700; color: #1e293b; margin: 0 0 6px 0;">Scan QRIS (Semua E-Wallet / Bank)</p>
-                                    @if(file_exists(public_path('images/payment/qris.png')))
-                                        <div style="background: #ffffff; padding: 6px; border-radius: 10px; border: 1px solid #e2e8f0; display: inline-block; box-shadow: 0 1px 2px rgba(0,0,0,0.05); margin-bottom: 6px;">
-                                            <img src="{{ asset('images/payment/qris.png') }}" 
-                                                alt="QRIS QR Code" 
-                                                style="width: 130px; height: 130px; margin: auto; object-fit: contain; display: block;">
+                                    @if($modalQrisImageUrl)
+                                        <div style="background: #ffffff; padding: 6px; border-radius: 12px; border: 1px solid #e2e8f0; display: inline-block; width: 100%; max-width: 220px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); margin-bottom: 6px;">
+                                            <img src="{{ $modalQrisImageUrl }}"
+                                                alt="QRIS QR Code"
+                                                style="width: 100%; height: auto; max-height: 290px; margin: auto; object-fit: contain; display: block; border-radius: 8px;">
                                         </div>
+                                        @if($modalQrisMerchant)
+                                            <p style="font-size: 11px; font-weight: 700; color: #334155; margin: 0 0 4px 0;">Merchant: {{ $modalQrisMerchant }}</p>
+                                        @endif
                                     @else
-                                        <div style="width: 130px; height: 130px; margin: auto; border: 2px dashed #cbd5e1; border-radius: 10px; display: flex; align-items: center; justify-content: center; background: #ffffff; margin-bottom: 6px;">
-                                            <p style="font-size: 11px; color: #94a3b8; margin: 0;">QRIS Code</p>
+                                        <div style="width: 140px; height: 140px; margin: auto; border: 2px dashed #cbd5e1; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #ffffff; margin-bottom: 6px; padding: 8px;">
+                                            <p style="font-size: 11px; font-weight: 700; color: #64748b; margin: 0;">QR Code belum tersedia</p>
+                                            <p style="font-size: 10px; color: #94a3b8; margin: 4px 0 0 0;">Admin belum mengunggah QRIS</p>
                                         </div>
                                     @endif
                                     <p style="font-size: 10px; color: #64748b; margin: 0;">GoPay, OVO, DANA, LinkAja, ShopeePay, BCA, Mandiri, dll</p>
@@ -1737,6 +1780,77 @@
                 updateCoordinates(lat, lng);
             });
 
+            function moveMapTo(lat, lng, zoom = 16) {
+                const parsedLat = parseFloat(lat);
+                const parsedLng = parseFloat(lng);
+                if (isNaN(parsedLat) || isNaN(parsedLng) || !leafletMapInstance || !leafletMarkerInstance) {
+                    return;
+                }
+                leafletMapInstance.flyTo([parsedLat, parsedLng], zoom, {
+                    animate: true,
+                    duration: 1.0
+                });
+                leafletMarkerInstance.setLatLng([parsedLat, parsedLng]);
+                updateCoordinates(parsedLat, parsedLng);
+            }
+
+            async function geocodeAndMoveMap(addressText) {
+                const cleanText = (addressText || '').trim();
+                if (cleanText.length < 3) return;
+                try {
+                    const url = new URL('/api/address/autocomplete', window.location.origin);
+                    url.searchParams.set('q', cleanText);
+                    if (citySelect && citySelect.selectedIndex > 0) {
+                        const cityTxt = (citySelect.options[citySelect.selectedIndex].text || '')
+                            .replace(/\(.*\)/, '')
+                            .replace(/Kota|Kabupaten/i, '')
+                            .trim();
+                        if (cityTxt) url.searchParams.set('city', cityTxt);
+                    }
+                    const res = await fetch(url.toString(), { headers: { 'Accept': 'application/json' } });
+                    if (!res.ok) return;
+                    const items = await res.json();
+                    if (Array.isArray(items) && items.length > 0) {
+                        const first = items.find(i => i && !isNaN(parseFloat(i.lat)) && !isNaN(parseFloat(i.lng)));
+                        if (first) {
+                            moveMapTo(first.lat, first.lng, 16);
+                        }
+                    }
+                } catch (err) {
+                    console.warn('Auto geocode address failed:', err);
+                }
+            }
+
+            function syncCityDropdown(cityName) {
+                if (!citySelect || !cityName) return;
+                const cleanCity = cityName.toLowerCase().replace(/kota|kabupaten/gi, '').trim();
+                for (let i = 0; i < citySelect.options.length; i++) {
+                    const opt = citySelect.options[i];
+                    if (opt.text.toLowerCase().includes(cleanCity)) {
+                        citySelect.selectedIndex = i;
+                        try {
+                            @this.set('city_id', opt.value);
+                        } catch (err) {
+                            citySelect.dispatchEvent(new Event('change', { bubbles: true }));
+                        }
+                        break;
+                    }
+                }
+            }
+
+            window._helpCreateMapMove = moveMapTo;
+            window._helpCreateGeocode = geocodeAndMoveMap;
+            window._helpCreateSyncCity = syncCityDropdown;
+            window._helpCreateFillFullAddr = function(addr) {
+                if (!addr) return;
+                try {
+                    const fullAddr = @this.get('full_address');
+                    if (!fullAddr || fullAddr.trim() === '') {
+                        @this.set('full_address', addr);
+                    }
+                } catch (err) {}
+            };
+
             // DETEKSI PERUBAHAN PILIHAN KOTA -> Geser Peta Otomatis
             if (citySelect) {
                 citySelect.addEventListener('change', function() {
@@ -1744,71 +1858,69 @@
                     const targetLat = parseFloat(opt.getAttribute('data-lat'));
                     const targetLng = parseFloat(opt.getAttribute('data-lng'));
 
-                    if (!isNaN(targetLat) && !isNaN(targetLng) && leafletMapInstance && leafletMarkerInstance) {
-                        leafletMapInstance.flyTo([targetLat, targetLng], 14, {
-                            animate: true,
-                            duration: 1.2
-                        });
-                        leafletMarkerInstance.setLatLng([targetLat, targetLng]);
-                        updateCoordinates(targetLat, targetLng);
+                    if (!isNaN(targetLat) && !isNaN(targetLng)) {
+                        moveMapTo(targetLat, targetLng, 13);
                     }
                 });
             }
 
-            // DETEKSI PILIHAN ALAMAT CERDAS -> Geser Pin dan Peta Otomatis
-            window.addEventListener('smart-address-selected', function(e) {
-                const item = e.detail;
-                if (!item || isNaN(item.lat) || isNaN(item.lng)) return;
+            if (!window._helpCreateMapGlobalListenersBound) {
+                window._helpCreateMapGlobalListenersBound = true;
 
-                if (leafletMapInstance && leafletMarkerInstance) {
-                    leafletMapInstance.flyTo([item.lat, item.lng], 16, {
-                        animate: true,
-                        duration: 1.5
-                    });
-                    leafletMarkerInstance.setLatLng([item.lat, item.lng]);
-                    updateCoordinates(item.lat, item.lng);
-                }
+                window.addEventListener('smart-address-preview', function(e) {
+                    const item = e.detail;
+                    if (item && window._helpCreateMapMove) {
+                        window._helpCreateMapMove(item.lat, item.lng, 16);
+                    }
+                });
 
-                // Jika terdeteksi kota, sinkronkan dropdown kota jika belum dipilih
-                if (citySelect && item.city) {
-                    const cleanCity = item.city.toLowerCase().replace(/kota|kabupaten/gi, '').trim();
-                    for (let i = 0; i < citySelect.options.length; i++) {
-                        const opt = citySelect.options[i];
-                        if (opt.text.toLowerCase().includes(cleanCity)) {
-                            citySelect.selectedIndex = i;
-                            try {
-                                @this.set('city_id', opt.value);
-                            } catch (err) {
-                                citySelect.dispatchEvent(new Event('change', { bubbles: true }));
-                            }
-                            break;
+                window.addEventListener('smart-address-selected', function(e) {
+                    const item = e.detail;
+                    if (!item) return;
+                    if (window._helpCreateMapMove) {
+                        window._helpCreateMapMove(item.lat, item.lng, 16);
+                    }
+                    if (item.city && window._helpCreateSyncCity) {
+                        window._helpCreateSyncCity(item.city);
+                    }
+                });
+
+                window.addEventListener('smart-location-selected', function(e) {
+                    const item = e.detail;
+                    if (!item) return;
+                    if (window._helpCreateMapMove) {
+                        window._helpCreateMapMove(item.lat, item.lng, 16);
+                    }
+                    if (item.full_address && window._helpCreateFillFullAddr) {
+                        window._helpCreateFillFullAddr(item.full_address);
+                    }
+                });
+
+                const registerLivewireMapListeners = () => {
+                    if (!window.Livewire || window._helpCreateLivewireListenersBound) return;
+                    window._helpCreateLivewireListenersBound = true;
+
+                    Livewire.on('coordinatesUpdated', (payload) => {
+                        const data = Array.isArray(payload) ? (payload[0] || {}) : (payload || {});
+                        if (data.lat && data.lng && window._helpCreateMapMove) {
+                            window._helpCreateMapMove(data.lat, data.lng, data.zoom || 16);
                         }
-                    }
-                }
-            });
-
-            // DETEKSI PILIHAN DETAIL LOKASI / PATOKAN CERDAS -> Geser Pin dan Peta Otomatis
-            window.addEventListener('smart-location-selected', function(e) {
-                const item = e.detail;
-                if (!item || isNaN(item.lat) || isNaN(item.lng)) return;
-
-                if (leafletMapInstance && leafletMarkerInstance) {
-                    leafletMapInstance.flyTo([item.lat, item.lng], 16, {
-                        animate: true,
-                        duration: 1.5
                     });
-                    leafletMarkerInstance.setLatLng([item.lat, item.lng]);
-                    updateCoordinates(item.lat, item.lng);
-                }
 
-                // Jika Alamat Lengkap masih kosong, otomatis isi dengan full_address dari patokan
-                try {
-                    const fullAddr = @this.get('full_address');
-                    if (!fullAddr || fullAddr.trim() === '') {
-                        @this.set('full_address', item.full_address);
-                    }
-                } catch (err) {}
-            });
+                    Livewire.on('addressNeedsGeocode', (payload) => {
+                        const data = Array.isArray(payload) ? (payload[0] || {}) : (payload || {});
+                        if (data.address && window._helpCreateGeocode) {
+                            window._helpCreateGeocode(data.address);
+                        }
+                    });
+                };
+
+                if (window.Livewire) {
+                    registerLivewireMapListeners();
+                } else {
+                    document.addEventListener('livewire:init', registerLivewireMapListeners);
+                }
+            }
         }
     </script>
 </div>

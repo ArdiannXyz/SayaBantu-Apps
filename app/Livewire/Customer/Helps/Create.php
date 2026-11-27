@@ -304,6 +304,7 @@ class Create extends Component
         if (! empty($city->latitude) && ! empty($city->longitude)) {
             $this->latitude = (float) $city->latitude;
             $this->longitude = (float) $city->longitude;
+            $this->dispatch('coordinatesUpdated', lat: $this->latitude, lng: $this->longitude, zoom: 13);
         }
         $this->dispatch('help:timezone-changed', zone: $zone, iana: $iana);
     }
@@ -700,7 +701,7 @@ class Create extends Component
         'category_id' => 'required|exists:categories,id',
         'other_category' => 'nullable|string|max:100',
         'city_id' => 'required|exists:cities,id,is_active,1',
-        'location' => 'required|string|max:255',
+        'location' => 'nullable|string|max:255',
         'full_address' => 'required|string|max:1000',
         'latitude' => 'required|numeric|between:-90,90',
         'longitude' => 'required|numeric|between:-180,180',
@@ -861,6 +862,11 @@ class Create extends Component
             $minutes = $isUrgent ? (int) ($this->auto_cancel_minutes ?: 30) : null;
             $autoCancelAt = ($isUrgent && $minutes) ? now()->addMinutes($minutes) : null;
 
+            $resolvedLocation = trim((string) $this->location);
+            if ($resolvedLocation === '') {
+                $resolvedLocation = \Illuminate\Support\Str::limit(trim((string) $this->full_address), 255, '');
+            }
+
             $help = Help::create([
                 'user_id' => $userId,
                 'order_id' => $orderId,
@@ -883,7 +889,7 @@ class Create extends Component
                 'total_amount' => $totalPaid,
                 'description' => $this->description,
                 'equipment_provided' => $this->equipment_provided,
-                'location' => $this->location,
+                'location' => $resolvedLocation,
                 'full_address' => $this->full_address,
                 'scheduled_at' => $scheduledAt,
                 'latitude' => $lat,
@@ -1104,49 +1110,21 @@ class Create extends Component
             return;
         }
 
-        $tier1_limit = (int) AppSetting::get('topup_tier1_limit', 50000);
-        $tier1_fee = (int) AppSetting::get('topup_tier1_fee', 9000);
-        $tier2_limit = (int) AppSetting::get('topup_tier2_limit', 100000);
-        $tier2_fee = (int) AppSetting::get('topup_tier2_fee', 7500);
-        $tier3_pct = (float) AppSetting::get('topup_tier3_percentage', 3);
-        $tier3_max = (int) AppSetting::get('topup_tier3_max', 15000);
+        $fee = AppSetting::calculateTopupAdminFee($amount);
 
-        if ($amount < $tier1_limit) {
-            $fee = $tier1_fee;
-        } elseif ($amount < $tier2_limit) {
-            $fee = $tier2_fee;
-        } else {
-            $fee = min($amount * ($tier3_pct / 100), $tier3_max);
-        }
-
-        $this->topupAdminFee = (int) round($fee);
+        $this->topupAdminFee = $fee;
         $this->topupTotalTransfer = (int) round($amount + $fee);
     }
 
     public function loadPaymentSettings()
     {
-        $raw = AppSetting::get('topup_payment_methods', '{}');
-        $methods = json_decode((string) $raw, true) ?: [];
+        $paymentConfig = AppSetting::activePaymentConfig();
 
-        $this->qrisEnabled = $methods['qris']['enabled'] ?? true;
+        $this->qrisEnabled = $paymentConfig['qris_enabled'];
+        $this->availableBanks = $paymentConfig['banks'];
 
-        $defaultBanks = [
-            ['code' => 'bca', 'name' => 'BCA', 'account_number' => '1234567890', 'account_name' => 'PT sayabantu', 'enabled' => true],
-            ['code' => 'mandiri', 'name' => 'Mandiri', 'account_number' => '0987654321', 'account_name' => 'PT sayabantu', 'enabled' => true],
-            ['code' => 'bni', 'name' => 'BNI', 'account_number' => '5555666677', 'account_name' => 'PT sayabantu', 'enabled' => true],
-            ['code' => 'bri', 'name' => 'BRI', 'account_number' => '8888999900', 'account_name' => 'PT sayabantu', 'enabled' => true],
-        ];
-
-        $banks = $methods['banks'] ?? $defaultBanks;
-
-        $this->availableBanks = collect($banks)
-            ->filter(fn ($bank) => $bank['enabled'] ?? false)
-            ->map(fn ($bank) => array_merge($bank, ['value' => 'bank_'.($bank['code'] ?? '')]))
-            ->values()
-            ->toArray();
-
-        if (empty($this->topupMethod) || $this->topupMethod === 'all') {
-            $this->topupMethod = $this->qrisEnabled ? 'qris' : ($this->availableBanks[0]['value'] ?? 'bank_bca');
+        if (empty($this->topupMethod) || $this->topupMethod === 'all' || (! $this->qrisEnabled && $this->topupMethod === 'qris')) {
+            $this->topupMethod = $this->qrisEnabled ? 'qris' : ($this->availableBanks[0]['value'] ?? '');
         }
     }
 
@@ -1327,7 +1305,9 @@ class Create extends Component
             if (! empty($addr->latitude) && ! empty($addr->longitude)) {
                 $this->latitude = (float) $addr->latitude;
                 $this->longitude = (float) $addr->longitude;
-                $this->dispatch('coordinatesUpdated', lat: $this->latitude, lng: $this->longitude);
+                $this->dispatch('coordinatesUpdated', lat: $this->latitude, lng: $this->longitude, zoom: 16);
+            } elseif (! empty($this->full_address)) {
+                $this->dispatch('addressNeedsGeocode', address: $this->full_address);
             }
         }
     }
@@ -1360,6 +1340,11 @@ class Create extends Component
             $iana = $this->ianaForZone($zone);
             $this->timezoneLabel = $zone;
             $this->timezoneIana = $iana;
+            if (! empty($city->latitude) && ! empty($city->longitude)) {
+                $this->latitude = (float) $city->latitude;
+                $this->longitude = (float) $city->longitude;
+                $this->dispatch('coordinatesUpdated', lat: $this->latitude, lng: $this->longitude, zoom: 13);
+            }
             $this->dispatch('help:timezone-changed', zone: $zone, iana: $iana);
         }
         $this->searchResults = [];

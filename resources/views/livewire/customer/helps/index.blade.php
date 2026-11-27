@@ -919,19 +919,20 @@
                                 <svg class="w-3.5 h-3.5 mr-1.5 text-primary-500" fill="currentColor" viewBox="0 0 20 20">
                                     <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
                                 </svg>
-                                Detail Lokasi Bantuan / Patokan
+                                Patokan / Catatan Lokasi
+                                <span class="text-gray-400 text-xs ml-1 font-normal">(Opsional)</span>
                             </span>
                         </label>
                         <x-smart-location-input 
                             wire:model.defer="editLocation" 
                             id="editLocation"
-                            placeholder="Ketik patokan / nama tempat / jalan..."
+                            placeholder="Contoh: Rumah Ibu Ani pagar biru, atau masuk gang sebelah warung..."
                         />
                         <p class="text-xs text-gray-500 mt-1.5 flex items-center">
                             <svg class="w-3 h-3 mr-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
                             </svg>
-                            Alamat singkat / patokan, contoh: nama jalan, RT/RW, dekat toko
+                            Boleh dikosongkan jika alamat lengkap sudah jelas, atau isi patokan/nama penerima saat memesan untuk orang lain.
                         </p>
                         @error('editLocation') 
                             <span class="text-red-500 text-xs mt-1.5 block flex items-center">
@@ -1496,21 +1497,42 @@
             }
         }
 
+        function moveEditMapTo(lat, lng, zoom = 15) {
+            const parsedLat = parseFloat(lat);
+            const parsedLng = parseFloat(lng);
+            if (isNaN(parsedLat) || isNaN(parsedLng) || !editMap) return;
+
+            editMap.flyTo([parsedLat, parsedLng], zoom, { animate: true, duration: 0.9 });
+            if (!editMarker) {
+                editMarker = L.marker([parsedLat, parsedLng], { draggable: true }).addTo(editMap);
+                editMarker.on('dragend', function (event) {
+                    const position = event.target.getLatLng();
+                    updateEditCoordinates(position.lat, position.lng);
+                });
+            } else {
+                editMarker.setLatLng([parsedLat, parsedLng]);
+            }
+            updateEditCoordinates(parsedLat, parsedLng);
+        }
+
+        window.addEventListener('smart-address-preview', function(e) {
+            const item = e.detail;
+            if (item && item.lat && item.lng) {
+                moveEditMapTo(item.lat, item.lng, 15);
+            }
+        });
+
         window.addEventListener('smart-address-selected', function(e) {
             const item = e.detail;
-            if (item && item.lat && item.lng && editMap && editMarker) {
-                editMap.flyTo([item.lat, item.lng], 15);
-                editMarker.setLatLng([item.lat, item.lng]);
-                updateEditCoordinates(item.lat, item.lng);
+            if (item && item.lat && item.lng) {
+                moveEditMapTo(item.lat, item.lng, 15);
             }
         });
 
         window.addEventListener('smart-location-selected', function(e) {
             const item = e.detail;
-            if (item && item.lat && item.lng && editMap && editMarker) {
-                editMap.flyTo([item.lat, item.lng], 15);
-                editMarker.setLatLng([item.lat, item.lng]);
-                updateEditCoordinates(item.lat, item.lng);
+            if (item && item.lat && item.lng) {
+                moveEditMapTo(item.lat, item.lng, 15);
             }
         });
     </script>

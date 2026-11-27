@@ -110,25 +110,10 @@ class TopupRequest extends Component
 
     protected function loadPaymentSettings()
     {
-        $raw = AppSetting::get('topup_payment_methods', '{}');
-        $methods = json_decode((string) $raw, true) ?: [];
+        $paymentConfig = AppSetting::activePaymentConfig();
 
-        $this->qrisEnabled = $methods['qris']['enabled'] ?? true;
-
-        $defaultBanks = [
-            ['code' => 'bca', 'name' => 'BCA', 'account_number' => '1234567890', 'account_name' => 'PT sayabantu', 'enabled' => true],
-            ['code' => 'mandiri', 'name' => 'Mandiri', 'account_number' => '0987654321', 'account_name' => 'PT sayabantu', 'enabled' => true],
-            ['code' => 'bni', 'name' => 'BNI', 'account_number' => '5555666677', 'account_name' => 'PT sayabantu', 'enabled' => true],
-            ['code' => 'bri', 'name' => 'BRI', 'account_number' => '8888999900', 'account_name' => 'PT sayabantu', 'enabled' => true],
-        ];
-
-        $banks = $methods['banks'] ?? $defaultBanks;
-
-        $this->availableBanks = collect($banks)
-            ->filter(fn ($bank) => $bank['enabled'] ?? false)
-            ->map(fn ($bank) => array_merge($bank, ['value' => 'bank_'.($bank['code'] ?? '')]))
-            ->values()
-            ->toArray();
+        $this->qrisEnabled = $paymentConfig['qris_enabled'];
+        $this->availableBanks = $paymentConfig['banks'];
     }
 
     public function setQuickAmount($amount)
@@ -148,23 +133,7 @@ class TopupRequest extends Component
         }
 
         $amount = floatval($this->amount);
-
-        $tier1_limit = (int) AppSetting::get('topup_tier1_limit', 50000);
-        $tier1_fee = (int) AppSetting::get('topup_tier1_fee', 9000);
-        $tier2_limit = (int) AppSetting::get('topup_tier2_limit', 100000);
-        $tier2_fee = (int) AppSetting::get('topup_tier2_fee', 7500);
-        $tier3_percentage = (float) AppSetting::get('topup_tier3_percentage', 3);
-        $tier3_max = (int) AppSetting::get('topup_tier3_max', 15000);
-
-        if ($amount < $tier1_limit) {
-            $this->adminFee = $tier1_fee;
-        } elseif ($amount < $tier2_limit) {
-            $this->adminFee = $tier2_fee;
-        } else {
-            $fee = $amount * ($tier3_percentage / 100);
-            $this->adminFee = min($fee, $tier3_max);
-        }
-
+        $this->adminFee = AppSetting::calculateTopupAdminFee($amount);
         $this->totalPayment = $amount + $this->adminFee;
         $this->saveFormData();
     }

@@ -66,10 +66,10 @@
                 <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-3">Tampilan Barcode QRIS</span>
                 
                 @if($qrisPreviewUrl)
-                    <div class="relative group">
+                    <div class="relative group w-full max-w-[240px] mx-auto bg-white rounded-2xl border border-slate-200 shadow-md overflow-hidden p-1.5">
                         <img src="{{ $qrisPreviewUrl }}" 
                              alt="QRIS Barcode" 
-                             class="w-48 h-48 aspect-square object-contain bg-white rounded-2xl border border-slate-200 shadow-md p-2">
+                             class="w-full h-auto max-h-80 object-contain rounded-xl block mx-auto">
                     </div>
                     @if($qris_merchant_name)
                         <p class="text-xs font-bold text-gray-900 mt-2">{{ $qris_merchant_name }}</p>

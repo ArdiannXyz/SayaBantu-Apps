@@ -232,6 +232,14 @@
                         if (!this.isSelecting) {
                             this.suggestions = Array.isArray(data) ? data : [];
                             this.isOpen = this.suggestions.length > 0;
+
+                            // Otomatis geser peta ke hasil pencarian teratas saat mengetik
+                            const firstWithCoords = this.suggestions.find(s => s && !isNaN(parseFloat(s.lat)) && !isNaN(parseFloat(s.lng)));
+                            if (firstWithCoords) {
+                                window.dispatchEvent(new CustomEvent('smart-address-preview', {
+                                    detail: firstWithCoords
+                                }));
+                            }
                         }
                     }
                 } catch (err) {

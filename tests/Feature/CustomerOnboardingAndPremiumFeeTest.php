@@ -8,6 +8,7 @@ use App\Livewire\SuperAdmin\Settings\FeePendapatan;
 use App\Models\AppSetting;
 use App\Models\Category;
 use App\Models\City;
+use App\Models\CustomerAddress;
 use App\Models\Help;
 use App\Models\Registration;
 use App\Models\User;
@@ -94,6 +95,12 @@ class CustomerOnboardingAndPremiumFeeTest extends TestCase
         // 5. Submit help order as unverified customer -> uses regular customer fee (default 10%)
         Livewire::actingAs($customer)
             ->test(CustomerHelpsCreate::class)
+            ->assertSee('25K')
+            ->assertSee('50K')
+            ->assertSee('100K')
+            ->assertSee('150K')
+            ->assertSee('200K')
+            ->assertSee('500K')
             ->set('title', 'Antar Belanja Harian')
             ->set('category_id', (string) $category->id)
             ->set('amount', '100000')
@@ -299,5 +306,173 @@ class CustomerOnboardingAndPremiumFeeTest extends TestCase
         $this->assertNotNull($reg);
         $this->assertSame('3404055566677788', $reg->nik);
         $this->assertSame('pending_verification', $reg->status);
+    }
+
+    public function test_verified_user_with_documents_cannot_reupload_ktp_or_selfie(): void
+    {
+        Storage::fake('public');
+        $city = $this->createActiveCity();
+
+        $verifiedCustomer = User::factory()->create([
+            'role' => 'customer',
+            'status' => 'active',
+            'is_completed' => true,
+            'verified' => true,
+            'nik' => '3404077788899900',
+            'ktp_photo' => 'ktp-photos/original-ktp.jpg',
+            'selfie_photo' => 'selfie-photos/original-selfie.jpg',
+            'city_id' => $city->id,
+        ]);
+
+        Livewire::actingAs($verifiedCustomer)
+            ->test(Verification::class)
+            ->assertSet('isVerified', true)
+            ->assertSet('isLocked', true)
+            ->assertSee('Akun Premium Aktif')
+            ->assertSee('Terverifikasi & Terkunci')
+            ->assertDontSee('Kamera KTP')
+            ->assertDontSee('Kamera Selfie')
+            ->assertDontSee('Pilih Galeri')
+            ->assertDontSee('Simpan Data')
+            ->set('ktp_photo', UploadedFile::fake()->image('new-ktp.jpg', 600, 400))
+            ->set('selfie_photo', UploadedFile::fake()->image('new-selfie.jpg', 600, 600))
+            ->call('save');
+
+        $verifiedCustomer->refresh();
+        $this->assertSame('ktp-photos/original-ktp.jpg', $verifiedCustomer->ktp_photo);
+        $this->assertSame('selfie-photos/original-selfie.jpg', $verifiedCustomer->selfie_photo);
+
+        $verifiedMitra = User::factory()->create([
+            'role' => 'mitra',
+            'status' => 'active',
+            'is_completed' => true,
+            'verified' => true,
+            'nik' => '3404077788899901',
+            'ktp_photo' => 'ktp-photos/mitra-ktp.jpg',
+            'selfie_photo' => 'selfie-photos/mitra-selfie.jpg',
+            'city_id' => $city->id,
+        ]);
+
+        Livewire::actingAs($verifiedMitra)
+            ->test(Verification::class)
+            ->assertSet('isVerified', true)
+            ->assertSet('isLocked', true)
+            ->assertSee('Identitas Terverifikasi')
+            ->assertDontSee('Kamera KTP')
+            ->assertDontSee('Pilih Galeri')
+            ->assertDontSee('Simpan Data');
+    }
+
+    public function test_customer_can_create_help_with_optional_location_empty(): void
+    {
+        $city = $this->createActiveCity();
+        $category = Category::create([
+            'name' => 'Kebersihan',
+            'icon' => '🧹',
+            'is_active' => true,
+        ]);
+
+        $customer = User::factory()->create([
+            'role' => 'customer',
+            'status' => 'active',
+            'is_completed' => true,
+            'phone' => '081234567895',
+            'city_id' => $city->id,
+            'city' => $city->name,
+            'address' => 'Jl. Gejayan No. 88',
+        ]);
+
+        UserBalance::create([
+            'user_id' => $customer->id,
+            'balance' => 300000,
+        ]);
+
+        $fullAddr = 'Jl. Gejayan No. 88, Caturtunggal, Depok, Sleman, DI Yogyakarta';
+
+        Livewire::actingAs($customer)
+            ->test(CustomerHelpsCreate::class)
+            ->assertSee('Patokan / Catatan Lokasi')
+            ->assertSee('(Opsional)')
+            ->set('title', 'Bersih Halaman')
+            ->set('category_id', (string) $category->id)
+            ->set('amount', '50000')
+            ->set('city_id', (string) $city->id)
+            ->set('location', '')
+            ->set('full_address', $fullAddr)
+            ->set('latitude', -7.7956)
+            ->set('longitude', 110.3695)
+            ->set('help_type', 'urgent')
+            ->set('auto_cancel_minutes', 60)
+            ->set('scheduled_date', now()->format('Y-m-d'))
+            ->set('scheduled_time', now()->addHour()->format('H:i'))
+            ->set('description', 'Tolong bantu bersihkan halaman rumah sesuai alamat lengkap')
+            ->call('prepareConfirm')
+            ->assertSet('showConfirmModal', true)
+            ->call('save')
+            ->assertHasNoErrors();
+
+        $help = Help::where('user_id', $customer->id)->first();
+        $this->assertNotNull($help);
+        $this->assertSame($fullAddr, $help->location);
+        $this->assertSame($fullAddr, $help->full_address);
+    }
+
+    public function test_map_coordinates_update_automatically_on_city_and_saved_address_change(): void
+    {
+        $city1 = $this->createActiveCity();
+        $city2 = City::create([
+            'name' => 'Kabupaten Sleman',
+            'province' => 'DI Yogyakarta',
+            'latitude' => -7.7160,
+            'longitude' => 110.3556,
+            'is_active' => true,
+        ]);
+
+        $customer = User::factory()->create([
+            'role' => 'customer',
+            'status' => 'active',
+            'is_completed' => true,
+            'phone' => '081234567896',
+            'city_id' => $city1->id,
+            'city' => $city1->name,
+            'address' => 'Jl. Malioboro',
+        ]);
+
+        $savedWithCoords = CustomerAddress::create([
+            'user_id' => $customer->id,
+            'label' => 'Rumah',
+            'recipient_name' => 'Budi Santoso',
+            'phone' => '081234567896',
+            'address' => 'Jl. Kaliurang KM 7',
+            'city_name' => 'Kabupaten Sleman',
+            'province' => 'DI Yogyakarta',
+            'city_id' => $city2->id,
+            'latitude' => -7.7325,
+            'longitude' => 110.3912,
+            'is_primary' => true,
+        ]);
+
+        $savedWithoutCoords = CustomerAddress::create([
+            'user_id' => $customer->id,
+            'label' => 'Kantor',
+            'recipient_name' => 'Ani Wijaya',
+            'phone' => '081234567897',
+            'address' => 'Jl. Solo KM 8',
+            'city_name' => 'Kabupaten Sleman',
+            'province' => 'DI Yogyakarta',
+            'city_id' => $city2->id,
+            'latitude' => null,
+            'longitude' => null,
+            'is_primary' => false,
+        ]);
+
+        Livewire::actingAs($customer)
+            ->test(CustomerHelpsCreate::class)
+            ->call('setCityId', $city2->id)
+            ->assertDispatched('coordinatesUpdated', lat: -7.7160, lng: 110.3556, zoom: 13)
+            ->call('selectSavedAddress', $savedWithCoords->id)
+            ->assertDispatched('coordinatesUpdated', lat: -7.7325, lng: 110.3912, zoom: 16)
+            ->call('selectSavedAddress', $savedWithoutCoords->id)
+            ->assertDispatched('addressNeedsGeocode', address: $savedWithoutCoords->formatted_address);
     }
 }

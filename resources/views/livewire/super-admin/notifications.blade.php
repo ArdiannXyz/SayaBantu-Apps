@@ -6,47 +6,50 @@
 
 <div class="space-y-6">
     <!-- Top Summary & Actions Bar -->
-    <div class="bg-white rounded-2xl border border-gray-200 p-5 sm:p-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div class="bg-white rounded-2xl border border-gray-200 p-4 sm:p-5 shadow-xs flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
         <!-- Left: Filters -->
-        <div class="flex flex-wrap items-center gap-2">
+        <div class="inline-flex flex-wrap sm:flex-nowrap items-center gap-1 bg-slate-100/90 p-1 rounded-xl border border-slate-200/70 w-fit max-w-full">
             <button 
+                type="button"
                 wire:click="$set('filter', 'all')"
-                class="px-4 py-2 rounded-xl text-xs font-bold transition-all duration-200 cursor-pointer flex items-center gap-2 {{ $filter === 'all' ? 'bg-primary-600 text-white shadow-sm ring-2 ring-primary-500/20' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}">
+                class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 cursor-pointer inline-flex items-center gap-1.5 whitespace-nowrap {{ $filter === 'all' ? 'bg-[#0066FF] text-white shadow-xs' : 'text-slate-600 hover:text-slate-900 hover:bg-white/70' }}">
                 <span>Semua</span>
-                <span class="px-1.5 py-0.5 text-[10px] rounded-full {{ $filter === 'all' ? 'bg-white/25 text-white' : 'bg-gray-200 text-gray-600' }}">
+                <span class="px-1.5 py-0.5 text-[10px] rounded-full leading-none {{ $filter === 'all' ? 'bg-white/25 text-white' : 'bg-slate-200/80 text-slate-700' }}">
                     {{ $totalCount ?? $notifications->total() }}
                 </span>
             </button>
             <button 
+                type="button"
                 wire:click="$set('filter', 'unread')"
-                class="px-4 py-2 rounded-xl text-xs font-bold transition-all duration-200 cursor-pointer flex items-center gap-2 {{ $filter === 'unread' ? 'bg-primary-600 text-white shadow-sm ring-2 ring-primary-500/20' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}">
+                class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 cursor-pointer inline-flex items-center gap-1.5 whitespace-nowrap {{ $filter === 'unread' ? 'bg-[#0066FF] text-white shadow-xs' : 'text-slate-600 hover:text-slate-900 hover:bg-white/70' }}">
                 <span>Belum Dibaca</span>
                 @if(($unreadCount ?? 0) > 0)
-                    <span class="px-1.5 py-0.5 text-[10px] bg-red-500 text-white rounded-full font-bold animate-pulse">
+                    <span class="px-1.5 py-0.5 text-[10px] bg-red-500 text-white rounded-full font-bold leading-none">
                         {{ $unreadCount }}
                     </span>
                 @else
-                    <span class="px-1.5 py-0.5 text-[10px] rounded-full {{ $filter === 'unread' ? 'bg-white/25 text-white' : 'bg-gray-200 text-gray-600' }}">0</span>
+                    <span class="px-1.5 py-0.5 text-[10px] rounded-full leading-none {{ $filter === 'unread' ? 'bg-white/25 text-white' : 'bg-slate-200/80 text-slate-700' }}">0</span>
                 @endif
             </button>
             <button 
+                type="button"
                 wire:click="$set('filter', 'read')"
-                class="px-4 py-2 rounded-xl text-xs font-bold transition-all duration-200 cursor-pointer flex items-center gap-2 {{ $filter === 'read' ? 'bg-primary-600 text-white shadow-sm ring-2 ring-primary-500/20' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}">
+                class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 cursor-pointer inline-flex items-center gap-1.5 whitespace-nowrap {{ $filter === 'read' ? 'bg-[#0066FF] text-white shadow-xs' : 'text-slate-600 hover:text-slate-900 hover:bg-white/70' }}">
                 <span>Sudah Dibaca</span>
-                <span class="px-1.5 py-0.5 text-[10px] rounded-full {{ $filter === 'read' ? 'bg-white/25 text-white' : 'bg-gray-200 text-gray-600' }}">
+                <span class="px-1.5 py-0.5 text-[10px] rounded-full leading-none {{ $filter === 'read' ? 'bg-white/25 text-white' : 'bg-slate-200/80 text-slate-700' }}">
                     {{ $readCount ?? 0 }}
                 </span>
             </button>
         </div>
 
         <!-- Right: Action Buttons -->
-        <div class="flex flex-wrap items-center gap-2 self-start md:self-auto">
+        <div class="flex flex-wrap items-center gap-2 shrink-0">
             @if(($unreadCount ?? 0) > 0)
                 <button 
                     wire:click="markAllAsRead"
                     type="button"
-                    class="inline-flex items-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition shadow-xs cursor-pointer">
-                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    class="inline-flex items-center gap-1.5 px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition shadow-xs cursor-pointer whitespace-nowrap">
+                    <svg class="w-3.5 h-3.5 shrink-0" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
                     </svg>
                     <span>Tandai Semua Dibaca</span>
@@ -58,11 +61,12 @@
                     wire:click="deleteAllRead"
                     wire:confirm="Apakah Anda yakin ingin menghapus semua notifikasi yang sudah dibaca?"
                     type="button"
-                    class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white border border-gray-200 hover:bg-red-50 hover:border-red-200 text-gray-700 hover:text-red-600 rounded-xl text-xs font-bold transition shadow-xs cursor-pointer">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    title="Hapus semua notifikasi yang sudah dibaca"
+                    class="inline-flex items-center gap-1.5 px-3 py-2 bg-white border border-gray-200 hover:bg-red-50 hover:border-red-200 text-gray-700 hover:text-red-600 rounded-xl text-xs font-bold transition shadow-xs cursor-pointer whitespace-nowrap">
+                    <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                     </svg>
-                    <span>Hapus Yang Sudah Dibaca</span>
+                    <span>Hapus Dibaca</span>
                 </button>
             @endif
 
@@ -71,8 +75,8 @@
                     wire:click="deleteAllNotifications"
                     wire:confirm="Apakah Anda yakin ingin menghapus SELURUH notifikasi?"
                     type="button"
-                    class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-bold transition shadow-xs cursor-pointer">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    class="inline-flex items-center gap-1.5 px-3 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-bold transition shadow-xs cursor-pointer whitespace-nowrap">
+                    <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                     </svg>
                     <span>Hapus Semua</span>

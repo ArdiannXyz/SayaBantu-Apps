@@ -5,6 +5,7 @@ namespace App\Livewire\SuperAdmin\Settings;
 use App\Models\AppSetting;
 use App\Models\BankChannel;
 use App\Services\ImageCompressionService;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -290,6 +291,7 @@ class BankSettings extends Component
 
         if ($this->qris_image_upload) {
             $path = ImageCompressionService::compressAndStore($this->qris_image_upload, 'payment');
+            File::ensureDirectoryExists(public_path('images/payment'));
             @copy(storage_path('app/public/'.$path), public_path('images/payment/qris.png'));
 
             if ($this->current_qris_image && $this->current_qris_image !== 'images/payment/qris.png' && Storage::disk('public')->exists($this->current_qris_image)) {
@@ -419,9 +421,7 @@ class BankSettings extends Component
                 $qrisPreviewUrl = null;
             }
         } elseif ($this->current_qris_image) {
-            $qrisPreviewUrl = ($this->current_qris_image === 'images/payment/qris.png')
-                ? asset('images/payment/qris.png')
-                : asset('storage/' . $this->current_qris_image);
+            $qrisPreviewUrl = AppSetting::qrisImageUrl();
         }
 
         return view('livewire.super-admin.settings.bank-settings', [

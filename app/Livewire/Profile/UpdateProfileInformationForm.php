@@ -21,12 +21,28 @@ class UpdateProfileInformationForm extends Component
 
     public $gender;
 
+    public bool $isNameLocked = false;
+
+    public bool $isGenderLocked = false;
+
+    protected function shouldLockName(?\App\Models\User $user): bool
+    {
+        return $user !== null
+            && $user->isMitra()
+            && (bool) ($user->verified ?? false)
+            && ! empty(trim((string) $user->name));
+    }
+
     protected function rules(): array
     {
+        $user = Auth::user();
         $userId = Auth::id();
+        $nameLocked = $this->shouldLockName($user);
 
         return [
-            'name' => ['required', 'string', 'max:255', 'regex:/^[a-zA-Z\s]+$/'],
+            'name' => $nameLocked
+                ? ['required', 'string', 'max:255']
+                : ['required', 'string', 'max:255', 'regex:/^[a-zA-Z\s]+$/'],
             'email' => ['required', 'email', 'max:255', \Illuminate\Validation\Rule::unique('users', 'email')->ignore($userId)],
             'nik' => ['nullable', 'string'],
             'phone' => [
@@ -71,6 +87,8 @@ class UpdateProfileInformationForm extends Component
         $this->address = $user->address;
         $this->city_id = $user->city_id;
         $this->gender = $user->gender;
+        $this->isNameLocked = $this->shouldLockName($user);
+        $this->isGenderLocked = ! empty(trim((string) $user->gender));
     }
 
     public function selectCityByName(?string $cityName): void
@@ -97,7 +115,20 @@ class UpdateProfileInformationForm extends Component
     {
         $user = Auth::user();
 
-        $this->name = preg_replace('/[^a-zA-Z\s]/', '', (string) $this->name);
+        if ($this->shouldLockName($user)) {
+            $this->name = $user->name;
+            $this->isNameLocked = true;
+        } else {
+            $this->name = preg_replace('/[^a-zA-Z\s]/', '', (string) $this->name);
+            $this->isNameLocked = false;
+        }
+
+        // Jenis Kelamin dan NIK dikunci permanen sesuai identitas akun yang sudah tercatat
+        if (! empty(trim((string) $user->gender))) {
+            $this->gender = $user->gender;
+            $this->isGenderLocked = true;
+        }
+
         $this->phone = preg_replace('/[^0-9]/', '', (string) $this->phone);
         // NIK dikunci permanen sesuai identitas akun terdaftar
         $this->nik = $user->nik;

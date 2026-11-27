@@ -28,6 +28,8 @@ class Verification extends Component
 
     public bool $isVerified = false;
 
+    public bool $isLocked = false;
+
     public $rejection_reason = null;
 
     public $is_rejected = false;
@@ -39,6 +41,7 @@ class Verification extends Component
         $this->existing_ktp = $user->ktp_photo;
         $this->existing_selfie = $user->selfie_photo;
         $this->isVerified = (bool) ($user->verified ?? false);
+        $this->isLocked = $this->isVerified && ! empty($this->existing_ktp) && ! empty($this->existing_selfie);
 
         $reg = Registration::where('email', $user->email)->first();
         if ($reg && $reg->status === 'rejected') {
@@ -50,6 +53,17 @@ class Verification extends Component
     public function save()
     {
         $user = Auth::user();
+
+        if ($user && (bool) ($user->verified ?? false) && ! empty($user->ktp_photo) && ! empty($user->selfie_photo)) {
+            $this->isVerified = true;
+            $this->isLocked = true;
+            $this->ktp_photo = null;
+            $this->selfie_photo = null;
+            session()->flash('error', 'Identitas dan dokumen KTP/Selfie Anda sudah terverifikasi sehingga tidak dapat diunggah ulang.');
+
+            return;
+        }
+
         $this->nik = preg_replace('/\D/', '', $this->nik);
 
         $rules = [

@@ -65,19 +65,31 @@ x-on:profile-saved.window="
 
         <!-- Name -->
         <div>
-            <label class="block text-sm font-semibold text-gray-900 mb-2">
-                <span class="flex items-center gap-2">
-                    <svg class="w-4 h-4" style="color: #0066FF;" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
-                    </svg>
-                    Nama Lengkap
-
-                </span>
-            </label>
+            <div class="flex items-center justify-between mb-2">
+                <label class="block text-sm font-semibold text-gray-900">
+                    <span class="flex items-center gap-2">
+                        <svg class="w-4 h-4" style="color: #0066FF;" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
+                        </svg>
+                        Nama Lengkap
+                    </span>
+                </label>
+                @if($isNameLocked)
+                    <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-gray-500 bg-gray-100 px-2 py-0.5 rounded-md border border-gray-200">
+                        <svg class="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                        </svg>
+                        Terkunci
+                    </span>
+                @endif
+            </div>
             <input type="text" wire:model="name" required
-                oninput="this.value = this.value.replace(/[^a-zA-Z\s]/g, '')"
-                class="w-full px-4 py-3.5 text-sm rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-100 transition bg-white"
+                @if($isNameLocked) disabled readonly @else oninput="this.value = this.value.replace(/[^a-zA-Z\s]/g, '')" @endif
+                class="w-full px-4 py-3.5 text-sm rounded-xl border border-gray-200 transition {{ $isNameLocked ? 'bg-gray-100/90 text-gray-500 cursor-not-allowed select-none' : 'focus:border-primary-500 focus:ring-2 focus:ring-primary-100 bg-white' }}"
                 placeholder="Masukkan nama lengkap">
+            @if($isNameLocked)
+                <p class="mt-1 text-[11px] text-gray-400">Nama lengkap terikat dengan identitas KTP yang sudah terverifikasi dan tidak dapat diubah.</p>
+            @endif
             @error('name')
                 <p class="mt-2 text-xs text-red-600 flex items-center gap-1">
                     <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -123,21 +135,33 @@ x-on:profile-saved.window="
 
         <!-- Gender (Jenis Kelamin) -->
         <div>
-            <label class="block text-sm font-semibold text-gray-900 mb-2">
-                <span class="flex items-center gap-2">
-                    <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                    </svg>
-                    Jenis Kelamin
-
-                </span>
-            </label>
-            <select wire:model="gender" required
-                class="w-full px-4 py-3.5 text-sm rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-100 transition bg-white">
+            <div class="flex items-center justify-between mb-2">
+                <label class="block text-sm font-semibold text-gray-900">
+                    <span class="flex items-center gap-2">
+                        <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                        </svg>
+                        Jenis Kelamin
+                    </span>
+                </label>
+                @if($isGenderLocked)
+                    <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-gray-500 bg-gray-100 px-2 py-0.5 rounded-md border border-gray-200">
+                        <svg class="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                        </svg>
+                        Terkunci
+                    </span>
+                @endif
+            </div>
+            <select wire:model="gender" required @if($isGenderLocked) disabled @endif
+                class="w-full px-4 py-3.5 text-sm rounded-xl border border-gray-200 transition {{ $isGenderLocked ? 'bg-gray-100/90 text-gray-500 cursor-not-allowed select-none' : 'focus:border-primary-500 focus:ring-2 focus:ring-primary-100 bg-white' }}">
                 <option value="">Pilih Jenis Kelamin</option>
                 <option value="Laki-laki">Laki-laki</option>
                 <option value="Perempuan">Perempuan</option>
             </select>
+            @if($isGenderLocked)
+                <p class="mt-1 text-[11px] text-gray-400">Jenis kelamin terikat dengan identitas akun dan tidak dapat diubah.</p>
+            @endif
             @error('gender')
                 <p class="mt-2 text-xs text-red-600 flex items-center gap-1">{{ $message }}</p>
             @enderror

@@ -41,43 +41,46 @@ class Index extends Component
     // Status that means the help was rejected - show in a separate dedicated query
     protected $rejectedStatuses = ['rejected'];
 
-    public $selectedHelpData = null;
+    /** @var array<string, mixed>|null */
+    public ?array $selectedHelpData = null;
 
     // Edit modal properties (declare as public so Livewire can bind to them)
-    public $editingHelp = null;
+    public int|string|null $editingHelp = null;
 
-    public $editTitle = null;
+    public ?string $editTitle = null;
 
-    public $editDescription = null;
+    public ?string $editDescription = null;
 
-    public $editAmount = null;
+    public int|float|string|null $editAmount = null;
 
-    public $editLocation = null;
+    public ?string $editLocation = null;
 
-    public $editFullAddress = null;
+    public ?string $editFullAddress = null;
 
-    public $editEquipmentProvided = null;
+    public ?string $editEquipmentProvided = null;
 
-    public $editCityId = null;
+    public int|string|null $editCityId = null;
 
-    public $editLatitude = null;
+    public float|int|string|null $editLatitude = null;
 
-    public $editLongitude = null;
+    public float|int|string|null $editLongitude = null;
 
-    public $editPhoto = null;
+    /** @var \Livewire\Features\SupportFileUploads\TemporaryUploadedFile|string|null */
+    public mixed $editPhoto = null;
 
-    public $editExistingPhoto = null;
+    public ?string $editExistingPhoto = null;
 
-    public $editSearchResults = [];
+    public array $editSearchResults = [];
 
-    public $editCityQuery = null;
+    public ?string $editCityQuery = null;
 
-    public $cities = null;
+    /** @var \Illuminate\Database\Eloquent\Collection<int, City>|null */
+    public mixed $cities = null;
 
     // Delete confirmation modal state & cancellation reason
-    public $showDeleteConfirm = false;
+    public bool $showDeleteConfirm = false;
 
-    public $deletingHelpId = null;
+    public int|string|null $deletingHelpId = null;
 
     public $selectedCancelReason = '';
 
@@ -141,7 +144,7 @@ class Index extends Component
     /**
      * Trigger the delete confirmation modal for a given help id.
      */
-    public function confirmDelete($id)
+    public function confirmDelete(int|string $id): void
     {
         $help = Help::find($id);
         if (! $help || $help->user_id !== auth()->id()) {
@@ -231,12 +234,12 @@ class Index extends Component
     }
 
     // --- Completion confirmation (from index list) ---
-    public $confirmingHelpId = null;
+    public int|string|null $confirmingHelpId = null;
 
     /**
      * Prepare the confirmation modal for marking a help as completed.
      */
-    public function confirmCompletion($id)
+    public function confirmCompletion(int|string $id): void
     {
         $help = Help::find($id);
         if (! $help || $help->user_id !== auth()->id()) {
@@ -325,11 +328,11 @@ class Index extends Component
     }
 
     // Rating flow
-    public $ratingComment = null;
+    public ?string $ratingComment = null;
 
-    public $pendingRating = null;
+    public int|string|null $pendingRating = null;
 
-    public $pendingHelpForRating = null;
+    public int|string|null $pendingHelpForRating = null;
 
     public $isAnonymous = false;
 
@@ -352,7 +355,7 @@ class Index extends Component
     }
 
     // --- Edit flow ---
-    public function editHelp($id)
+    public function editHelp(int|string $id): void
     {
         $help = Help::findOrFail($id);
 
@@ -381,7 +384,7 @@ class Index extends Component
     }
 
     // Set city id from search result (used by the edit modal search)
-    public function setEditCityId($id)
+    public function setEditCityId(int|string $id): void
     {
         $this->editCityId = $id;
         $city = City::find($id);
@@ -391,9 +394,9 @@ class Index extends Component
         $this->editSearchResults = [];
     }
 
-    public function updatedEditCityQuery($value)
+    public function updatedEditCityQuery(mixed $value): void
     {
-        $q = trim($value);
+        $q = trim((string) $value);
         if ($q === '') {
             $this->editSearchResults = [];
 
@@ -639,7 +642,7 @@ class Index extends Component
      * Called when a customer clicks a rating star.
      * Stores the pending rating value and which help is being rated.
      */
-    public function setRating($helpId, $value)
+    public function setRating(int|string $helpId, int|string $value): void
     {
         $this->pendingHelpForRating = $helpId;
         $this->pendingRating = (int) $value;
@@ -648,7 +651,7 @@ class Index extends Component
     /**
      * Submit rating and optional comment for a help.
      */
-    public function submitRating($helpId)
+    public function submitRating(int|string $helpId): void
     {
         $this->validate([
             'pendingRating' => 'required|integer|min:1|max:5',
@@ -687,11 +690,24 @@ class Index extends Component
 
     public function saveEdit()
     {
+        $help = Help::findOrFail($this->editingHelp);
+
+        if ($help->user_id !== auth()->id()) {
+            session()->flash('error', 'Anda tidak memiliki izin untuk mengedit bantuan ini.');
+
+            return;
+        }
+
+        $minNominal = $help->isUrgent()
+            ? (int) \App\Models\AppSetting::get('default_urgent_nominal', 50000)
+            : (int) \App\Models\AppSetting::get('min_help_nominal', 10000);
+        $maxNominal = (int) \App\Models\AppSetting::get('max_help_nominal', 10000000);
+
         $this->validate([
             'editTitle' => 'required|string|max:255',
             'editDescription' => 'required|string',
-            'editAmount' => 'required|numeric|min:10000|max:10000000',
-            'editLocation' => 'required|string|max:255',
+            'editAmount' => 'required|numeric|min:'.$minNominal.'|max:'.$maxNominal,
+            'editLocation' => 'nullable|string|max:255',
             'editFullAddress' => 'required|string|max:1000',
             'editEquipmentProvided' => 'nullable|string|max:1000',
             'editCityId' => ['required', \Illuminate\Validation\Rule::exists('cities', 'id')->where('is_active', true)],
@@ -707,23 +723,20 @@ class Index extends Component
             'editLongitude.required' => 'Silakan tentukan titik lokasi pada peta.',
             'editCityId.required' => 'Kota wajib dipilih.',
             'editCityId.exists' => 'Kota yang dipilih saat ini sedang tidak aktif.',
-            'editAmount.min' => 'Nominal minimal Rp 10.000',
-            'editAmount.max' => 'Nominal maksimal Rp 10.000.000',
+            'editAmount.min' => 'Nominal minimal '.format_rupiah($minNominal),
+            'editAmount.max' => 'Nominal maksimal '.format_rupiah($maxNominal),
         ]);
 
-        $help = Help::findOrFail($this->editingHelp);
-
-        if ($help->user_id !== auth()->id()) {
-            session()->flash('error', 'Anda tidak memiliki izin untuk mengedit bantuan ini.');
-
-            return;
+        $resolvedEditLocation = trim((string) $this->editLocation);
+        if ($resolvedEditLocation === '') {
+            $resolvedEditLocation = \Illuminate\Support\Str::limit(trim((string) $this->editFullAddress), 255, '');
         }
 
         $updateData = [
             'title' => $this->editTitle,
             'description' => $this->editDescription,
             'amount' => $this->editAmount,
-            'location' => $this->editLocation,
+            'location' => $resolvedEditLocation,
             'full_address' => $this->editFullAddress,
             'equipment_provided' => $this->editEquipmentProvided,
             'city_id' => $this->editCityId,

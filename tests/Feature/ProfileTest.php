@@ -60,12 +60,19 @@ class ProfileTest extends TestCase
 
     public function test_profile_information_can_be_updated(): void
     {
-        $user = $this->user(['nik' => '3402123456780001']);
+        $user = $this->user([
+            'name' => 'Budi Santoso',
+            'nik' => '3402123456780001',
+            'gender' => null,
+            'verified' => false,
+        ]);
         $city = City::create(['name' => 'Kota Test', 'is_active' => true]);
 
         $this->actingAs($user);
 
         Livewire::test(UpdateProfileInformationForm::class)
+            ->assertSet('isNameLocked', false)
+            ->assertSet('isGenderLocked', false)
             ->set('name', 'Nama Baru')
             ->set('phone', '081234567890')
             ->set('city_id', $city->id)
@@ -78,6 +85,7 @@ class ProfileTest extends TestCase
 
         $this->assertSame('Nama Baru', $user->name);
         $this->assertSame('3402123456780001', $user->nik);
+        $this->assertSame('Laki-laki', $user->gender);
         $this->assertSame('081234567890', $user->phone);
         $this->assertSame($city->id, $user->city_id);
     }
@@ -86,21 +94,88 @@ class ProfileTest extends TestCase
     {
         $city = City::create(['name' => 'Kota Test', 'is_active' => true]);
         $originalNik = '3402123456780001';
-        $user = $this->user(['email' => 'saya@example.test', 'nik' => $originalNik]);
+        $user = $this->user([
+            'name' => 'Siti Aminah',
+            'email' => 'saya@example.test',
+            'nik' => $originalNik,
+            'gender' => 'Perempuan',
+            'verified' => false,
+        ]);
         $this->actingAs($user);
 
         Livewire::test(UpdateProfileInformationForm::class)
+            ->assertSet('isNameLocked', false)
+            ->assertSet('isGenderLocked', true)
             ->set('name', 'Nama Baru')
+            ->set('gender', 'Laki-laki')
             ->set('nik', '3402999999999999')
             ->set('phone', '081234567890')
             ->set('city_id', $city->id)
             ->set('address', 'Jl. Contoh No. 1')
-            ->set('gender', 'Laki-laki')
             ->call('updateProfileInformation')
             ->assertHasNoErrors();
 
-        // NIK harus tetap sama dengan NIK awal pengguna (terkunci)
-        $this->assertSame($originalNik, $user->fresh()->nik);
+        $fresh = $user->fresh();
+        // NIK dan Jenis Kelamin tetap terkunci, sementara Nama masih bisa diubah sebelum KTP terverifikasi
+        $this->assertSame($originalNik, $fresh->nik);
+        $this->assertSame('Nama Baru', $fresh->name);
+        $this->assertSame('Perempuan', $fresh->gender);
+    }
+
+    public function test_name_is_locked_after_ktp_verification(): void
+    {
+        $city = City::create(['name' => 'Kota Test', 'is_active' => true]);
+        $verifiedMitra = $this->user([
+            'role' => 'mitra',
+            'name' => 'Hendra Wijaya',
+            'email' => 'hendra@example.test',
+            'nik' => '3402123456780009',
+            'gender' => 'Laki-laki',
+            'verified' => true,
+        ]);
+
+        Livewire::actingAs($verifiedMitra)
+            ->test(UpdateProfileInformationForm::class)
+            ->assertSet('isNameLocked', true)
+            ->assertSet('isGenderLocked', true)
+            ->set('name', 'Nama Palsu')
+            ->set('gender', 'Perempuan')
+            ->set('phone', '081234567891')
+            ->set('city_id', $city->id)
+            ->set('address', 'Jl. Contoh No. 2')
+            ->call('updateProfileInformation')
+            ->assertHasNoErrors();
+
+        $fresh = $verifiedMitra->fresh();
+        $this->assertSame('Hendra Wijaya', $fresh->name);
+        $this->assertSame('Laki-laki', $fresh->gender);
+        $this->assertSame('081234567891', $fresh->phone);
+
+        // Customer yang sudah terverifikasi KTP tetap dapat mengubah namanya
+        $verifiedCustomer = $this->user([
+            'role' => 'customer',
+            'name' => 'Siti Awal',
+            'email' => 'siti.verified@example.test',
+            'nik' => '3402123456780010',
+            'gender' => 'Perempuan',
+            'verified' => true,
+        ]);
+
+        Livewire::actingAs($verifiedCustomer)
+            ->test(UpdateProfileInformationForm::class)
+            ->assertSet('isNameLocked', false)
+            ->assertSet('isGenderLocked', true)
+            ->set('name', 'Siti Baru')
+            ->set('gender', 'Laki-laki')
+            ->set('phone', '081234567892')
+            ->set('city_id', $city->id)
+            ->set('address', 'Jl. Contoh No. 3')
+            ->call('updateProfileInformation')
+            ->assertHasNoErrors();
+
+        $freshCustomer = $verifiedCustomer->fresh();
+        $this->assertSame('Siti Baru', $freshCustomer->name);
+        $this->assertSame('Perempuan', $freshCustomer->gender);
     }
 
     public function test_user_can_delete_their_account(): void

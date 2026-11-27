@@ -66,6 +66,18 @@
                 </div>
             </div>
         @endif
+    @elseif($isVerified)
+        <div class="mb-5 p-4 rounded-2xl border border-emerald-200 bg-gradient-to-r from-emerald-50 to-teal-50 text-emerald-900 shadow-2xs">
+            <div class="flex items-center gap-2.5">
+                <span class="w-8 h-8 rounded-xl bg-emerald-500 text-white flex items-center justify-center text-sm shrink-0">✓</span>
+                <div>
+                    <p class="font-bold text-sm text-emerald-950">Identitas Terverifikasi</p>
+                    <p class="text-xs text-emerald-800">
+                        NIK, foto KTP, dan foto selfie Anda telah disetujui dan diverifikasi oleh Admin.
+                    </p>
+                </div>
+            </div>
+        </div>
     @endif
 
     <form wire:submit="save" class="space-y-6">
@@ -107,7 +119,7 @@
                     @elseif ($existing_ktp)
                         <img src="{{ Storage::url($existing_ktp) }}" alt="KTP Saat Ini" class="mx-auto h-36 object-contain rounded-lg shadow-xs mb-2">
                         <div class="inline-block bg-green-500 text-white text-[11px] px-2.5 py-0.5 rounded-full font-bold">
-                            ✓ Terverifikasi / Tersimpan
+                            {{ $isLocked ? '✓ Terverifikasi & Terkunci' : '✓ Terverifikasi / Tersimpan' }}
                         </div>
                     @else
                         <svg class="mx-auto h-12 w-12 text-gray-400 group-hover:text-[#0066FF] transition" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
@@ -115,25 +127,27 @@
                         </svg>
                     @endif
 
-                    <div class="flex flex-wrap items-center justify-center gap-2.5">
-                        <button type="button" onclick="openDirectCamera('ktp-upload', 'ktp')" class="inline-flex items-center justify-center gap-1.5 whitespace-nowrap bg-[#0066FF] hover:bg-[#0052CC] text-white px-4 py-2.5 rounded-xl text-xs font-bold shadow-xs transition active:scale-95 cursor-pointer">
-                            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-                            </svg>
-                            <span>Kamera KTP</span>
-                        </button>
-                        <label for="ktp-upload-gallery" class="inline-flex items-center justify-center gap-1.5 whitespace-nowrap bg-white hover:bg-gray-100 text-gray-700 border border-gray-300 px-4 py-2.5 rounded-xl text-xs font-semibold transition cursor-pointer">
-                            <svg class="w-4 h-4 text-gray-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                            </svg>
-                            <span>Pilih Galeri</span>
-                        </label>
-                    </div>
+                    @if (!$isLocked)
+                        <div class="flex flex-wrap items-center justify-center gap-2.5">
+                            <button type="button" onclick="openDirectCamera('ktp-upload', 'ktp')" class="inline-flex items-center justify-center gap-1.5 whitespace-nowrap bg-[#0066FF] hover:bg-[#0052CC] text-white px-4 py-2.5 rounded-xl text-xs font-bold shadow-xs transition active:scale-95 cursor-pointer">
+                                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                                <span>Kamera KTP</span>
+                            </button>
+                            <label for="ktp-upload-gallery" class="inline-flex items-center justify-center gap-1.5 whitespace-nowrap bg-white hover:bg-gray-100 text-gray-700 border border-gray-300 px-4 py-2.5 rounded-xl text-xs font-semibold transition cursor-pointer">
+                                <svg class="w-4 h-4 text-gray-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                                <span>Pilih Galeri</span>
+                            </label>
+                        </div>
 
-                    <input id="ktp-upload" wire:model="ktp_photo" type="file" class="sr-only" accept="image/*" capture="environment">
-                    <input id="ktp-upload-gallery" type="file" class="hidden" accept="image/*" onchange="transferGalleryFile(this, 'ktp-upload')">
-                    <p class="text-[11px] text-gray-500">Format gambar JPG, JPEG, PNG (Maks 15MB)</p>
+                        <input id="ktp-upload" wire:model="ktp_photo" type="file" class="sr-only" accept="image/*" capture="environment">
+                        <input id="ktp-upload-gallery" type="file" class="hidden" accept="image/*" onchange="transferGalleryFile(this, 'ktp-upload')">
+                        <p class="text-[11px] text-gray-500">Format gambar JPG, JPEG, PNG (Maks 15MB)</p>
+                    @endif
                 </div>
                 
                 <div wire:loading wire:target="ktp_photo" class="absolute inset-0 bg-white/80 flex items-center justify-center z-20">
@@ -159,7 +173,7 @@
                     @elseif ($existing_selfie)
                         <img src="{{ Storage::url($existing_selfie) }}" alt="Selfie Saat Ini" class="mx-auto h-36 object-contain rounded-lg shadow-xs mb-2">
                         <div class="inline-block bg-green-500 text-white text-[11px] px-2.5 py-0.5 rounded-full font-bold">
-                            ✓ Terverifikasi / Tersimpan
+                            {{ $isLocked ? '✓ Terverifikasi & Terkunci' : '✓ Terverifikasi / Tersimpan' }}
                         </div>
                     @else
                         <svg class="mx-auto h-12 w-12 text-gray-400 group-hover:text-[#0066FF] transition" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
@@ -167,25 +181,27 @@
                         </svg>
                     @endif
 
-                    <div class="flex flex-wrap items-center justify-center gap-2.5">
-                        <button type="button" onclick="openDirectCamera('selfie-upload', 'selfie')" class="inline-flex items-center justify-center gap-1.5 whitespace-nowrap bg-[#0066FF] hover:bg-[#0052CC] text-white px-4 py-2.5 rounded-xl text-xs font-bold shadow-xs transition active:scale-95 cursor-pointer">
-                            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-                            </svg>
-                            <span>Kamera Selfie</span>
-                        </button>
-                        <label for="selfie-upload-gallery" class="inline-flex items-center justify-center gap-1.5 whitespace-nowrap bg-white hover:bg-gray-100 text-gray-700 border border-gray-300 px-4 py-2.5 rounded-xl text-xs font-semibold transition cursor-pointer">
-                            <svg class="w-4 h-4 text-gray-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                            </svg>
-                            <span>Pilih Galeri</span>
-                        </label>
-                    </div>
+                    @if (!$isLocked)
+                        <div class="flex flex-wrap items-center justify-center gap-2.5">
+                            <button type="button" onclick="openDirectCamera('selfie-upload', 'selfie')" class="inline-flex items-center justify-center gap-1.5 whitespace-nowrap bg-[#0066FF] hover:bg-[#0052CC] text-white px-4 py-2.5 rounded-xl text-xs font-bold shadow-xs transition active:scale-95 cursor-pointer">
+                                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                                <span>Kamera Selfie</span>
+                            </button>
+                            <label for="selfie-upload-gallery" class="inline-flex items-center justify-center gap-1.5 whitespace-nowrap bg-white hover:bg-gray-100 text-gray-700 border border-gray-300 px-4 py-2.5 rounded-xl text-xs font-semibold transition cursor-pointer">
+                                <svg class="w-4 h-4 text-gray-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                                <span>Pilih Galeri</span>
+                            </label>
+                        </div>
 
-                    <input id="selfie-upload" wire:model="selfie_photo" type="file" class="sr-only" accept="image/*" capture="user">
-                    <input id="selfie-upload-gallery" type="file" class="hidden" accept="image/*" onchange="transferGalleryFile(this, 'selfie-upload')">
-                    <p class="text-[11px] text-gray-500">Format gambar JPG, JPEG, PNG (Maks 15MB)</p>
+                        <input id="selfie-upload" wire:model="selfie_photo" type="file" class="sr-only" accept="image/*" capture="user">
+                        <input id="selfie-upload-gallery" type="file" class="hidden" accept="image/*" onchange="transferGalleryFile(this, 'selfie-upload')">
+                        <p class="text-[11px] text-gray-500">Format gambar JPG, JPEG, PNG (Maks 15MB)</p>
+                    @endif
                 </div>
                 
                 <div wire:loading wire:target="selfie_photo" class="absolute inset-0 bg-white/80 flex items-center justify-center z-20">
@@ -198,10 +214,20 @@
             @error('selfie_photo') <span class="text-sm text-red-600 mt-1 block">{{ $message }}</span> @enderror
         </div>
 
-        <button type="submit" onclick="sessionStorage.removeItem('dismissed_ktp_rejected_modal');" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-bold text-white bg-gradient-to-r from-[#0066FF] to-[#003EA8] hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0066FF] transition" wire:loading.attr="disabled">
-            <span wire:loading.remove wire:target="save">Simpan Data</span>
-            <span wire:loading wire:target="save">Menyimpan...</span>
-        </button>
+        @if ($isLocked)
+            <div class="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-800 font-semibold text-center">
+                ✓ Identitas dan dokumen Anda sudah terverifikasi sehingga tidak perlu diunggah ulang.
+            </div>
+            <a href="{{ auth()->user()?->role === 'mitra' ? route('mitra.profile') : route('profile') }}" wire:navigate
+               class="w-full flex justify-center py-3 px-4 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-sm font-bold text-gray-700 transition">
+                Kembali ke Profil
+            </a>
+        @else
+            <button type="submit" onclick="sessionStorage.removeItem('dismissed_ktp_rejected_modal');" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-bold text-white bg-gradient-to-r from-[#0066FF] to-[#003EA8] hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0066FF] transition" wire:loading.attr="disabled">
+                <span wire:loading.remove wire:target="save">Simpan Data</span>
+                <span wire:loading wire:target="save">Menyimpan...</span>
+            </button>
+        @endif
     </form>
 </div>
 
