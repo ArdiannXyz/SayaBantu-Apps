@@ -5,7 +5,6 @@ namespace App\Livewire\Home;
 use App\Models\AppSetting;
 use App\Models\Category;
 use App\Models\City;
-use App\Models\Help;
 use App\Models\UserBalance;
 use Livewire\Attributes\Renderless;
 use Livewire\Component;
@@ -105,32 +104,11 @@ class Index extends Component
         $radiusVal = (float) AppSetting::get('mitra_max_distance_km', AppSetting::get('max_help_radius_km', AppSetting::get('mitra_search_radius', 10)));
         $radius = ($radiusVal == (int) $radiusVal) ? (int) $radiusVal : $radiusVal;
 
-        // Order terakhir
-        if ($user) {
-            $recentOrders = Help::with(['category', 'city', 'mitra'])
-                ->where('user_id', $user->id)
-                ->latest()
-                ->take(3)
-                ->get();
-            if ($recentOrders->isEmpty()) {
-                $recentOrders = Help::with(['category', 'city', 'mitra'])
-                    ->latest()
-                    ->take(3)
-                    ->get();
-            }
-        } else {
-            $recentOrders = Help::with(['category', 'city', 'mitra'])
-                ->latest()
-                ->take(3)
-                ->get();
-        }
-
         return view('livewire.home.index', [
             'categories' => $categories,
             'balance' => $balance,
             'userLocation' => $this->userLocation,
             'radius' => $radius,
-            'recentOrders' => $recentOrders,
         ]);
     }
 }

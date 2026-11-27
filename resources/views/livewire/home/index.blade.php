@@ -302,70 +302,9 @@
                 </div>
             </div>
 
-            <!-- 5. ORDER TERAKHIR SECTION -->
-            <div>
-                <div class="flex items-center justify-between mb-2.5">
-                    <h2 class="text-sm font-extrabold text-slate-900 tracking-tight">Order terakhir</h2>
-                    @auth
-                        <a href="{{ route('customer.helps.index') }}" wire:navigate class="text-[11px] font-bold text-[#0066FF] hover:underline">
-                            Lihat Riwayat
-                        </a>
-                    @endauth
-                </div>
-
-                @if(!empty($recentOrders) && $recentOrders->count() > 0)
-                    <div class="space-y-2">
-                        @foreach($recentOrders as $order)
-                            <div class="bg-white rounded-2xl p-3.5 shadow-xs border border-slate-200/90 hover:border-[#0066FF]/40 transition flex items-center justify-between gap-3">
-                                <div class="flex items-center gap-3 min-w-0">
-                                    <div class="w-10 h-10 rounded-xl bg-blue-50 text-[#0066FF] flex items-center justify-center shrink-0 font-bold shadow-2xs">
-                                        {{ $order->category->icon ?? '📦' }}
-                                    </div>
-                                    <div class="min-w-0">
-                                        <h3 class="text-xs font-bold text-slate-900 truncate leading-snug">{{ $order->title }}</h3>
-                                        <div class="flex items-center gap-1.5 mt-1">
-                                            <span class="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase bg-blue-50 text-[#0066FF] border border-blue-100">
-                                                {{ $order->category->name ?? 'Layanan' }}
-                                            </span>
-                                            <span class="text-[10px] text-slate-400">
-                                                {{ $order->created_at ? $order->created_at->diffForHumans() : 'Baru' }}
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="text-right shrink-0">
-                                    <div class="text-xs font-extrabold text-[#0066FF]">
-                                        {{ format_rupiah($order->final_cost ?? $order->budget, false) }}
-                                    </div>
-                                    <a href="{{ auth()->check() ? route('customer.helps.detail', $order->id) : route('login') }}" wire:navigate
-                                       class="text-[10px] font-bold text-slate-500 hover:text-[#0066FF] transition block mt-0.5">
-                                        Detail &rarr;
-                                    </a>
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
-                @else
-                    <div class="bg-white rounded-2xl p-5 shadow-xs border border-dashed border-slate-200 text-center">
-                        <div class="w-11 h-11 rounded-2xl bg-blue-50 text-[#0066FF] flex items-center justify-center mx-auto mb-2 text-xl shadow-2xs">
-                            📦
-                        </div>
-                        <p class="text-xs font-bold text-slate-800">Belum ada order</p>
-                        <p class="text-[11px] text-slate-500 mt-0.5">Pesan jasa bantuan pertama Anda sekarang dengan mudah dan cepat.</p>
-                        <a href="{{ auth()->check() ? route('customer.helps.create') : route('register') }}" wire:navigate
-                           class="mt-3 inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-[#0066FF] hover:bg-blue-700 text-white font-bold text-xs shadow-xs active:scale-95 transition">
-                            <span>Buat Order</span>
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
-                        </a>
-                    </div>
-                @endif
-            </div>
-
-
-
         </div>
 
-        <!-- 6. BOTTOM NAVIGATION BAR (Beranda, Buat Order, Pesanan, Chat, Profil) -->
+        <!-- 5. BOTTOM NAVIGATION BAR (Beranda, Buat Order, Pesanan, Chat, Profil) -->
         <x-customer-bottom-nav />
 
     </main>

@@ -58,7 +58,7 @@
                         <x-user-avatar :user="auth()->user()" class="h-full w-full text-white font-bold text-sm" />
                     </div>
                     <div>
-                        <h1 class="text-base font-extrabold text-white leading-tight">{{ trim(preg_replace('/\s*\((?:Mitra|Customer)[^)]*\)|\s*(?:Mitra|Customer)\b/i', '', optional(auth()->user())->name ?? 'Budi Santoso')) }}</h1>
+                        <h1 class="text-base font-extrabold text-white leading-tight">{{ trim(preg_replace('/\s*\((?:Mitra|Customer)[^)]*\)|\s*(?:Mitra|Customer)\b/i', '', optional(auth()->user())->name ?? 'Mitra')) }}</h1>
                         <div class="mt-1">
                             <span class="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-300 bg-emerald-950/40 px-2 py-0.5 rounded-full border border-emerald-400/30">
                                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
@@ -139,7 +139,7 @@
                 <div class="w-7 h-7 rounded-xl bg-yellow-50 text-amber-500 flex items-center justify-center mb-1 text-xs">
                     ⭐
                 </div>
-                <span class="text-sm font-black text-gray-900 leading-none">{{ $ratingAvg ?? 4.8 }}</span>
+                <span class="text-sm font-black text-gray-900 leading-none">{{ $ratingAvg ?? '0.0' }}</span>
                 <span class="text-[10px] text-gray-500 font-semibold mt-1 leading-tight">Rating</span>
             </div>
 
@@ -149,11 +149,7 @@
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                 </div>
                 <span class="text-[11px] min-[380px]:text-xs font-black text-gray-900 leading-none whitespace-nowrap">
-                    @if($totalEarnings >= 1000000)
-                        {{ format_rupiah($totalEarnings) }}
-                    @else
-                        Rp {{ number_format($totalEarnings / 1000, 0) }}rb
-                    @endif
+                    {{ format_rupiah($totalEarnings ?? 0) }}
                 </span>
                 <span class="text-[10px] text-gray-500 font-semibold mt-1 leading-tight">Penghasilan</span>
             </div>
@@ -380,14 +376,18 @@
                 @forelse($recommendedHelps as $help)
                     @php 
                         $schedDate = $help->scheduled_at ?? $help->created_at;
-                        $timeStr = $schedDate ? \Carbon\Carbon::parse($schedDate)->format('H:i') : '09:00';
-                        $schedLabel = $schedDate ? \Carbon\Carbon::parse($schedDate)->translatedFormat('d M Y, H:i') : '-' ;
+                        $schedCarbon = $schedDate ? \Carbon\Carbon::parse($schedDate) : null;
+                        $timeStr = $schedCarbon ? $schedCarbon->format('H:i') : '09:00';
+                        $dateText = $schedCarbon ? ($schedCarbon->isToday() ? 'Hari ini, ' . $timeStr : $schedCarbon->translatedFormat('d M, H:i')) : '-';
+                        $schedLabel = $schedCarbon ? $schedCarbon->translatedFormat('d M Y, H:i') : '-' ;
                         $catName = $help->category ? $help->category->name : 'Jasa Serabutan';
                         $isUrgent = $help->isUrgent();
                         $addressStr = $help->location ?? $help->full_address ?? ($help->city->name ?? 'Yogyakarta');
                         $cityLabel = $help->city->name ?? '-';
                         $distLabel = isset($help->distance) ? number_format($help->distance, 1) . ' km' : '';
                         $isCancelledByMe = auth()->check() && $help->wasCancelledByMitra(auth()->id());
+                        $custRatingCount = $help->user ? (int) $help->user->customer_rating_count : 0;
+                        $custRatingLabel = $custRatingCount > 0 ? '⭐ ' . number_format((float) $help->user->customer_average_rating, 1) : 'Pelanggan Baru';
                     @endphp
                     <div onclick="showHelpPreview({{ $help->id }}, '{{ addslashes($help->title) }}', {{ $help->amount }}, '{{ addslashes($schedLabel) }}', '{{ addslashes($catName) }}', {{ $isUrgent ? 'true' : 'false' }}, '{{ addslashes($cityLabel) }}', '{{ addslashes($distLabel) }}', {{ $isCancelledByMe ? 'true' : 'false' }})"
                         class="bg-white border border-gray-200/90 rounded-2xl p-3.5 shadow-2xs hover:shadow-sm hover:border-[#0066FF]/30 transition flex items-center gap-3 cursor-pointer group">
@@ -417,7 +417,7 @@
                             <div class="flex items-center gap-2 mt-1">
                                 <span class="text-xs font-black text-gray-900">{{ format_rupiah($help->amount) }}</span>
                                 <span class="text-gray-300">•</span>
-                                <span class="text-[10px] text-gray-500 font-medium">⭐ 4.8 | Hari ini, {{ $timeStr }}</span>
+                                <span class="text-[10px] text-gray-500 font-medium">{{ $custRatingLabel }} | {{ $dateText }}</span>
                             </div>
                         </div>
 

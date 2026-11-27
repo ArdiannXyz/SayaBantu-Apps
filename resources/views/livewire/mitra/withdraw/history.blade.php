@@ -47,7 +47,7 @@
                     <div>
                         <p class="text-xs font-semibold text-blue-100 mb-1">Saldo Tersedia</p>
                         <h2 class="text-2xl font-black text-white tracking-tight">
-                            {{ format_rupiah($user->balance ?? 250000) }}
+                            {{ format_rupiah($user->balance ?? 0) }}
                         </h2>
                     </div>
                     <div class="text-white/95 mt-1">

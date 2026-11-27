@@ -51,7 +51,7 @@
 
                         <div class="min-w-0 flex-1">
                             <h2 class="text-base font-extrabold text-white truncate leading-snug">
-                                {{ trim(preg_replace('/\s*\((?:Mitra|Customer)[^)]*\)|\s*(?:Mitra|Customer)\b/i', '', $user->name ?? 'Budi Santoso')) }}
+                                {{ trim(preg_replace('/\s*\((?:Mitra|Customer)[^)]*\)|\s*(?:Mitra|Customer)\b/i', '', $user->name ?? 'Mitra')) }}
                             </h2>
 
                             <div class="flex items-center gap-2 mt-1 flex-wrap">
@@ -76,12 +76,12 @@
                                 @endif
                             </div>
                             
-                            <!-- Rating Row: ⭐ 4.8 (12 ulasan) -->
+                            <!-- Rating Row -->
                             <div class="flex items-center gap-1.5 mt-1.5 text-xs">
                                 <span class="text-amber-300">⭐</span>
-                                <span class="font-bold text-white">{{ $totalRatings > 0 ? $averageRating : '4.8' }}</span>
+                                <span class="font-bold text-white">{{ $totalRatings > 0 ? $averageRating : '0.0' }}</span>
                                 <a href="{{ route('mitra.ratings') }}" wire:navigate class="text-blue-100 hover:text-white hover:underline font-medium">
-                                    ({{ $totalRatings > 0 ? $totalRatings : '12' }} ulasan)
+                                    ({{ $totalRatings > 0 ? $totalRatings : 0 }} ulasan)
                                 </a>
                             </div>
                         </div>

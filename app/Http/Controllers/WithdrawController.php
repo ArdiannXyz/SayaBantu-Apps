@@ -293,7 +293,7 @@ class WithdrawController extends Controller
             ->get()
             ->map(function ($item) use ($prefix) {
                 $bankCode = strtoupper($item->bank_code ?? 'BCA');
-                $accMasked = strlen($item->account_number) >= 4 ? '****'.substr($item->account_number, -4) : '****1234';
+                $accMasked = strlen((string) $item->account_number) >= 4 ? '****'.substr((string) $item->account_number, -4) : '****';
 
                 return (object) [
                     'id' => $item->id,
@@ -310,52 +310,6 @@ class WithdrawController extends Controller
         $combinedTransactions = $recentIncomes->concat($recentWithdraws)
             ->sortByDesc('created_at')
             ->values();
-
-        // If user has no transactions yet, show exact preview items matching the reference mockup
-        if ($combinedTransactions->isEmpty()) {
-            $combinedTransactions = collect([
-                (object) [
-                    'id' => 1,
-                    'type' => 'income',
-                    'title' => 'Order #SRB0012',
-                    'subtitle' => 'Bersih-bersih Rumah',
-                    'amount' => 75000,
-                    'created_at' => \Carbon\Carbon::create(2025, 5, 12, 10, 30),
-                    'status' => 'completed',
-                    'detail_url' => null,
-                ],
-                (object) [
-                    'id' => 2,
-                    'type' => 'income',
-                    'title' => 'Order #PDN0008',
-                    'subtitle' => 'Pindahan Barang',
-                    'amount' => 120000,
-                    'created_at' => \Carbon\Carbon::create(2025, 5, 10, 14, 20),
-                    'status' => 'completed',
-                    'detail_url' => null,
-                ],
-                (object) [
-                    'id' => 3,
-                    'type' => 'withdraw',
-                    'title' => 'Penarikan Saldo',
-                    'subtitle' => 'Ke BCA ****1234',
-                    'amount' => 100000,
-                    'created_at' => \Carbon\Carbon::create(2025, 5, 8, 9, 15),
-                    'status' => 'completed',
-                    'detail_url' => null,
-                ],
-                (object) [
-                    'id' => 4,
-                    'type' => 'income',
-                    'title' => 'Order #TBG0005',
-                    'subtitle' => 'Tukang Bangunan',
-                    'amount' => 150000,
-                    'created_at' => \Carbon\Carbon::create(2025, 5, 5, 16, 40),
-                    'status' => 'completed',
-                    'detail_url' => null,
-                ],
-            ]);
-        }
 
         return view('livewire.mitra.withdraw.history', [
             'incomeHistory' => $incomeHistory,
