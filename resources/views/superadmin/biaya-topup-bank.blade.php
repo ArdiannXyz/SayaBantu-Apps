@@ -277,7 +277,8 @@
         </div>
     </div>
 
-    <form wire:submit.prevent="save">
+    <form wire:submit.prevent="save"
+        wire:confirm="Apakah Anda yakin ingin menyimpan perubahan pengaturan biaya admin top-up ini? Perubahan akan langsung diterapkan pada transaksi pengisian saldo.">
         @if(session()->has('message'))
             <div class="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
                 <div class="flex items-center gap-3">

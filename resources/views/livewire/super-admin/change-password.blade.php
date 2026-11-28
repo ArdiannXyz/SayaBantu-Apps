@@ -193,7 +193,9 @@
             </div>
 
             {{-- Form Fields --}}
-            <form wire:submit.prevent="updatePassword" class="mt-6 space-y-5">
+            <form wire:submit.prevent="updatePassword"
+                  wire:confirm="Apakah Anda yakin ingin mengubah kata sandi Super Admin?"
+                  class="mt-6 space-y-5">
                 {{-- 1. Kata Sandi Saat Ini --}}
                 <div>
                     <label for="sa_current_password" class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">

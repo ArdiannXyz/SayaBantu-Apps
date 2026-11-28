@@ -257,49 +257,55 @@ class AdminWithdrawController extends Controller
             return back()->withErrors(['general' => 'Hanya request dengan status pending yang dapat diproses.']);
         }
 
-        $user = $withdraw->user;
-        $alreadyHeld = false;
-        if ($user) {
-            $alreadyHeld = \App\Models\BalanceTransaction::where('user_id', $user->id)
-                ->where('type', 'deduction')
-                ->where('amount', $withdraw->amount)
-                ->where(function ($q) {
-                    $q->where('reference_id', 'WD-PENDING')
-                      ->orWhere('description', 'like', '%Pengajuan Penarikan Saldo%');
-                })
-                ->exists();
-
-            if (! $alreadyHeld) {
-                $current = (int) $user->balance;
-                if ($current < $withdraw->amount) {
-                    return back()->withErrors(['general' => 'Saldo user tidak mencukupi untuk melakukan transfer.']);
-                }
-            }
-        }
-
         try {
-            if (! $alreadyHeld && $user) {
-                $user->adjustBalance(-((int) $withdraw->amount));
+            $result = \Illuminate\Support\Facades\DB::transaction(function () use ($request, $withdraw) {
+                $lockedWithdraw = WithdrawRequest::where('id', $withdraw->id)->lockForUpdate()->firstOrFail();
+
+                if ($lockedWithdraw->status !== WithdrawRequest::STATUS_PENDING) {
+                    return ['error' => 'Hanya request dengan status pending yang dapat diproses.'];
+                }
+
+                $user = $lockedWithdraw->user
+                    ? \App\Models\User::where('id', $lockedWithdraw->user->id)->lockForUpdate()->first()
+                    : null;
+
+                $alreadyHeld = $this->hasHeldBalance($lockedWithdraw);
+
+                if (! $alreadyHeld && $user) {
+                    \App\Models\UserBalance::recalculateForUser($user->id);
+                    $current = (int) ($user->fresh()->balance ?? 0);
+                    if ($current < $lockedWithdraw->amount) {
+                        return ['error' => 'Saldo user tidak mencukupi untuk melakukan transfer.'];
+                    }
+                    $user->adjustBalance(-((int) $lockedWithdraw->amount));
+                }
+
+                $dataToUpdate = [
+                    'status' => WithdrawRequest::STATUS_SUCCESS,
+                    'processed_at' => now(),
+                    'description' => $request->input('note') ?: $lockedWithdraw->description,
+                    'external_id' => $request->input('transfer_reference') ?: $lockedWithdraw->external_id,
+                ];
+
+                if ($request->hasFile('transfer_proof')) {
+                    $proofPath = $request->file('transfer_proof')->store('proof-of-payment', 'public');
+                    $dataToUpdate['transfer_proof'] = $proofPath;
+                }
+
+                $lockedWithdraw->update($dataToUpdate);
+
+                return ['withdraw' => $lockedWithdraw];
+            });
+
+            if (isset($result['error'])) {
+                return back()->withErrors(['general' => $result['error']]);
             }
 
-            $dataToUpdate = [
-                'status' => WithdrawRequest::STATUS_SUCCESS,
-                'processed_at' => now(),
-                'description' => $request->input('note') ?: $withdraw->description,
-                'external_id' => $request->input('transfer_reference') ?: $withdraw->external_id,
-            ];
-
-            // Simpan bukti transfer jika admin mengunggah file
-            if ($request->hasFile('transfer_proof')) {
-                $proofPath = $request->file('transfer_proof')->store('proof-of-payment', 'public');
-                $dataToUpdate['transfer_proof'] = $proofPath;
-            }
-
-            $withdraw->update($dataToUpdate);
+            $processedWithdraw = $result['withdraw'];
 
             // Notify user via database notification with link to success page
             try {
-                $withdraw->user?->notify(new WithdrawStatusNotification($withdraw));
+                $processedWithdraw->user?->notify(new WithdrawStatusNotification($processedWithdraw));
             } catch (\Throwable $e) {
                 Log::warning('Failed to send withdraw success notification: '.$e->getMessage());
             }
@@ -323,49 +329,91 @@ class AdminWithdrawController extends Controller
         }
 
         try {
-            $user = $withdraw->user;
-            $alreadyHeld = false;
-            if ($user) {
-                $alreadyHeld = \App\Models\BalanceTransaction::where('user_id', $user->id)
-                    ->where('type', 'deduction')
-                    ->where('amount', $withdraw->amount)
-                    ->where(function ($q) {
-                        $q->where('reference_id', 'WD-PENDING')
-                          ->orWhere('description', 'like', '%Pengajuan Penarikan Saldo%');
-                    })
-                    ->exists();
+            $result = \Illuminate\Support\Facades\DB::transaction(function () use ($request, $withdraw) {
+                $lockedWithdraw = WithdrawRequest::where('id', $withdraw->id)->lockForUpdate()->firstOrFail();
+
+                if ($lockedWithdraw->status !== WithdrawRequest::STATUS_PENDING) {
+                    return ['error' => 'Hanya request dengan status pending yang dapat dibatalkan.'];
+                }
+
+                $user = $lockedWithdraw->user
+                    ? \App\Models\User::where('id', $lockedWithdraw->user->id)->lockForUpdate()->first()
+                    : null;
+
+                $alreadyHeld = $this->hasHeldBalance($lockedWithdraw);
+
+                // Refund the held balance back to user wallet if it was deducted at request time
+                if ($alreadyHeld && $user) {
+                    $refundRef = 'REFUND-WD-' . $lockedWithdraw->id;
+                    $alreadyRefunded = \App\Models\BalanceTransaction::where('user_id', $user->id)
+                        ->where('reference_id', $refundRef)
+                        ->exists();
+
+                    if (! $alreadyRefunded) {
+                        $userBalance = $user->balance()->firstOrCreate(['user_id' => $user->id], ['balance' => 0]);
+                        $userBalance->addBalance(
+                            (int) $lockedWithdraw->amount,
+                            'Pengembalian Dana Penarikan Ditolak: ' . ($request->input('note') ?: 'Permintaan withdraw ditolak oleh admin'),
+                            $refundRef
+                        );
+                    }
+                }
+
+                $lockedWithdraw->update([
+                    'status' => WithdrawRequest::STATUS_FAILED,
+                    'processed_at' => now(),
+                    'description' => $request->input('note') ?? $lockedWithdraw->description,
+                ]);
+
+                return ['withdraw' => $lockedWithdraw];
+            });
+
+            if (isset($result['error'])) {
+                return back()->withErrors(['general' => $result['error']]);
             }
 
-            // Refund the held balance back to user wallet if it was deducted at request time
-            if ($alreadyHeld && $user) {
-                $userBalance = $user->balance()->firstOrCreate(['user_id' => $user->id], ['balance' => 0]);
-                $userBalance->addBalance(
-                    (int) $withdraw->amount,
-                    'Pengembalian Dana Penarikan Ditolak: ' . ($request->input('note') ?: 'Permintaan withdraw ditolak oleh admin'),
-                    'REFUND-WD-' . $withdraw->id
-                );
-            }
-
-            $withdraw->update([
-                'status' => WithdrawRequest::STATUS_FAILED,
-                'processed_at' => now(),
-                'description' => $request->input('note') ?? $withdraw->description,
-            ]);
+            $processedWithdraw = $result['withdraw'];
 
             // Notify user about rejection/failure
             try {
-                $withdraw->user?->notify(new WithdrawStatusNotification($withdraw));
+                $processedWithdraw->user?->notify(new WithdrawStatusNotification($processedWithdraw));
             } catch (\Throwable $e) {
                 Log::warning('Failed to send withdraw failed notification: '.$e->getMessage());
             }
 
-            $targetRole = $withdraw->user?->role === 'customer' ? 'customer' : 'mitra';
-            return redirect()->route($this->withdrawIndexRouteName())->with('status', 'Permintaan withdraw ditolak dan saldo ' . format_rupiah($withdraw->amount) . ' telah dikembalikan ke saldo ' . $targetRole . '.');
+            $targetRole = $processedWithdraw->user?->role === 'customer' ? 'customer' : 'mitra';
+            return redirect()->route($this->withdrawIndexRouteName())->with('status', 'Permintaan withdraw ditolak dan saldo ' . format_rupiah($processedWithdraw->amount) . ' telah dikembalikan ke saldo ' . $targetRole . '.');
         } catch (\Throwable $e) {
             Log::error('AdminWithdrawController: reject error', ['error' => $e->getMessage(), 'withdraw_id' => $withdraw->id]);
 
             return back()->withErrors(['general' => 'Terjadi kesalahan saat menolak withdraw.']);
         }
+    }
+
+    private function hasHeldBalance(WithdrawRequest $withdraw): bool
+    {
+        if (! $withdraw->user_id) {
+            return false;
+        }
+
+        $exactHold = \App\Models\BalanceTransaction::where('user_id', $withdraw->user_id)
+            ->where('type', 'deduction')
+            ->where('reference_id', 'WD-' . $withdraw->id)
+            ->exists();
+
+        if ($exactHold) {
+            return true;
+        }
+
+        return \App\Models\BalanceTransaction::where('user_id', $withdraw->user_id)
+            ->where('type', 'deduction')
+            ->where('amount', $withdraw->amount)
+            ->where('created_at', '>=', ($withdraw->created_at ?? now())->copy()->subMinutes(5))
+            ->where(function ($q) {
+                $q->where('reference_id', 'WD-PENDING')
+                    ->orWhere('description', 'like', '%Pengajuan Penarikan Saldo%');
+            })
+            ->exists();
     }
 
     /**

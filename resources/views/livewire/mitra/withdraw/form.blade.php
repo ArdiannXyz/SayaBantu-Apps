@@ -4,8 +4,10 @@
     $dashRoute = $prefix . '.dashboard';
     $formRoute = $prefix . '.withdraw.form';
     $reqRoute = $prefix . '.withdraw.request';
+    $cancelRoute = $prefix . '.withdraw.cancel';
     $histRoute = $prefix . '.withdraw.history';
     $bankRoute = $prefix . '.bank-accounts';
+    $minWithdraw = $minWithdraw ?? 10000;
 @endphp
 @extends($isCustomer ? 'layouts.app' : 'layouts.mitra')
 
@@ -63,8 +65,15 @@
                     </div>
                 </div>
 
-                <div class="relative z-10 mt-3 pt-3 border-t border-white/20 text-xs text-blue-100">
-                    <span>Minimum penarikan: <strong class="text-white font-bold">Rp 10.000</strong></span>
+                <div class="relative z-10 mt-3 pt-3 border-t border-white/20 text-xs text-blue-100 flex items-center justify-between gap-2 flex-wrap">
+                    <span>Minimum penarikan: <strong class="text-white font-bold">{{ format_rupiah($minWithdraw) }}</strong></span>
+                    @if(isset($limit24h))
+                        @if(($limit24h['max_limit'] ?? 3) === 0)
+                            <span>Kuota 24 jam: <strong class="text-white font-bold">Tanpa batas</strong></span>
+                        @else
+                            <span>Kuota 24 jam: <strong class="text-white font-bold">{{ $limit24h['remaining_count'] ?? 0 }}/{{ $limit24h['max_limit'] }}x tersisa</strong></span>
+                        @endif
+                    @endif
                 </div>
             </div>
         </div>
@@ -91,16 +100,46 @@
                         </svg>
                     </div>
                     <h3 class="text-base font-extrabold text-slate-900 mb-1.5">Pengajuan Sedang Diproses</h3>
-                    <p class="text-xs text-slate-600 mb-6 leading-relaxed">
+                    <p class="text-xs text-slate-600 mb-4 leading-relaxed">
                         Pengajuan penarikan saldo Anda sedang diproses oleh admin. Mohon tunggu 1-5 hari kerja. 
                         Anda akan menerima notifikasi ketika status berubah.
                     </p>
-                    <a href="{{ route($histRoute) }}" wire:navigate class="inline-flex items-center gap-2 px-5 py-2.5 bg-[#0066FF] hover:bg-[#0052CC] text-white text-xs font-bold rounded-xl transition shadow-md active:scale-95">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                        </svg>
-                        Lihat Riwayat Penarikan
-                    </a>
+
+                    @if(isset($pendingWithdraw) && $pendingWithdraw)
+                        <div class="mb-5 p-3.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-left text-xs space-y-1.5">
+                            <div class="flex justify-between">
+                                <span class="text-slate-500">Kode Pengajuan</span>
+                                <span class="font-bold text-slate-800 font-mono">{{ $pendingWithdraw->withdraw_code }}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-slate-500">Nominal</span>
+                                <span class="font-extrabold text-slate-900">{{ format_rupiah($pendingWithdraw->amount) }}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-slate-500">Rekening Tujuan</span>
+                                <span class="font-bold text-slate-800">{{ strtoupper($pendingWithdraw->bank_code) }} • ****{{ substr((string) $pendingWithdraw->account_number, -4) }}</span>
+                            </div>
+                        </div>
+                    @endif
+
+                    <div class="flex flex-wrap items-center justify-center gap-2.5">
+                        <a href="{{ route($histRoute) }}" wire:navigate class="inline-flex items-center gap-2 px-5 py-2.5 bg-[#0066FF] hover:bg-[#0052CC] text-white text-xs font-bold rounded-xl transition shadow-md active:scale-95">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                            Lihat Riwayat Penarikan
+                        </a>
+
+                        @if(isset($pendingWithdraw) && $pendingWithdraw->status === \App\Models\WithdrawRequest::STATUS_PENDING)
+                            <form id="cancel-pending-withdraw-form" action="{{ route($cancelRoute, $pendingWithdraw->id) }}" method="POST"
+                                onsubmit="event.preventDefault(); const f = this; if (typeof window.sbConfirm === 'function') { window.sbConfirm({ title: 'Batalkan Pengajuan?', text: 'Pengajuan penarikan {{ format_rupiah($pendingWithdraw->amount) }} akan dibatalkan dan saldo langsung dikembalikan ke dompet Anda.', confirmButtonText: 'Ya, Batalkan', isDanger: true }).then(r => { if (r.isConfirmed) f.submit(); }); } else if (confirm('Batalkan pengajuan penarikan ini?')) { f.submit(); }">
+                                @csrf
+                                <button type="submit" class="inline-flex items-center gap-1.5 px-4 py-2.5 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 text-xs font-bold rounded-xl transition active:scale-95 cursor-pointer">
+                                    Batalkan Pengajuan
+                                </button>
+                            </form>
+                        @endif
+                    </div>
                 </div>
             @else
                 @if(!$user->hasVerifiedEmail())
@@ -194,7 +233,7 @@
                     </div>
                 @endif
 
-                @if(($user->balance ?? 0) < 10000)
+                @if(($user->balance ?? 0) < $minWithdraw)
                     <!-- Saldo Kurang Notice -->
                     <div class="p-4 bg-amber-50 border border-amber-200 rounded-2xl text-amber-900 shadow-2xs">
                         <div class="flex items-start gap-3">
@@ -206,7 +245,7 @@
                             <div>
                                 <h4 class="font-bold text-xs text-amber-950">Saldo Belum Mencukupi</h4>
                                 <p class="text-xs text-amber-800 mt-1 leading-relaxed">
-                                    Saldo Anda saat ini adalah <strong>{{ format_rupiah($user->balance ?? 0) }}</strong>. Minimal saldo untuk melakukan penarikan saldo adalah <strong>Rp 10.000</strong>.
+                                    Saldo Anda saat ini adalah <strong>{{ format_rupiah($user->balance ?? 0) }}</strong>. Minimal saldo untuk melakukan penarikan saldo adalah <strong>{{ format_rupiah($minWithdraw) }}</strong>.
                                 </p>
                             </div>
                         </div>
@@ -222,9 +261,9 @@
                                 </svg>
                             </div>
                             <div>
-                                <p class="font-bold text-amber-900 text-xs mb-0.5">Penarikan Dibatasi 1x dalam 24 Jam</p>
+                                <p class="font-bold text-amber-900 text-xs mb-0.5">Penarikan Dibatasi {{ $limit24h['max_limit'] ?? 3 }}x dalam 24 Jam</p>
                                 <p class="text-xs text-amber-800 leading-relaxed">
-                                    Anda telah mengajukan penarikan pada <strong>{{ $limit24h['latest_withdraw']?->created_at->format('d M Y, H:i') }} WIB</strong>. Pengajuan penarikan berikutnya dapat dilakukan pada <strong>{{ $limit24h['available_at']?->format('d M Y, H:i') }} WIB</strong> (sisa <strong>{{ $limit24h['remaining_text'] }}</strong>).
+                                    Anda telah mencapai batas {{ $limit24h['max_limit'] ?? 3 }}x penarikan dalam 24 jam terakhir. Pengajuan penarikan berikutnya dapat dilakukan pada <strong>{{ $limit24h['available_at']?->format('d M Y, H:i') }} WIB</strong> (sisa <strong>{{ $limit24h['remaining_text'] }}</strong>).
                                 </p>
                             </div>
                         </div>
@@ -253,7 +292,7 @@
 
                 @php
                     $is24hBlocked = isset($limit24h) && !$limit24h['allowed'];
-                    $canWithdraw = ($user->balance ?? 0) >= 10000 
+                    $canWithdraw = ($user->balance ?? 0) >= $minWithdraw 
                         && $user->hasVerifiedEmail() 
                         && $user->hasTransactionPin() 
                         && isset($bankAccounts) 
@@ -271,7 +310,7 @@
                         <div>
                             <div class="flex items-center justify-between mb-1.5">
                                 <label class="block text-xs font-bold text-slate-800">Jumlah Penarikan <span class="text-red-500">*</span></label>
-                                @if(($user->balance ?? 0) >= 10000 && $user->hasVerifiedEmail())
+                                @if(($user->balance ?? 0) >= $minWithdraw && $user->hasVerifiedEmail())
                                     <button type="button" id="btn-tarik-semua" class="text-[11px] font-bold text-[#0066FF] hover:text-[#0052CC] hover:underline cursor-pointer">
                                         Tarik Semua ({{ format_rupiah($user->balance) }})
                                     </button>
@@ -284,15 +323,28 @@
                                     value="{{ old('amount') ? number_format((int) preg_replace('/\D/', '', old('amount')), 0, ',', '.') : '' }}" required
                                     @if(!$canWithdraw) disabled @endif
                                     class="pl-10 w-full px-3.5 py-3 border border-slate-200 rounded-xl text-sm font-bold text-slate-900 focus:border-[#0066FF] focus:ring-2 focus:ring-[#0066FF]/20 transition-all disabled:bg-slate-50 disabled:text-slate-400 disabled:cursor-not-allowed placeholder:font-normal placeholder:text-xs" 
-                                    placeholder="{{ !$user->hasVerifiedEmail() ? 'Verifikasi email untuk penarikan saldo' : (($user->balance ?? 0) < 10000 ? 'Saldo kurang dari Rp 10.000' : 'Contoh: 50.000') }}" />
+                                    placeholder="{{ !$user->hasVerifiedEmail() ? 'Verifikasi email untuk penarikan saldo' : (($user->balance ?? 0) < $minWithdraw ? 'Saldo kurang dari ' . format_rupiah($minWithdraw) : 'Contoh: 50.000') }}" />
                             </div>
+                            @if($canWithdraw)
+                                <div class="flex flex-wrap gap-1.5 mt-2">
+                                    @foreach([25000 => 'Rp 25rb', 50000 => 'Rp 50rb', 100000 => 'Rp 100rb', 250000 => 'Rp 250rb'] as $chipVal => $chipLabel)
+                                        @if($chipVal >= $minWithdraw && $chipVal <= ($user->balance ?? 0))
+                                            <button type="button"
+                                                data-quick-amount="{{ $chipVal }}"
+                                                class="quick-withdraw-chip px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-[#0066FF] border border-slate-200/80 hover:border-blue-200 text-[11px] font-bold transition active:scale-95 cursor-pointer">
+                                                {{ $chipLabel }}
+                                            </button>
+                                        @endif
+                                    @endforeach
+                                </div>
+                            @endif
                             <div id="amount-feedback" class="mt-1.5 text-[11px] text-slate-500">
                                 @if(!$user->hasVerifiedEmail())
                                     <span class="text-amber-600 font-medium">Verifikasi email diperlukan untuk penarikan saldo</span>
                                 @elseif($is24hBlocked)
-                                    <span class="text-amber-600 font-semibold">Penarikan dibatasi 1x per 24 jam (Sisa {{ $limit24h['remaining_text'] ?? '' }})</span>
+                                    <span class="text-amber-600 font-semibold">Penarikan dibatasi {{ $limit24h['max_limit'] ?? 3 }}x per 24 jam (Sisa {{ $limit24h['remaining_text'] ?? '' }})</span>
                                 @else
-                                    Minimum penarikan adalah <span class="font-bold text-slate-700">Rp 10.000</span>
+                                    Minimum penarikan adalah <span class="font-bold text-slate-700">{{ format_rupiah($minWithdraw) }}</span>
                                 @endif
                             </div>
                         </div>
@@ -365,10 +417,10 @@
                                     Tambah Rekening Terlebih Dahulu
                                 @elseif($user->isPinLocked())
                                     PIN Terkunci
-                                @elseif(($user->balance ?? 0) < 10000)
+                                @elseif(($user->balance ?? 0) < $minWithdraw)
                                     Saldo Tidak Mencukupi
                                 @elseif($is24hBlocked)
-                                    Batas 1x24 Jam (Sisa {{ $limit24h['remaining_text'] ?? '' }})
+                                    Batas {{ $limit24h['max_limit'] ?? 3 }}x / 24 Jam (Sisa {{ $limit24h['remaining_text'] ?? '' }})
                                 @else
                                     <span>Lanjutkan Penarikan</span>
                                     <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
@@ -479,6 +531,8 @@
                 const hasBankAccounts = {{ (isset($bankAccounts) && $bankAccounts->isNotEmpty()) ? 'true' : 'false' }};
                 const is24hLimited = {{ (isset($limit24h) && !$limit24h['allowed']) ? 'true' : 'false' }};
                 const userBalance = {{ (int) ($user->balance ?? 0) }};
+                const minWithdraw = {{ (int) $minWithdraw }};
+                const fMinWithdraw = (window.formatRupiah || (x => 'Rp ' + Number(x || 0).toLocaleString('id-ID')))(minWithdraw);
                 const amountInput = document.getElementById('amount-input');
                 const feedback = document.getElementById('amount-feedback');
                 const submitBtn = document.getElementById('btn-submit-withdraw');
@@ -504,7 +558,18 @@
                     });
                 }
 
-                function validateAmount() {
+                document.querySelectorAll('.quick-withdraw-chip').forEach(function(chip) {
+                    chip.addEventListener('click', function() {
+                        if (!amountInput) return;
+                        const val = parseInt(this.dataset.quickAmount || '0', 10);
+                        if (val > 0) {
+                            amountInput.value = val.toLocaleString('id-ID');
+                            validateAmount();
+                        }
+                    });
+                });
+
+                function validateAmount(requireNonZero = false) {
                     if (!amountInput || !feedback) return false;
 
                     if (!isEmailVerified) {
@@ -548,19 +613,19 @@
                     }
 
                     if (is24hLimited) {
-                        feedback.innerHTML = '<span class="text-amber-600 font-semibold">Penarikan dibatasi 1x per 24 jam</span>';
+                        feedback.innerHTML = '<span class="text-amber-600 font-semibold">Penarikan dibatasi {{ $limit24h["max_limit"] ?? 3 }}x per 24 jam</span>';
                         if (submitBtn) {
                             submitBtn.disabled = true;
                             submitBtn.className = 'flex-1 px-4 py-3 text-xs font-bold rounded-xl shadow-sm transition-all text-amber-800 bg-amber-100 border border-amber-300 cursor-not-allowed';
-                            submitBtn.innerHTML = 'Batas 1x24 Jam (Sisa {{ $limit24h["remaining_text"] ?? "" }})';
+                            submitBtn.innerHTML = 'Batas {{ $limit24h["max_limit"] ?? 3 }}x / 24 Jam (Sisa {{ $limit24h["remaining_text"] ?? "" }})';
                         }
                         return false;
                     }
 
                     const val = parseInt(amountInput.value.replace(/\D/g, '')) || 0;
 
-                    if (userBalance < 10000) {
-                        feedback.innerHTML = '<span class="text-amber-600 font-semibold">Saldo tidak mencukupi (minimal Rp 10.000)</span>';
+                    if (userBalance < minWithdraw) {
+                        feedback.innerHTML = `<span class="text-amber-600 font-semibold">Saldo tidak mencukupi (minimal ${fMinWithdraw})</span>`;
                         if (submitBtn) {
                             submitBtn.disabled = true;
                             submitBtn.className = 'flex-1 px-4 py-3 text-xs font-bold rounded-xl shadow-sm transition-all text-slate-500 bg-slate-300 cursor-not-allowed';
@@ -578,15 +643,15 @@
                             submitBtn.innerHTML = 'Nominal Melebihi Saldo';
                         }
                         return false;
-                    } else if (val > 0 && val < 10000) {
-                        feedback.innerHTML = '<span class="text-amber-600 font-semibold">Minimal penarikan adalah Rp 10.000</span>';
+                    } else if (val > 0 && val < minWithdraw) {
+                        feedback.innerHTML = `<span class="text-amber-600 font-semibold">Minimal penarikan adalah ${fMinWithdraw}</span>`;
                         if (submitBtn) {
                             submitBtn.disabled = true;
                             submitBtn.className = 'flex-1 px-4 py-3 text-xs font-bold rounded-xl shadow-sm transition-all text-slate-500 bg-slate-300 cursor-not-allowed';
-                            submitBtn.innerHTML = 'Minimal Rp 10.000';
+                            submitBtn.innerHTML = `Minimal ${fMinWithdraw}`;
                         }
                         return false;
-                    } else if (val >= 10000) {
+                    } else if (val >= minWithdraw) {
                         const fValid = (window.formatRupiah || (x => 'Rp ' + Number(x || 0).toLocaleString('id-ID')))(val);
                         feedback.innerHTML = `<span class="text-emerald-600 font-semibold">✓ Nominal valid: ${fValid}</span>`;
                         if (submitBtn) {
@@ -596,13 +661,15 @@
                         }
                         return true;
                     } else {
-                        feedback.innerHTML = 'Minimum penarikan adalah <span class="font-bold text-slate-700">Rp 10.000</span>';
+                        feedback.innerHTML = requireNonZero
+                            ? `<span class="text-amber-600 font-semibold">Silakan masukkan nominal penarikan minimal ${fMinWithdraw}</span>`
+                            : `Minimum penarikan adalah <span class="font-bold text-slate-700">${fMinWithdraw}</span>`;
                         if (submitBtn) {
                             submitBtn.disabled = false;
                             submitBtn.className = 'flex-1 px-4 py-3 text-xs font-bold rounded-xl shadow-md transition-all text-white bg-[#0066FF] hover:bg-[#0052CC] active:scale-95 cursor-pointer inline-flex items-center justify-center gap-1.5';
                             submitBtn.innerHTML = '<span>Lanjutkan Penarikan</span><svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>';
                         }
-                        return true;
+                        return !requireNonZero;
                     }
                 }
 
@@ -705,7 +772,7 @@
                 if (submitBtn) {
                     submitBtn.addEventListener('click', function(e) {
                         e.preventDefault();
-                        if (!validateAmount()) {
+                        if (!validateAmount(true)) {
                             if (amountInput) amountInput.focus();
                             return;
                         }

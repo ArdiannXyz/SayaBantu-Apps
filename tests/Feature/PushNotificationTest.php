@@ -141,7 +141,7 @@ class PushNotificationTest extends TestCase
         $this->assertNotFalse($swContent);
         $this->assertStringContainsString('self.registration.showNotification(title, options)', $swContent);
         $this->assertStringNotContainsString('if (!hasFocusedClient)', $swContent);
-        $this->assertStringContainsString("sayabantu-v6", $swContent);
+        $this->assertMatchesRegularExpression('/sayabantu-v\d+/', $swContent);
     }
 
     public function test_authenticated_layouts_render_push_optin_banner_and_auth_meta(): void

@@ -361,7 +361,9 @@
                 </div>
 
                 <!-- Modal Body Form -->
-                <form wire:submit="save" class="p-5 space-y-4 text-xs">
+                <form wire:submit="save"
+                      wire:confirm="{{ $isEditing ? 'Apakah Anda yakin ingin menyimpan perubahan saluran pembayaran ini?' : 'Apakah Anda yakin ingin menambahkan saluran pembayaran baru ini?' }}"
+                      class="p-5 space-y-4 text-xs">
                     <div class="grid grid-cols-2 gap-3">
                         <div>
                             <label class="block font-bold text-slate-700 mb-1">Kategori Saluran</label>

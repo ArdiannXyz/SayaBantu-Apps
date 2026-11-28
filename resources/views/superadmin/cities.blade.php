@@ -138,6 +138,7 @@
                                         <button type="button"
                                             wire:key="city-toggle-{{ $city->id }}-{{ $city->is_active ? '1' : '0' }}"
                                             wire:click="toggleStatus({{ $city->id }})"
+                                            wire:confirm="{{ $city->is_active ? 'Apakah Anda yakin ingin menonaktifkan kota layanan ' . $city->name . '?' : 'Apakah Anda yakin ingin mengaktifkan kota layanan ' . $city->name . '?' }}"
                                             wire:loading.attr="disabled"
                                             wire:target="toggleStatus({{ $city->id }})"
                                             class="inline-flex items-center gap-1.5 cursor-pointer focus:outline-none"
@@ -223,7 +224,9 @@
 
                 <!-- Modal body (form) -->
                 <div class="px-6 py-6 max-h-[70vh] overflow-y-auto">
-                    <form wire:submit.prevent="save" class="space-y-6">
+                    <form wire:submit.prevent="save"
+                        wire:confirm="{{ $editMode ? 'Apakah Anda yakin ingin menyimpan pembaruan data kota ini?' : 'Apakah Anda yakin ingin menyimpan kota layanan baru ini?' }}"
+                        class="space-y-6">
                         <div class="grid grid-cols-1 gap-4">
                             <div>
                                 <label class="text-xs font-medium text-gray-700">Provinsi</label>
@@ -338,7 +341,8 @@
                 </div>
 
                 <div class="p-6">
-                    <form wire:submit.prevent="saveProvince">
+                    <form wire:submit.prevent="saveProvince"
+                        wire:confirm="{{ $provinceEditId ? 'Apakah Anda yakin ingin menyimpan perubahan nama provinsi ini?' : 'Apakah Anda yakin ingin menambahkan provinsi baru ini?' }}">
                         <div>
                             <label class="text-xs font-medium text-gray-700">Nama Provinsi</label>
                             <input type="text" wire:model="provinceName" class="w-full mt-2 px-4 py-3 border rounded-lg" />

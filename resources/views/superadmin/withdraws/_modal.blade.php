@@ -140,7 +140,10 @@
                 <!-- Approval Form -->
                 <div class="bg-white border border-gray-200 rounded-xl p-6">
                     <h5 class="text-sm font-semibold text-gray-900 mb-4">Form Approval & Bukti Transfer</h5>
-                    <form action="{{ route('superadmin.withdraws.approve', $withdraw) }}" method="POST" enctype="multipart/form-data">
+                    <form action="{{ route('superadmin.withdraws.approve', $withdraw) }}" method="POST" enctype="multipart/form-data"
+                        data-confirm="Apakah Anda yakin ingin menyetujui dan menyelesaikan transfer penarikan saldo sebesar {{ format_rupiah($withdraw->amount) }} ke {{ $withdraw->user?->name ?? 'pengguna' }}?"
+                        data-confirm-danger="false"
+                        data-confirm-btn="Ya, Setujui Transfer">
                         @csrf
                         <div class="space-y-4">
                             <div>

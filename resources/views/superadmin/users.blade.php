@@ -256,6 +256,7 @@
                                         <button type="button"
                                             wire:key="user-toggle-{{ $user->id }}-{{ $user->status }}"
                                             wire:click="toggleStatus({{ $user->id }})"
+                                            wire:confirm="{{ $isStatusActive ? 'Apakah Anda yakin ingin menonaktifkan akun ' . $user->name . '?' : 'Apakah Anda yakin ingin mengaktifkan kembali akun ' . $user->name . '?' }}"
                                             wire:loading.attr="disabled"
                                             wire:target="toggleStatus({{ $user->id }})"
                                             class="inline-flex items-center gap-1 cursor-pointer focus:outline-none"
@@ -727,7 +728,9 @@
                 </div>
 
                 <div class="px-6 py-6 max-h-[70vh] overflow-y-auto">
-                    <form wire:submit.prevent="saveUser" class="space-y-6">
+                    <form wire:submit.prevent="saveUser"
+                        wire:confirm="{{ $showEditModal ? 'Apakah Anda yakin ingin menyimpan pembaruan data pengguna ini?' : 'Apakah Anda yakin ingin menyimpan pengguna baru ini?' }}"
+                        class="space-y-6">
                         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                             <div class="lg:col-span-2 space-y-4">
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">

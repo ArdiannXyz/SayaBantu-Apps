@@ -209,7 +209,8 @@
     </div>
 
     <!-- Form Pengaturan Fee & Pendapatan -->
-    <form wire:submit.prevent="save">
+    <form wire:submit.prevent="save"
+        wire:confirm="Apakah Anda yakin ingin menyimpan perubahan pengaturan fee & pendapatan platform ini? Perubahan akan langsung berlaku di seluruh sistem.">
         @if(session()->has('message'))
             <div class="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
                 <div class="flex items-center gap-3">

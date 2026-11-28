@@ -417,7 +417,9 @@
                     @endif
 
                     <div x-show="showForm" x-transition>
-                        <form method="POST" action="{{ route('admin.partners.reports.update', $report) }}">
+                        <form method="POST" action="{{ route('admin.partners.reports.update', $report) }}"
+                            data-confirm="Apakah Anda yakin ingin menyimpan perubahan status penanganan laporan aduan ini?"
+                            data-confirm-danger="false">
                             @csrf
                             <label class="block text-xs font-semibold text-gray-600 mb-1.5">Pilih Status Penanganan:</label>
                             <select name="status"

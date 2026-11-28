@@ -321,7 +321,9 @@
 
                 <!-- Modal Body (Scrollable Form) -->
                 <div class="flex-1 overflow-y-auto px-6 py-5 space-y-5">
-                    <form id="adminForm" wire:submit.prevent="saveUser" class="space-y-5">
+                    <form id="adminForm" wire:submit.prevent="saveUser"
+                        wire:confirm="{{ $showEditModal ? 'Apakah Anda yakin ingin menyimpan pembaruan data admin ini?' : 'Apakah Anda yakin ingin menyimpan akun admin baru ini?' }}"
+                        class="space-y-5">
                         
                         <!-- CARD 1: LEVEL WEWENANG / PERAN (ROLE SELECTOR) -->
                         <div class="bg-gray-50/70 border border-gray-200/80 rounded-2xl p-4 sm:p-5">

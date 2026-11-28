@@ -374,7 +374,8 @@
                     <p class="text-3xl font-bold">{{ format_rupiah($totalPayment) }}</p>
                 </div>
 
-                <form wire:submit.prevent="submitRequest">
+                <form wire:submit.prevent="submitRequest"
+                    wire:confirm="Apakah Anda yakin data dan bukti transfer top-up sudah sesuai dan siap dikirim untuk diverifikasi admin?">
                     <!-- QRIS -->
                     @if($qrisEnabled)
                         <div class="mb-4">

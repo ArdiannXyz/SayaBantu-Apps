@@ -39,6 +39,7 @@ Route::middleware(['auth', 'onboarded', 'mitra'])
 
         Route::get('/withdraw', [\App\Http\Controllers\WithdrawController::class, 'showForm'])->name('withdraw.form');
         Route::post('/withdraw', [\App\Http\Controllers\WithdrawController::class, 'requestWithdraw'])->name('withdraw.request');
+        Route::post('/withdraw/{withdraw}/cancel', [\App\Http\Controllers\WithdrawController::class, 'cancelPendingWithdraw'])->name('withdraw.cancel');
         Route::get('/withdraw/history', [\App\Http\Controllers\WithdrawController::class, 'withdrawHistory'])->name('withdraw.history');
         Route::get('/withdraw/success/{withdraw}', [\App\Http\Controllers\WithdrawController::class, 'showSuccess'])->name('withdraw.success');
         Route::get('/withdraw/rejected/{withdraw}', [\App\Http\Controllers\WithdrawController::class, 'showRejected'])->name('withdraw.rejected');

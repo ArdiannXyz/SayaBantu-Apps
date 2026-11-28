@@ -142,26 +142,35 @@ trait HasOrderQuota
     }
 
     /**
-     * Cek apakah user terkena batas penarikan saldo 1x dalam 24 jam.
+     * Cek kuota & batas frekuensi penarikan saldo per 24 jam (berlaku untuk Customer & Mitra).
+     * Nilai `max_withdraw_per_24h` diatur dari Super Admin (default 3x, 0 = tanpa batas frekuensi).
      */
     public function getWithdraw24hLimitStatus(): array
     {
-        $latest = \App\Models\WithdrawRequest::where('user_id', $this->id)
+        $maxPer24h = max(0, (int) \App\Models\AppSetting::get('max_withdraw_per_24h', 3));
+
+        $recentWithdraws = \App\Models\WithdrawRequest::where('user_id', $this->id)
             ->whereNotIn('status', [\App\Models\WithdrawRequest::STATUS_FAILED, 'rejected'])
             ->where('created_at', '>=', now()->subHours(24))
-            ->orderByDesc('created_at')
-            ->first();
+            ->orderBy('created_at')
+            ->get();
 
-        if (! $latest) {
+        $usedCount = $recentWithdraws->count();
+
+        if ($maxPer24h === 0 || $usedCount < $maxPer24h) {
             return [
                 'allowed' => true,
+                'max_limit' => $maxPer24h,
+                'used_count' => $usedCount,
+                'remaining_count' => $maxPer24h === 0 ? null : max(0, $maxPer24h - $usedCount),
                 'available_at' => null,
                 'remaining_text' => null,
-                'latest_withdraw' => null,
+                'latest_withdraw' => $recentWithdraws->last(),
             ];
         }
 
-        $availableAt = $latest->created_at->copy()->addHours(24);
+        $oldestInWindow = $recentWithdraws->first();
+        $availableAt = $oldestInWindow->created_at->copy()->addHours(24);
         $diffMinutes = max(1, (int) now()->diffInMinutes($availableAt, false));
         $hours = intdiv($diffMinutes, 60);
         $minutes = $diffMinutes % 60;
@@ -169,9 +178,12 @@ trait HasOrderQuota
 
         return [
             'allowed' => false,
+            'max_limit' => $maxPer24h,
+            'used_count' => $usedCount,
+            'remaining_count' => 0,
             'available_at' => $availableAt,
             'remaining_text' => $remainingText,
-            'latest_withdraw' => $latest,
+            'latest_withdraw' => $recentWithdraws->last(),
         ];
     }
 }

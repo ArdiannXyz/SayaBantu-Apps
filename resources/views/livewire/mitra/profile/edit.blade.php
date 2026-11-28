@@ -75,6 +75,7 @@
                                 <button type="button" wire:click="closeModal"
                                     class="px-4 py-2 border rounded">Batal</button>
                                 <button type="button" wire:click="save"
+                                    wire:confirm="Apakah Anda yakin ingin menyimpan perubahan profil mitra ini?"
                                     class="px-4 py-2 bg-primary-600 text-white rounded">Simpan</button>
                             </div>
                         </div>

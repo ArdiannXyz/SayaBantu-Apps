@@ -6,23 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="color-scheme" content="only light">
     <meta name="supported-color-schemes" content="only light">
-    <meta name="theme-color" content="#ffffff">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Daftar Bantuan Tersedia - sayabantu.com</title>
     <meta name="description" content="Temukan daftar layanan bantuan serabutan yang mudah, cepat, dan terpercaya di sayabantu.com.">
 
-    @php
-        $dynamicAppIcon = \App\Models\AppSetting::get('app_icon');
-        $dynamicAppIconUrl = $dynamicAppIcon && \Illuminate\Support\Facades\Storage::disk('public')->exists($dynamicAppIcon) ? asset('storage/' . $dynamicAppIcon) : null;
-    @endphp
-    @if($dynamicAppIconUrl)
-        <link rel="icon" href="{{ $dynamicAppIconUrl }}">
-        <link rel="apple-touch-icon" href="{{ $dynamicAppIconUrl }}">
-    @else
-        <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicon-32x32.png') }}">
-        <link rel="icon" type="image/svg+xml" href="{{ asset('icons/icon.svg') }}">
-        <link rel="shortcut icon" href="{{ asset('favicon.ico') }}">
-    @endif
+    @include('partials.pwa-head')
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -348,6 +336,7 @@
         }
     </script>
     @livewireScripts
+    @include('partials.pwa-install', ['showPwaInstallBanner' => false])
 </body>
 
 </html>

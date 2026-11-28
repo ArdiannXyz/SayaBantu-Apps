@@ -57,6 +57,7 @@
                         Tandai Dibaca
                     </button>
                     <button type="button" wire:click="bulkDelete"
+                        wire:confirm="Apakah Anda yakin ingin menghapus {{ count($selected) }} notifikasi terpilih?"
                         class="px-3 py-1.5 rounded-lg bg-red-600 text-white text-xs font-medium hover:bg-red-700">
                         Hapus
                     </button>
@@ -140,6 +141,7 @@
                                     @endif
                                     <button type="button"
                                         wire:click="deleteNotification('{{ $notification->id }}')"
+                                        wire:confirm="Apakah Anda yakin ingin menghapus notifikasi ini?"
                                         class="text-xs font-semibold text-red-500 hover:underline">
                                         Hapus
                                     </button>

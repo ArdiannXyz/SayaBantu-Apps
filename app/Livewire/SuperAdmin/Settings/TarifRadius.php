@@ -21,6 +21,10 @@ class TarifRadius extends Component
 
     public $show_whatsapp_button = false;
 
+    public $min_withdraw_nominal;
+
+    public $max_withdraw_per_24h;
+
     protected function rules()
     {
         return [
@@ -28,6 +32,8 @@ class TarifRadius extends Component
             'admin_fee' => 'nullable|numeric|min:0',
             'default_urgent_nominal' => 'required|numeric|min:0',
             'mitra_max_distance_km' => 'required|numeric|min:1|max:100',
+            'min_withdraw_nominal' => 'required|integer|min:1000',
+            'max_withdraw_per_24h' => 'required|integer|min:0|max:50',
         ];
     }
 
@@ -38,6 +44,8 @@ class TarifRadius extends Component
         $this->default_urgent_nominal = (int) AppSetting::get('default_urgent_nominal', 50000);
         $this->mitra_max_distance_km = (float) AppSetting::get('mitra_max_distance_km', 10);
         $this->show_whatsapp_button = AppSetting::isWhatsappEnabled();
+        $this->min_withdraw_nominal = max(1000, (int) AppSetting::get('min_withdraw_nominal', 10000));
+        $this->max_withdraw_per_24h = max(0, (int) AppSetting::get('max_withdraw_per_24h', 3));
     }
 
     public function updatedShowWhatsappButton($value)
@@ -49,7 +57,7 @@ class TarifRadius extends Component
 
     public function save()
     {
-        $nominalFields = ['min_help_nominal', 'admin_fee', 'default_urgent_nominal'];
+        $nominalFields = ['min_help_nominal', 'admin_fee', 'default_urgent_nominal', 'min_withdraw_nominal', 'max_withdraw_per_24h'];
         foreach ($nominalFields as $f) {
             if (isset($this->$f)) {
                 $this->$f = (int) preg_replace('/\D/', '', (string) $this->$f);
@@ -67,9 +75,11 @@ class TarifRadius extends Component
         AppSetting::set('max_help_radius_km', (string) $this->mitra_max_distance_km);
         AppSetting::set('mitra_search_radius', (string) $this->mitra_max_distance_km);
         AppSetting::set('show_whatsapp_button', $this->show_whatsapp_button ? '1' : '0');
+        AppSetting::set('min_withdraw_nominal', (string) $this->min_withdraw_nominal);
+        AppSetting::set('max_withdraw_per_24h', (string) $this->max_withdraw_per_24h);
 
-        session()->flash('message', 'Tarif, radius, dan pengaturan WhatsApp bantuan berhasil disimpan.');
-        $this->dispatch('settingsSaved', message: 'Tarif, radius, dan pengaturan WhatsApp bantuan berhasil disimpan.');
+        session()->flash('message', 'Tarif, radius, kuota penarikan, dan pengaturan WhatsApp berhasil disimpan.');
+        $this->dispatch('settingsSaved', message: 'Tarif, radius, kuota penarikan, dan pengaturan WhatsApp berhasil disimpan.');
     }
 
     public function render()

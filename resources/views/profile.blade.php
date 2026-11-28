@@ -185,11 +185,17 @@
                         </div>
                     </div>
 
-                    <!-- Tombol Top Up -->
-                    <a href="{{ route('customer.topup') }}" wire:navigate 
-                       class="relative z-10 px-4 py-2 rounded-xl text-xs font-bold text-[#0066FF] bg-white hover:bg-blue-50 active:scale-95 transition shadow-sm shrink-0 flex items-center justify-center">
-                        Top Up
-                    </a>
+                    <!-- Tombol Top Up & Tarik Saldo -->
+                    <div class="relative z-10 flex items-center gap-1.5 shrink-0">
+                        <a href="{{ route('customer.topup') }}" wire:navigate 
+                           class="px-3.5 py-2 rounded-xl text-xs font-bold text-[#0066FF] bg-white hover:bg-blue-50 active:scale-95 transition shadow-sm flex items-center justify-center">
+                            Top Up
+                        </a>
+                        <a href="{{ route('customer.withdraw.form') }}" wire:navigate 
+                           class="px-3.5 py-2 rounded-xl text-xs font-bold text-white bg-white/20 hover:bg-white/30 border border-white/30 active:scale-95 transition flex items-center justify-center">
+                            Tarik
+                        </a>
+                    </div>
                 </div>
             </div>
             @endif
@@ -410,6 +416,20 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
                             </svg>
                             <span class="text-sm font-semibold text-gray-800 group-hover:text-[#0066FF] transition">Metode Pembayaran</span>
+                        </div>
+                        <svg class="w-4 h-4 text-gray-400 group-hover:text-[#0066FF] transition shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </a>
+
+                    <!-- 3b. Rekening & PIN Penarikan -->
+                    <a href="{{ route('customer.bank-accounts') }}" wire:navigate 
+                       class="py-4 px-2 flex items-center justify-between hover:bg-slate-50/80 active:bg-slate-100/70 rounded-2xl transition group cursor-pointer">
+                        <div class="flex items-center gap-4 min-w-0">
+                            <svg class="w-5 h-5 text-slate-700 group-hover:text-[#0066FF] transition shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                            </svg>
+                            <span class="text-sm font-semibold text-gray-800 group-hover:text-[#0066FF] transition">Rekening &amp; PIN Penarikan</span>
                         </div>
                         <svg class="w-4 h-4 text-gray-400 group-hover:text-[#0066FF] transition shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />

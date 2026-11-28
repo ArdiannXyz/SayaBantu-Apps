@@ -122,6 +122,7 @@
 
                     <div class="flex items-center gap-3 shrink-0">
                         <button type="button" wire:click="toggleWhatsapp" wire:loading.attr="disabled"
+                            wire:confirm="{{ $show_whatsapp_button ? 'Apakah Anda yakin ingin menyembunyikan tombol WhatsApp di halaman detail bantuan?' : 'Apakah Anda yakin ingin menampilkan kembali tombol WhatsApp di halaman detail bantuan?' }}"
                             class="relative inline-flex h-7 w-14 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-[#0066FF] focus:ring-offset-2 {{ $show_whatsapp_button ? 'bg-emerald-600' : 'bg-gray-300' }}"
                             role="switch" aria-checked="{{ $show_whatsapp_button ? 'true' : 'false' }}">
                             <span class="sr-only">Toggle WhatsApp Button</span>

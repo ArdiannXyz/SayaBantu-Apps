@@ -78,7 +78,9 @@
                         <button type="button" wire:click="bulkMarkAsRead" class="px-2.5 py-1.5 rounded-lg bg-blue-600 text-white text-xs font-medium hover:bg-blue-700 whitespace-nowrap">
                             Dibaca
                         </button>
-                        <button type="button" wire:click="bulkDelete" class="px-2.5 py-1.5 rounded-lg bg-red-600 text-white text-xs font-medium hover:bg-red-700 whitespace-nowrap">
+                        <button type="button" wire:click="bulkDelete"
+                            wire:confirm="Apakah Anda yakin ingin menghapus {{ count($selected) }} notifikasi terpilih?"
+                            class="px-2.5 py-1.5 rounded-lg bg-red-600 text-white text-xs font-medium hover:bg-red-700 whitespace-nowrap">
                             Hapus
                         </button>
                         <button type="button" wire:click="clearSelection" class="p-1 text-gray-400 hover:text-gray-600 text-xs">
@@ -274,7 +276,9 @@
                                             @if($isUnread)
                                                 <button type="button" wire:click.stop="markAsRead('{{ $notification->id }}')" class="text-xs font-semibold text-emerald-600 hover:underline">Tandai Dibaca</button>
                                             @endif
-                                            <button type="button" wire:click.stop="deleteNotification('{{ $notification->id }}')" class="text-xs font-semibold text-red-500 hover:underline ml-auto">Hapus</button>
+                                            <button type="button" wire:click.stop="deleteNotification('{{ $notification->id }}')"
+                                                wire:confirm="Apakah Anda yakin ingin menghapus notifikasi ini?"
+                                                class="text-xs font-semibold text-red-500 hover:underline ml-auto">Hapus</button>
                                         @endif
                                     </div>
                                 </div>

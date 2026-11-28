@@ -121,7 +121,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="color-scheme" content="only light">
     <meta name="supported-color-schemes" content="only light">
-    <meta name="theme-color" content="#ffffff">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="sb-authenticated" content="{{ auth()->check() ? '1' : '0' }}">
     <meta name="sb-vapid-key" content="{{ config('webpush.vapid.public_key') }}">
@@ -130,20 +129,7 @@
     <meta name="sb-push-unsubscribe-url" content="{{ route('api.push.unsubscribe', [], false) }}">
     <meta name="sb-push-test-url" content="{{ route('api.push.test', [], false) }}">
     <title>{{ $pageTitle }} - sayabantu</title>
-    <!-- Favicon & Icons -->
-    @php
-        $dynamicAppIcon = \App\Models\AppSetting::get('app_icon');
-        $dynamicAppIconUrl = $dynamicAppIcon && \Illuminate\Support\Facades\Storage::disk('public')->exists($dynamicAppIcon) ? asset('storage/' . $dynamicAppIcon) : null;
-    @endphp
-    @if($dynamicAppIconUrl)
-        <link rel="icon" href="{{ $dynamicAppIconUrl }}">
-        <link rel="apple-touch-icon" href="{{ $dynamicAppIconUrl }}">
-    @else
-        <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicon-32x32.png') }}">
-        <link rel="icon" type="image/svg+xml" href="{{ asset('icons/icon.svg') }}">
-        <link rel="shortcut icon" href="{{ asset('favicon.ico') }}">
-        <link rel="apple-touch-icon" href="{{ asset('icons/icon-192x192.png') }}">
-    @endif
+    @include('partials.pwa-head')
     <!-- Fonts: Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -818,13 +804,7 @@
             });
         </script>
     @endif
-    <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js').catch(() => {});
-            });
-        }
-    </script>
+    @include('partials.pwa-install', ['showPwaInstallBanner' => false])
     @include('partials.push-optin-banner')
 </body>
 

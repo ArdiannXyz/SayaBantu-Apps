@@ -1,17 +1,30 @@
-const CACHE_NAME = 'sayabantu-v6';
+const CACHE_NAME = 'sayabantu-v11';
 const ASSETS_TO_CACHE = [
   '/',
   '/manifest.json',
   '/icons/icon-192x192.png',
   '/icons/icon-512x512.png',
+  '/icons/apple-touch-icon.png',
   '/icons/icon.svg'
 ];
 
 // Install Event
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS_TO_CACHE);
+    caches.open(CACHE_NAME).then(async (cache) => {
+      await Promise.allSettled(
+        ASSETS_TO_CACHE.map(async (assetUrl) => {
+          try {
+            const response = await fetch(assetUrl, {
+              credentials: 'same-origin',
+              headers: { 'ngrok-skip-browser-warning': '1' }
+            });
+            if (response && response.ok) {
+              await cache.put(assetUrl, response);
+            }
+          } catch (e) {}
+        })
+      );
     }).then(() => self.skipWaiting())
   );
 });
@@ -33,18 +46,30 @@ self.addEventListener('activate', (event) => {
 
 // Fetch Event
 self.addEventListener('fetch', (event) => {
-  // Hanya proses GET request
+  // Hanya proses GET request same-origin
   if (event.request.method !== 'GET') return;
 
   const url = new URL(event.request.url);
+  if (url.origin !== self.location.origin) return;
 
-  // PENTING: Jangan interupsi atau cache halaman navigasi dinamis / Livewire
+  // Pastikan start_url ('/') mendukung network-first dengan offline fallback
+  // agar syarat installability PWA di mobile browser terpenuhi penuh.
+  if (event.request.mode === 'navigate' && url.pathname === '/') {
+    event.respondWith(
+      fetch(event.request).catch(() => caches.match('/'))
+    );
+    return;
+  }
+
+  // Jangan interupsi atau cache halaman navigasi dinamis / Livewire lainnya
   // agar perpindahan halaman Livewire (wire:navigate) instan & tidak konflik dengan cache lama.
   if (
     event.request.mode === 'navigate' ||
     event.request.headers.get('X-Livewire-Navigate') ||
     url.pathname.startsWith('/login') ||
     url.pathname.startsWith('/register') ||
+    url.pathname.startsWith('/onboarding') ||
+    url.pathname.startsWith('/bantuan') ||
     url.pathname.startsWith('/customer') ||
     url.pathname.startsWith('/mitra') ||
     url.pathname.startsWith('/admin') ||
@@ -53,12 +78,13 @@ self.addEventListener('fetch', (event) => {
     url.pathname.startsWith('/api') ||
     url.pathname.startsWith('/chat') ||
     url.pathname.startsWith('/profile') ||
-    url.pathname.startsWith('/settings')
+    url.pathname.startsWith('/settings') ||
+    url.pathname.startsWith('/storage')
   ) {
-    return; // Browser & Livewire menangani langsung via jaringan secara native
+    return;
   }
 
-  // Untuk aset statis (gambar, icon, css build, js build), gunakan cache-first fallback network
+  // Untuk aset statis (gambar, icon, css build, js build, manifest), cache-first fallback network
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
       if (cachedResponse) {
@@ -73,8 +99,6 @@ self.addEventListener('fetch', (event) => {
         }
         return networkResponse;
       });
-    }).catch(() => {
-      return caches.match('/');
     })
   );
 });
@@ -128,8 +152,6 @@ self.addEventListener('push', (event) => {
     options.image = data.image;
   }
 
-  // Selalu tampilkan notifikasi native OS / perangkat (Windows Action Center via Edge/Chrome,
-  // heads-up notification tray di Android) baik saat tab aktif, diminimize, maupun ditutup.
   event.waitUntil(
     Promise.all([
       self.registration.showNotification(title, options),
@@ -189,4 +211,3 @@ self.addEventListener('notificationclick', (event) => {
     })
   );
 });
-

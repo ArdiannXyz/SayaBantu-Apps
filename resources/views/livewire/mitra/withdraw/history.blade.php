@@ -103,25 +103,40 @@
                         $y = $dt->format('Y');
                         $time = $dt->format('H:i');
                         $dateFormatted = "{$d} {$m} {$y}, {$time}";
+                        $statusBadgeClass = match($tx->status ?? '') {
+                            'success' => 'bg-emerald-50 text-emerald-700 border-emerald-200',
+                            'failed' => 'bg-rose-50 text-rose-700 border-rose-200',
+                            'processing' => 'bg-blue-50 text-blue-700 border-blue-200',
+                            default => 'bg-amber-50 text-amber-700 border-amber-200',
+                        };
                     @endphp
-                    <div class="py-3.5 flex items-center justify-between gap-3 hover:bg-slate-50/50 transition px-1 rounded-xl">
+                    @if(!empty($tx->detail_url))
+                    <a href="{{ $tx->detail_url }}" wire:navigate class="py-3.5 flex items-center justify-between gap-3 hover:bg-slate-50/80 transition px-1.5 rounded-xl cursor-pointer">
+                    @else
+                    <div class="py-3.5 flex items-center justify-between gap-3 hover:bg-slate-50/50 transition px-1.5 rounded-xl">
+                    @endif
                         <!-- Left: Icon + Info -->
                         <div class="flex items-center gap-3 min-w-0">
                             <div class="w-10 h-10 rounded-2xl bg-blue-50 text-[#0066FF] border border-blue-100/70 flex items-center justify-center flex-shrink-0">
                                 @if($tx->type === 'income')
-                                    <!-- House / Order building icon matching Mockup -->
                                     <svg class="w-5 h-5 text-[#0066FF]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
                                     </svg>
                                 @else
-                                    <!-- Bank / Building / Card icon matching Mockup -->
                                     <svg class="w-5 h-5 text-[#0066FF]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
                                     </svg>
                                 @endif
                             </div>
                             <div class="min-w-0">
-                                <h3 class="text-xs font-bold text-gray-900 truncate">{{ $tx->title }}</h3>
+                                <div class="flex items-center gap-1.5 flex-wrap">
+                                    <h3 class="text-xs font-bold text-gray-900 truncate">{{ $tx->title }}</h3>
+                                    @if(!empty($tx->status_label))
+                                        <span class="px-1.5 py-0.5 rounded-full text-[9px] font-bold border {{ $statusBadgeClass }}">
+                                            {{ $tx->status_label }}
+                                        </span>
+                                    @endif
+                                </div>
                                 <p class="text-[11px] text-gray-500 truncate mt-0.5">{{ $tx->subtitle }}</p>
                                 <p class="text-[10px] text-gray-400 mt-0.5">{{ $dateFormatted }}</p>
                             </div>
@@ -134,12 +149,19 @@
                                     + {{ format_rupiah($tx->amount) }}
                                 </span>
                             @else
-                                <span class="text-xs font-bold text-red-500">
+                                <span class="text-xs font-bold text-red-500 block">
                                     - {{ format_rupiah($tx->amount) }}
                                 </span>
+                                @if(!empty($tx->detail_url))
+                                    <span class="text-[10px] text-[#0066FF] font-semibold">Lihat detail &rsaquo;</span>
+                                @endif
                             @endif
                         </div>
+                    @if(!empty($tx->detail_url))
+                    </a>
+                    @else
                     </div>
+                    @endif
                 @empty
                     <div class="py-12 text-center">
                         <div class="w-14 h-14 bg-blue-50 text-[#0066FF] rounded-full flex items-center justify-center mx-auto mb-3">
@@ -148,7 +170,9 @@
                             </svg>
                         </div>
                         <p class="text-sm font-bold text-gray-800">Belum Ada Transaksi</p>
-                        <p class="text-xs text-gray-500 mt-1 max-w-xs mx-auto">Riwayat pendapatan dari order dan penarikan saldo Anda akan muncul di sini.</p>
+                        <p class="text-xs text-gray-500 mt-1 max-w-xs mx-auto">
+                            {{ $isCustomer ? 'Riwayat top-up, pengembalian dana, dan penarikan saldo Anda akan muncul di sini.' : 'Riwayat pendapatan dari order dan penarikan saldo Anda akan muncul di sini.' }}
+                        </p>
                     </div>
                 @endforelse
             </div>

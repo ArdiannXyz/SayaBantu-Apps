@@ -16,27 +16,7 @@
 
     <title>{{ config('app.name', 'sayabantu') }}</title>
 
-    <!-- PWA & Favicon Settings -->
-    <link rel="manifest" href="/manifest.json">
-    @php
-        $dynamicAppIcon = \App\Models\AppSetting::get('app_icon');
-        $dynamicAppIconUrl = $dynamicAppIcon && \Illuminate\Support\Facades\Storage::disk('public')->exists($dynamicAppIcon) ? asset('storage/' . $dynamicAppIcon) : null;
-    @endphp
-    @if($dynamicAppIconUrl)
-        <link rel="icon" href="{{ $dynamicAppIconUrl }}">
-        <link rel="apple-touch-icon" href="{{ $dynamicAppIconUrl }}">
-    @else
-        <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicon-32x32.png') }}">
-        <link rel="icon" type="image/svg+xml" href="{{ asset('icons/icon.svg') }}">
-        <link rel="shortcut icon" href="{{ asset('favicon.ico') }}">
-        <link rel="apple-touch-icon" href="{{ asset('icons/icon-192x192.png') }}">
-    @endif
-    <meta name="theme-color" content="#ffffff">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="SayaBantu">
-    <link rel="apple-touch-icon" href="{{ asset('icons/icon-192x192.png') }}">
+    @include('partials.pwa-head')
 
     <!-- Fonts: Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -953,75 +933,7 @@
     </script>
 
     <!-- PWA Service Worker & Install Banner -->
-    <div id="pwa-install-banner" class="hidden fixed bottom-20 left-4 right-4 max-w-sm mx-auto bg-gray-900/95 backdrop-blur-md text-white p-4 rounded-2xl shadow-2xl border border-gray-700/80 z-[99999] flex items-center justify-between gap-3 animate-slide-up">
-        <div class="flex items-center gap-2.5 min-w-0">
-            <img src="{{ $dynamicAppIconUrl ?: '/icons/icon-192x192.png' }}" alt="SayaBantu" class="w-9 h-9 rounded-xl shadow-xs shrink-0 object-contain bg-white">
-            <div class="min-w-0">
-                <h4 class="text-xs font-bold text-white leading-tight line-clamp-2">Pasang Aplikasi SayaBantu</h4>
-                <p class="text-[11px] text-gray-300 leading-tight mt-0.5 hidden min-[360px]:block">Akses cepat & instan di HP Anda</p>
-            </div>
-        </div>
-        <div class="flex items-center gap-1.5 shrink-0">
-            <button id="pwa-install-btn" type="button" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold rounded-xl shadow-xs transition active:scale-95 cursor-pointer">
-                Install
-            </button>
-            <button id="pwa-dismiss-btn" type="button" class="p-1.5 text-gray-400 hover:text-white rounded-lg transition cursor-pointer">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                </svg>
-            </button>
-        </div>
-    </div>
-
-    <script>
-        if (!window._pwaScriptLoaded) {
-        window._pwaScriptLoaded = true;
-        // Registrasi PWA Service Worker
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js').catch(() => {});
-            });
-        }
-
-        // PWA Install Prompt Handler
-        window._deferredPrompt = window._deferredPrompt || null;
-        const installBanner = document.getElementById('pwa-install-banner');
-        const installBtn = document.getElementById('pwa-install-btn');
-        const dismissBtn = document.getElementById('pwa-dismiss-btn');
-
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            window._deferredPrompt = e;
-            const dismissedAt = localStorage.getItem('pwa_dismissed_at');
-            if (!dismissedAt || (Date.now() - parseInt(dismissedAt)) > 86400000) {
-                if (installBanner) {
-                    installBanner.classList.remove('hidden');
-                    // Beri ruang ekstra di bawah konten agar banner tidak menutupi form.
-                    document.body.classList.add('pwa-banner-open');
-                }
-            }
-        });
-
-        if (installBtn) {
-            installBtn.addEventListener('click', async () => {
-                if (!window._deferredPrompt) return;
-                installBanner.classList.add('hidden');
-                document.body.classList.remove('pwa-banner-open');
-                window._deferredPrompt.prompt();
-                const { outcome } = await window._deferredPrompt.userChoice;
-                window._deferredPrompt = null;
-            });
-        }
-
-        if (dismissBtn) {
-            dismissBtn.addEventListener('click', () => {
-                if (installBanner) installBanner.classList.add('hidden');
-                document.body.classList.remove('pwa-banner-open');
-                localStorage.setItem('pwa_dismissed_at', Date.now().toString());
-            });
-        }
-        } // end if !_pwaScriptLoaded
-    </script>
+    @include('partials.pwa-install', ['showPwaInstallBanner' => auth()->check()])
 
     <script data-navigate-once>
         // Transisi halus dan umpan balik instan (0ms) untuk Bottom Navigation

@@ -213,7 +213,9 @@
                     </button>
                 </div>
 
-                <form wire:submit="saveAccount" class="space-y-3.5">
+                <form wire:submit="saveAccount"
+                    wire:confirm="Apakah Anda yakin ingin menyimpan rekening bank/e-wallet baru ini?"
+                    class="space-y-3.5">
                     <!-- Bank Channel Select -->
                     <div>
                         <label class="block text-xs font-bold text-slate-700 mb-1">Pilih Bank / E-Wallet <span class="text-red-500">*</span></label>
@@ -327,7 +329,9 @@
                     </p>
                 </div>
 
-                <form wire:submit="savePin" class="space-y-3.5">
+                <form wire:submit="savePin"
+                    wire:confirm="Apakah Anda yakin ingin menyimpan pengaturan PIN transaksi Anda?"
+                    class="space-y-3.5">
                     @if($pinMode === 'change')
                         <div>
                             <div class="flex items-center justify-between mb-1">

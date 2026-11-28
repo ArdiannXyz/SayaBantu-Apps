@@ -130,6 +130,7 @@
                                         <button type="button"
                                             wire:key="category-toggle-{{ $category->id }}-{{ $category->is_active ? '1' : '0' }}"
                                             wire:click="toggleStatus({{ $category->id }})"
+                                            wire:confirm="{{ $category->is_active ? 'Apakah Anda yakin ingin menonaktifkan kategori ' . $category->name . '?' : 'Apakah Anda yakin ingin mengaktifkan kategori ' . $category->name . '?' }}"
                                             wire:loading.attr="disabled"
                                             wire:target="toggleStatus({{ $category->id }})"
                                             class="inline-flex items-center gap-1.5 cursor-pointer focus:outline-none"
@@ -192,7 +193,9 @@
                 </div>
 
                 <div class="p-6 overflow-y-auto max-h-[80vh] no-scrollbar">
-                    <form wire:submit.prevent="saveCategory" class="space-y-5">
+                    <form wire:submit.prevent="saveCategory"
+                        wire:confirm="{{ $categoryId ? 'Apakah Anda yakin ingin menyimpan perubahan kategori ini?' : 'Apakah Anda yakin ingin menambahkan kategori baru ini?' }}"
+                        class="space-y-5">
                         <div class="grid grid-cols-1 gap-5">
                             <div>
                                 <label class="text-xs font-semibold text-gray-700">Nama Kategori</label>

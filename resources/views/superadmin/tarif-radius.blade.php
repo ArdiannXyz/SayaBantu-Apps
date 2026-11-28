@@ -78,7 +78,8 @@
         </div>
     </div>
 
-    <form wire:submit.prevent="save">
+    <form wire:submit.prevent="save"
+        wire:confirm="Apakah Anda yakin ingin menyimpan dan menerapkan perubahan tarif, radius, dan batas penarikan ini? Perubahan akan langsung berlaku untuk seluruh Mitra dan Customer.">
         @if(session()->has('message'))
             <div class="mb-6 p-4 bg-emerald-50 border border-emerald-200 rounded-2xl shadow-2xs">
                 <div class="flex items-center gap-3">
@@ -408,6 +409,73 @@
                             <div class="w-14 h-7 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-[#0066FF] rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-emerald-600"></div>
                         </label>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. Pengaturan Penarikan Saldo (Customer & Mitra) -->
+        <div class="bg-white rounded-2xl shadow-xs border border-blue-200/80 overflow-hidden mb-8">
+            <div class="border-b border-blue-100 px-5 sm:px-8 py-5 bg-gradient-to-r from-blue-50/80 via-white to-slate-50/40 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div class="flex items-center gap-3.5">
+                    <div class="w-11 h-11 rounded-2xl bg-[#0066FF] text-white flex items-center justify-center shrink-0 shadow-md shadow-blue-500/25">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h2 class="text-base sm:text-lg font-bold text-slate-900">Pengaturan Penarikan Saldo (Customer &amp; Mitra)</h2>
+                        <p class="text-xs sm:text-sm text-slate-500 mt-0.5">Atur nominal minimal dan batas frekuensi pengajuan tarik saldo per 24 jam</p>
+                    </div>
+                </div>
+                <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 border border-blue-200 text-xs font-bold rounded-xl self-start sm:self-auto">
+                    {{ (int) ($max_withdraw_per_24h ?? 3) === 0 ? 'Frekuensi: Tanpa Batas' : 'Batas: ' . ($max_withdraw_per_24h ?? 3) . 'x / 24 Jam' }}
+                </span>
+            </div>
+
+            <div class="p-5 sm:p-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-2">Nominal Minimal Penarikan Saldo</label>
+                    <div class="flex items-center rounded-xl border border-slate-300 bg-white hover:border-blue-400 focus-within:border-blue-600 focus-within:ring-2 focus-within:ring-blue-100 transition px-3.5 py-1 shadow-2xs">
+                        <span class="text-slate-400 font-bold text-sm mr-2 select-none">Rp</span>
+                        <input type="text"
+                            inputmode="numeric"
+                            wire:ignore
+                            x-data
+                            x-init="$el.value = ($wire.min_withdraw_nominal !== null && $wire.min_withdraw_nominal !== '') ? Number($wire.min_withdraw_nominal).toLocaleString('id-ID') : '10.000'"
+                            x-on:input="
+                                let raw = $el.value.replace(/\D/g, '');
+                                $el.value = raw ? Number(raw).toLocaleString('id-ID') : '';
+                                $wire.set('min_withdraw_nominal', raw ? parseInt(raw, 10) : 0);
+                            "
+                            value="{{ number_format((int) ($min_withdraw_nominal ?? 10000), 0, ',', '.') }}"
+                            placeholder="10.000"
+                            class="w-full py-2 text-sm sm:text-base font-bold text-slate-900 bg-transparent outline-none border-none focus:ring-0" />
+                    </div>
+                    @error('min_withdraw_nominal')
+                        <p class="mt-2 text-rose-600 text-xs font-medium">{{ $message }}</p>
+                    @enderror
+                    <p class="text-xs text-slate-500 mt-2.5 leading-relaxed">
+                        Batas minimal jumlah dana yang dapat ditarik Customer maupun Mitra (minimal Rp 1.000).
+                    </p>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-2">Maksimal Penarikan dalam 24 Jam</label>
+                    <div class="flex items-center rounded-xl border border-slate-300 bg-white hover:border-blue-400 focus-within:border-blue-600 focus-within:ring-2 focus-within:ring-blue-100 transition px-3.5 py-1 shadow-2xs">
+                        <input type="number"
+                            min="0"
+                            max="50"
+                            wire:model.live="max_withdraw_per_24h"
+                            placeholder="3"
+                            class="w-full py-2 text-sm sm:text-base font-bold text-slate-900 bg-transparent outline-none border-none focus:ring-0" />
+                        <span class="text-slate-400 font-semibold text-xs ml-2 shrink-0 select-none">kali / 24 jam</span>
+                    </div>
+                    @error('max_withdraw_per_24h')
+                        <p class="mt-2 text-rose-600 text-xs font-medium">{{ $message }}</p>
+                    @enderror
+                    <p class="text-xs text-slate-500 mt-2.5 leading-relaxed">
+                        Berlaku sama untuk Customer dan Mitra. Isi <strong>0</strong> jika ingin tanpa batas frekuensi per 24 jam (antrean tetap 1 pengajuan aktif dalam satu waktu).
+                    </p>
                 </div>
             </div>
         </div>

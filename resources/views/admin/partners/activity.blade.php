@@ -460,7 +460,9 @@
                                 </ul>
 
                                 <div class="mt-2 flex flex-wrap gap-1.5">
-                                    <form method="POST" action="{{ route('admin.partners.toggle', $selectedActivity->user_id) }}">
+                                    <form method="POST" action="{{ route('admin.partners.toggle', $selectedActivity->user_id) }}"
+                                        data-confirm="Apakah Anda yakin ingin mengubah status blokir akun {{ $selectedActivity->user?->name ?? 'mitra ini' }}?"
+                                        data-confirm-danger="true">
                                         @csrf
                                         <button type="submit"
                                             class="px-2 py-0.5 rounded text-[10px] font-semibold bg-red-600 text-white hover:bg-red-700">
@@ -469,7 +471,9 @@
                                     </form>
 
                                     <form method="POST"
-                                        action="{{ route('admin.partners.activity.reset_sessions', $selectedActivity->user_id) }}">
+                                        action="{{ route('admin.partners.activity.reset_sessions', $selectedActivity->user_id) }}"
+                                        data-confirm="Apakah Anda yakin ingin mereset semua sesi login aktif milik {{ $selectedActivity->user?->name ?? 'mitra ini' }}?"
+                                        data-confirm-danger="true">
                                         @csrf
                                         <button type="submit"
                                             class="px-2 py-0.5 rounded text-[10px] font-semibold bg-gray-800 text-white hover:bg-gray-900">
@@ -478,7 +482,9 @@
                                     </form>
 
                                     <form method="POST"
-                                        action="{{ route('admin.partners.activity.reset_password', $selectedActivity->user_id) }}">
+                                        action="{{ route('admin.partners.activity.reset_password', $selectedActivity->user_id) }}"
+                                        data-confirm="Apakah Anda yakin ingin mereset kata sandi akun {{ $selectedActivity->user?->name ?? 'mitra ini' }}?"
+                                        data-confirm-danger="true">
                                         @csrf
                                         <button type="submit"
                                             class="px-2 py-0.5 rounded text-[10px] font-semibold bg-blue-600 text-white hover:bg-blue-700">

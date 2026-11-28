@@ -113,6 +113,9 @@
             @if($withdraw->status === 'pending')
                 <div class="flex flex-col md:flex-row gap-4 mt-4">
                     <form action="{{ route('admin.withdraws.approve', $withdraw) }}" method="POST" enctype="multipart/form-data"
+                        data-confirm="Apakah Anda yakin ingin menyetujui dan menyelesaikan transfer penarikan saldo sebesar {{ format_rupiah($withdraw->amount) }} ke {{ $withdraw->user?->name ?? 'pengguna' }}?"
+                        data-confirm-danger="false"
+                        data-confirm-btn="Ya, Setujui Transfer"
                         class="flex-1 bg-white p-4 border border-gray-100 rounded">
                         @csrf
                         <div class="mb-3">

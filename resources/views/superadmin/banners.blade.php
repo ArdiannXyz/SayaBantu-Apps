@@ -161,6 +161,7 @@
 
                         <button type="button" 
                                 wire:click="togglePromosEnabled"
+                                wire:confirm="{{ $promosEnabled ? 'Apakah Anda yakin ingin menyembunyikan seluruh banner promosi dari aplikasi?' : 'Apakah Anda yakin ingin mengaktifkan dan menayangkan banner promosi di aplikasi?' }}"
                                 class="shrink-0 relative inline-flex h-6 w-12 items-center rounded-full transition-colors focus:outline-none cursor-pointer {{ $promosEnabled ? 'bg-emerald-600' : 'bg-gray-300' }}"
                                 title="Klik untuk On/Off Banner Promosi">
                             <span class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform shadow-xs {{ $promosEnabled ? 'translate-x-7' : 'translate-x-1' }}"></span>
@@ -242,6 +243,7 @@
                                 <!-- Actions -->
                                 <div class="flex items-center gap-1.5 shrink-0">
                                     <button type="button" wire:click="togglePromoActive('{{ $pId }}')"
+                                        wire:confirm="{{ $pActive ? 'Apakah Anda yakin ingin menonaktifkan iklan promosi ini?' : 'Apakah Anda yakin ingin mengaktifkan iklan promosi ini?' }}"
                                         class="px-2.5 py-1 text-xs font-semibold rounded-lg border transition cursor-pointer {{ $pActive ? 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100' : 'bg-gray-100 text-gray-600 border-gray-300 hover:bg-gray-200' }}"
                                         title="Ubah status">
                                         {{ $pActive ? 'Nonaktifkan' : 'Aktifkan' }}
@@ -518,6 +520,7 @@
 
                 <div class="flex items-center gap-2 pt-2">
                     <button type="button" wire:click.prevent="saveHome" wire:loading.attr="disabled" wire:target="homeUploads, saveHome"
+                        wire:confirm="Apakah Anda yakin ingin mengunggah dan menyimpan banner beranda ini?"
                         class="px-5 py-2.5 bg-primary-600 hover:bg-primary-700 disabled:opacity-50 text-white rounded-xl text-xs font-bold shadow-md shadow-primary-500/20 transition cursor-pointer">
                         <span wire:loading.remove wire:target="saveHome">Unggah &amp; Simpan Banner</span>
                         <span wire:loading wire:target="saveHome">Menyimpan...</span>
@@ -670,6 +673,7 @@
 
                     <div class="flex items-center gap-2 pt-1">
                         <button type="button" wire:click.prevent="saveIcon" wire:loading.attr="disabled" wire:target="iconUpload, saveIcon"
+                            wire:confirm="Apakah Anda yakin ingin menyimpan dan menerapkan ikon baru aplikasi?"
                             class="px-5 py-2.5 bg-primary-600 hover:bg-primary-700 disabled:opacity-50 text-white rounded-xl text-xs font-bold shadow-md shadow-primary-500/20 transition cursor-pointer">
                             <span wire:loading.remove wire:target="saveIcon">Simpan Ikon Baru</span>
                             <span wire:loading wire:target="saveIcon">Menyimpan...</span>
@@ -866,6 +870,7 @@
                         Batal
                     </button>
                     <button type="button" wire:click="savePromo" wire:loading.attr="disabled"
+                        wire:confirm="Apakah Anda yakin ingin menyimpan dan menerapkan iklan promosi ini?"
                         class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white rounded-xl text-xs font-bold shadow-md shadow-emerald-500/20 transition cursor-pointer">
                         <span wire:loading.remove wire:target="savePromo">Simpan Iklan</span>
                         <span wire:loading wire:target="savePromo">Menyimpan...</span>

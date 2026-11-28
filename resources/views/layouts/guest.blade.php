@@ -11,27 +11,7 @@
 
     <title>{{ config('app.name', 'sayabantu') }}</title>
 
-    <!-- PWA & Favicon Settings -->
-    <link rel="manifest" href="/manifest.json">
-    @php
-        $dynamicAppIcon = \App\Models\AppSetting::get('app_icon');
-        $dynamicAppIconUrl = $dynamicAppIcon && \Illuminate\Support\Facades\Storage::disk('public')->exists($dynamicAppIcon) ? asset('storage/' . $dynamicAppIcon) : null;
-    @endphp
-    @if($dynamicAppIconUrl)
-        <link rel="icon" href="{{ $dynamicAppIconUrl }}">
-        <link rel="apple-touch-icon" href="{{ $dynamicAppIconUrl }}">
-    @else
-        <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicon-32x32.png') }}">
-        <link rel="icon" type="image/svg+xml" href="{{ asset('icons/icon.svg') }}">
-        <link rel="shortcut icon" href="{{ asset('favicon.ico') }}">
-        <link rel="apple-touch-icon" href="{{ asset('icons/icon-192x192.png') }}">
-    @endif
-    <meta name="theme-color" content="#ffffff">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="SayaBantu">
-    <link rel="apple-touch-icon" href="{{ asset('icons/icon-192x192.png') }}">
+    @include('partials.pwa-head')
 
     <!-- Fonts: Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -148,6 +128,7 @@
     </div>
     <x-camera-modal />
     @livewireScripts
+    @include('partials.pwa-install', ['showPwaInstallBanner' => request()->routeIs('login', 'admin.login')])
 </body>
 
 </html>

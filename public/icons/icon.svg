@@ -1,56 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
-  <defs>
-    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#0066FF" />
-      <stop offset="100%" stop-color="#0047b3" />
-    </linearGradient>
-    <filter id="dropShadow" x="-10%" y="-10%" width="130%" height="130%">
-      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#001a4d" flood-opacity="0.35"/>
-    </filter>
-  </defs>
-
-  <!-- Background rounded rectangle -->
-  <rect width="512" height="512" rx="115" fill="url(#bgGradient)"/>
-
-  <!-- Subtle inner ambient glow -->
-  <circle cx="256" cy="256" r="185" fill="#ffffff" opacity="0.08"/>
-
-  <!-- Official SayaBantu OK-Hand Logo Icon -->
-  <g filter="url(#dropShadow)" transform="translate(116, 92) scale(3.5)">
-    <!-- Blue crescent / cuff at bottom (white on brand blue for maximum pop) -->
-    <path d="M14 68 Q6 84 28 90 Q52 96 64 78 Q54 88 38 86 Q22 82 14 68Z" fill="#ffffff" opacity="0.95"/>
-
-    <!-- OK Hand in vibrant golden yellow (#FFC107) -->
-    <path fill-rule="evenodd" clip-rule="evenodd"
-        d="M38 72
-           C26 72 16 62 16 50
-           C16 43 19 36 25 31
-           L18 12
-           C17 8 20 5 24 6
-           C28 7 30 10 31 14
-           L34 27
-           L36 10
-           C37 6 41 4 45 5
-           C49 6 51 10 50 14
-           L48 27
-           L51 13
-           C52 9 56 7 60 9
-           C64 11 65 15 63 19
-           L58 33
-           C64 29 70 31 72 37
-           C74 43 70 50 65 53
-           L54 63
-           C49 69 44 72 38 72
-           Z
-           M40 48
-           C35 48 31 52 31 57
-           C31 62 35 66 40 66
-           C45 66 49 62 49 57
-           C49 52 45 48 40 48
-           Z"
-        fill="#FFC107"/>
-
-    <!-- Inner circle fill in the OK hand circle for crisp contrast -->
-    <circle cx="40" cy="57" r="7" fill="#ffffff" opacity="0.9"/>
-  </g>
+  <circle cx="256" cy="256" r="240" fill="#0284c7"/>
+  <circle cx="256" cy="256" r="135.5" fill="none" stroke="#ffffff" stroke-width="35"/>
+  <circle cx="256" cy="235" r="56" fill="#ffffff"/>
+  <circle cx="378" cy="143" r="30" fill="#fbbf24"/>
 </svg>

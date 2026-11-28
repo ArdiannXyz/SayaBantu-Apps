@@ -34,7 +34,9 @@ x-on:profile-saved.window="
         </div>
     </div>
 
-    <form wire:submit.prevent="updateProfileInformation" class="space-y-5">
+    <form wire:submit.prevent="updateProfileInformation"
+        wire:confirm="Apakah Anda yakin ingin menyimpan perubahan informasi profil Anda?"
+        class="space-y-5">
 
         @if(!optional(auth()->user())->verified && (empty(auth()->user()->ktp_photo) || empty(auth()->user()->selfie_photo)))
             @if(optional(auth()->user())->isMitra())

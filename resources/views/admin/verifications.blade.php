@@ -406,13 +406,13 @@
                             </div>
                         </div>
 
-                        <div class="sticky bottom-0 bg-white border-t border-gray-100 px-6 py-4 rounded-b-lg shadow-lg">
+                        <div class="sticky bottom-0 bg-white border-t border-gray-100 px-4 sm:px-6 py-4 rounded-b-lg shadow-lg">
                             @if(!$showRejectForm)
-                                <div class="flex items-center justify-between gap-4">
+                                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
                                     <div class="text-xs text-gray-500"> 
                                         <span class="font-semibold">Catatan:</span> Pastikan dokumen terlihat jelas dan sesuai dengan data.
                                     </div>
-                                    <div class="flex items-center gap-3">
+                                    <div class="flex flex-wrap items-center justify-end gap-2 sm:gap-3">
                                         <button type="button" wire:click="closeModal" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-lg transition">
                                             Tutup
                                         </button>
@@ -423,7 +423,7 @@
                                                 </svg>
                                                 Tolak
                                             </button>
-                                            <button type="button" wire:click="approveKtp({{ $selected->id }})" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-lg shadow transition flex items-center gap-2">
+                                            <button type="button" wire:click="approveKtp({{ $selected->id }})" wire:confirm="Apakah Anda yakin ingin menyetujui dan memverifikasi KTP pengguna ini?" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-lg shadow transition flex items-center gap-2">
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                                                 </svg>
@@ -475,7 +475,7 @@
                                         <button type="button" wire:click="cancelRejectForm" class="px-4 py-2 bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-lg text-sm font-medium transition">
                                             Batal
                                         </button>
-                                        <button type="button" wire:click="confirmReject" class="px-5 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-bold shadow-md transition flex items-center gap-2">
+                                        <button type="button" wire:click="confirmReject" wire:confirm="Apakah Anda yakin ingin menolak pengajuan verifikasi KTP pengguna ini?" class="px-5 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-bold shadow-md transition flex items-center gap-2">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                                             </svg>

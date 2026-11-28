@@ -87,9 +87,9 @@ window.alert = function (message) {
         confirmButtonText: 'Oke, Mengerti',
         buttonsStyling: false,
         customClass: {
-            popup: 'rounded-3xl shadow-2xl p-6 border border-gray-100 font-sans max-w-sm',
+            popup: 'rounded-3xl shadow-2xl p-5 sm:p-6 border border-gray-100 font-sans !w-[calc(100vw-2rem)] sm:!w-full max-w-sm',
             confirmButton: `w-full py-3 px-5 rounded-xl font-bold text-xs ${confirmBtnClass} shadow-md transition active:scale-95 cursor-pointer mt-3`,
-            htmlContainer: 'text-xs text-gray-600 mt-2 leading-relaxed font-medium',
+            htmlContainer: 'text-xs text-gray-600 mt-2 leading-relaxed font-medium break-words',
         }
     });
 };
@@ -111,16 +111,17 @@ window.sbConfirm = function({
         text: text,
         icon: icon,
         showCancelButton: true,
+        reverseButtons: true,
         confirmButtonText: confirmButtonText,
         cancelButtonText: cancelButtonText,
         buttonsStyling: false,
         customClass: {
-            popup: 'rounded-3xl shadow-2xl p-6 border border-gray-100 font-sans max-w-sm',
+            popup: 'rounded-3xl shadow-2xl p-5 sm:p-6 border border-gray-100 font-sans !w-[calc(100vw-2rem)] sm:!w-full max-w-sm',
             title: 'text-base font-extrabold text-gray-900',
-            htmlContainer: 'text-xs text-gray-600 mt-1 leading-relaxed font-medium',
-            actions: 'flex gap-2.5 w-full mt-4',
-            confirmButton: `flex-1 py-3 px-4 rounded-xl font-bold text-xs ${isDanger ? 'bg-red-600 hover:bg-red-700' : 'bg-[#0066FF] hover:bg-[#0052cc]'} text-white shadow-md transition active:scale-95 cursor-pointer`,
-            cancelButton: 'flex-1 py-3 px-4 rounded-xl font-semibold text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 transition active:scale-95 cursor-pointer'
+            htmlContainer: 'text-xs text-gray-600 mt-1 leading-relaxed font-medium break-words',
+            actions: 'flex flex-col-reverse sm:flex-row gap-2 sm:gap-2.5 w-full mt-4',
+            confirmButton: `w-full sm:flex-1 py-3 px-4 rounded-xl font-bold text-xs ${isDanger ? 'bg-red-600 hover:bg-red-700' : 'bg-[#0066FF] hover:bg-[#0052cc]'} text-white shadow-md transition active:scale-95 cursor-pointer`,
+            cancelButton: 'w-full sm:flex-1 py-3 px-4 rounded-xl font-semibold text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 transition active:scale-95 cursor-pointer'
         }
     });
 };
@@ -274,17 +275,18 @@ function wrapLivewireConfirmElement(el, expr, modifiers = []) {
                 input: 'text',
                 inputPlaceholder: expected,
                 showCancelButton: true,
+                reverseButtons: true,
                 confirmButtonText: 'Konfirmasi',
                 cancelButtonText: 'Batal',
                 buttonsStyling: false,
                 customClass: {
-                    popup: 'rounded-3xl shadow-2xl p-6 border border-gray-100 font-sans max-w-sm',
+                    popup: 'rounded-3xl shadow-2xl p-5 sm:p-6 border border-gray-100 font-sans !w-[calc(100vw-2rem)] sm:!w-full max-w-sm',
                     title: 'text-base font-extrabold text-gray-900',
-                    htmlContainer: 'text-xs text-gray-600 mt-1 leading-relaxed font-medium',
+                    htmlContainer: 'text-xs text-gray-600 mt-1 leading-relaxed font-medium break-words',
                     input: 'w-full px-3 py-2 text-xs border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 my-3',
-                    actions: 'flex gap-2.5 w-full mt-2',
-                    confirmButton: 'flex-1 py-3 px-4 rounded-xl font-bold text-xs bg-red-600 hover:bg-red-700 text-white shadow-md transition active:scale-95 cursor-pointer',
-                    cancelButton: 'flex-1 py-3 px-4 rounded-xl font-semibold text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 transition active:scale-95 cursor-pointer'
+                    actions: 'flex flex-col-reverse sm:flex-row gap-2 sm:gap-2.5 w-full mt-2',
+                    confirmButton: 'w-full sm:flex-1 py-3 px-4 rounded-xl font-bold text-xs bg-red-600 hover:bg-red-700 text-white shadow-md transition active:scale-95 cursor-pointer',
+                    cancelButton: 'w-full sm:flex-1 py-3 px-4 rounded-xl font-semibold text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 transition active:scale-95 cursor-pointer'
                 }
             }).then((result) => {
                 if (result.isConfirmed) {
@@ -354,7 +356,15 @@ document.addEventListener('click', function(e) {
     }
 
     if (el) {
-        wrapLivewireConfirmElement(el, el.getAttribute('wire:confirm'));
+        wrapLivewireConfirmElement(el, el.getAttribute('wire:confirm') || el.getAttribute('wire:confirm.prompt'));
+    }
+}, true);
+
+// Pastikan submit form (misalnya via tombol Enter) juga memakai SweetAlert2 sbConfirm
+document.addEventListener('submit', function(e) {
+    const form = e.target;
+    if (form && form.hasAttribute && (form.hasAttribute('wire:confirm') || form.hasAttribute('wire:confirm.prompt'))) {
+        wrapLivewireConfirmElement(form, form.getAttribute('wire:confirm') || form.getAttribute('wire:confirm.prompt'));
     }
 }, true);
 

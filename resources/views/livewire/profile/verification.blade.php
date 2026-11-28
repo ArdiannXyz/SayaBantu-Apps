@@ -80,7 +80,9 @@
         </div>
     @endif
 
-    <form wire:submit="save" class="space-y-6">
+    <form wire:submit="save"
+        wire:confirm="Apakah Anda yakin data NIK, foto KTP, dan foto selfie sudah benar dan siap dikirim untuk verifikasi?"
+        class="space-y-6">
         <!-- NIK Input -->
         <div>
             <div class="flex items-center justify-between mb-1.5">

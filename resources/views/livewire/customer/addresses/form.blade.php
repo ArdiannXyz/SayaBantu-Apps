@@ -36,7 +36,9 @@
 
     <!-- Main Content Form -->
     <div class="max-w-md mx-auto px-4 pt-1 space-y-4 relative z-10">
-        <form wire:submit.prevent="save" class="space-y-4">
+        <form wire:submit.prevent="save"
+              wire:confirm="{{ $isEdit ? 'Apakah Anda yakin ingin menyimpan perubahan alamat ini?' : 'Apakah Anda yakin ingin menyimpan alamat baru ini?' }}"
+              class="space-y-4">
             <!-- Card 1: Kontak Penerima -->
             <div class="bg-white rounded-2xl border border-slate-200/80 shadow-2xs p-4 sm:p-5 space-y-3.5">
                 <div class="flex items-center gap-2 border-b border-slate-100 pb-2.5">

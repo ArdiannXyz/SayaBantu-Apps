@@ -1680,6 +1680,7 @@
                 {{-- Action Buttons --}}
                 <div class="space-y-2">
                     <button wire:click="acceptPartnerCancellation" 
+                            wire:confirm="Apakah Anda yakin ingin menyetujui permintaan pembatalan mitra ini? Pesanan akan dilepas agar bisa diambil mitra lain."
                             wire:loading.attr="disabled"
                             class="w-full px-5 py-3 bg-green-600 text-white rounded-xl font-semibold hover:bg-green-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
                         <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -1689,6 +1690,7 @@
                         <span wire:loading wire:target="acceptPartnerCancellation">Memproses...</span>
                     </button>
                     <button wire:click="rejectPartnerCancellation"
+                            wire:confirm="Apakah Anda yakin ingin menolak permintaan pembatalan mitra ini?"
                             wire:loading.attr="disabled"
                             class="w-full px-5 py-3 bg-gray-100 text-gray-700 rounded-xl font-semibold hover:bg-gray-200 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
